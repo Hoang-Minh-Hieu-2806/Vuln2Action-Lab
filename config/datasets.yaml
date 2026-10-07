@@ -1,0 +1,12 @@
+# Dataset registry. No automatic downloads: use scripts/download_data.py explicitly.
+datasets:
+  samples:
+    path: data/samples/sample_cves.json
+    description: Fake sample CVEs for offline pipeline smoke tests.
+  benchmark:
+    path: evaluation/datasets/benchmark.json
+    description: Placeholder benchmark schema (to be extended in Phase 7).
+  # Future (Phase 2+), all opt-in:
+  # nvd_snapshot:
+  #   path: data/raw/nvd_snapshot.json
+  #   source: https://nvd.nist.gov/  # download manually via script

@@ -1,0 +1,13 @@
+{
+  "version": "0.1.0",
+  "description": "Placeholder benchmark schema. Real cases to be added in Phase 7. No fabricated scores.",
+  "cases": [
+    {
+      "case_id": "BENCH-001",
+      "cve_id": "CVE-2024-0001",
+      "lab_id": "cve-001",
+      "expected_verdict": "PASS",
+      "notes": "SAMPLE placeholder linking the fake CVE to its demo lab."
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+# Core runtime dependencies (minimal, student-friendly).
+# Heavy ML frameworks (torch/transformers) are intentionally NOT required here;
+# they are optional for a future local T5 implementation.
+pyyaml>=6.0
+pydantic>=2.0
+requests>=2.31
+python-dotenv>=1.0
+
+# Retrieval baseline (TF-IDF). Optional but used by src/retrieval/tfidf.py.
+scikit-learn>=1.3
+
+# Optional API layer (FastAPI). Needed only if you run api/main.py.
+fastapi>=0.110
+uvicorn[standard]>=0.29
+
+# Testing
+pytest>=8.0

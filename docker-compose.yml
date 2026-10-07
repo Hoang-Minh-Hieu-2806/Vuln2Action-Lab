@@ -1,0 +1,17 @@
+# Vuln2Action-Lab root compose file.
+# Intentionally minimal: it defines an isolated lab network only.
+# Individual vulnerable labs live under labs/<id>/docker-compose.yml and are
+# started on demand, never against real-world targets.
+name: vuln2action-lab
+
+networks:
+  lab-net:
+    name: vuln2action-lab-net
+    driver: bridge
+
+# Example (disabled by default). Enable per-lab compose files instead:
+# services:
+#   example-target:
+#     build: ./labs/cve-001/target
+#     networks: [lab-net]
+#     ports: ["127.0.0.1:8080:8080"]

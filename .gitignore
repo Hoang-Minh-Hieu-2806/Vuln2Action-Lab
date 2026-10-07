@@ -1,0 +1,58 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+ENV/
+
+# ---- Testing / lint ----
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+*.log
+
+# ---- Packaging ----
+build/
+dist/
+*.egg-info/
+*.egg
+
+# ---- Editors / OS ----
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+.ipynb_checkpoints/
+
+# ---- Secrets (never commit) ----
+.env
+*.pem
+*.key
+credentials.json
+secrets.yaml
+
+# ---- Data (large / generated; keep samples + benchmark tracked) ----
+data/raw/*
+data/processed/*
+data/external/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+!data/external/.gitkeep
+
+# ---- Results (generated evidence; keep .gitkeep tracked) ----
+results/*
+!results/.gitkeep
+
+# ---- Docker ----
+.docker/
+docker-compose.override.yml
+*.log

@@ -1,0 +1,23 @@
+# Generation provider configs. The pipeline selects via `default_provider`
+# in settings.yaml or --provider flag. T5/LLM entries are inert until Phase 4.
+providers:
+  rule_based:
+    enabled: true
+    # no external deps
+
+  llm:
+    enabled: false
+    # TODO(Phase 4): wire an OpenAI-compatible client.
+    api_base_env: LLM_API_BASE
+    api_key_env: LLM_API_KEY
+    model_env: LLM_MODEL
+    default_model: gpt-4o-mini
+    timeout_seconds: 60
+
+  t5:
+    enabled: false
+    # TODO(Phase 4): wire a local small T5 checkpoint (e.g. t5-small).
+    # Keep torch/transformers OPTIONAL; do not add to requirements.txt yet.
+    checkpoint: t5-small
+    max_length: 512
+    device: cpu

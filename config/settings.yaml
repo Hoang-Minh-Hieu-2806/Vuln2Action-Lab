@@ -1,0 +1,19 @@
+# Pipeline defaults. Override via env vars or scripts/run_pipeline.py flags.
+pipeline:
+  default_provider: rule_based   # rule_based | llm | t5
+  retrieval_top_k: 3
+  lab_id: cve-001
+  simulate_execution: true        # Phase 1: never run real commands
+
+retrieval:
+  backends: [keyword, tfidf]
+  top_k: 3
+
+labs:
+  network: vuln2action-lab-net
+  allowed_hosts: [localhost, 127.0.0.1]
+  timeout_seconds: 120
+
+evidence:
+  output_dir: results
+  formats: [json, markdown]
