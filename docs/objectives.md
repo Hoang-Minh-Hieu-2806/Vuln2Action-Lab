@@ -2,8 +2,9 @@
 
 1. **O1 — Uniform ingestion:** parse CVE/CWE/CPE/CAPEC/reference data into
    typed domain contracts (`src/vuln2action/domain/`) through read-only connectors.
-2. **O2 — Retrieval baseline:** implement keyword and TF-IDF retrieval with a
-   shared ranker interface, leaving room for embedding-based retrieval later.
+2. **O2 — Retrieval baseline:** implement keyword, TF-IDF, and MITRE-enriched
+   semantic retrieval behind one shared ranker interface, leaving room for
+   neural embeddings later.
 3. **O3 — Pluggable generation:** expose a `GenerationProvider` abstraction so
    the pipeline works with `RuleBasedGenerator` today and `LLMGenerator` /
    `T5Generator` tomorrow without architectural changes.

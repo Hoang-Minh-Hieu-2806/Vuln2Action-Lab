@@ -12,5 +12,7 @@ class LabManifest(BaseModel):
     status: str = "placeholder"
     compose_file: str = "docker-compose.yml"
     allowed_hosts: list[str] = Field(default_factory=lambda: ["localhost", "127.0.0.1"])
+    setup_command: list[str] = Field(default_factory=list)
     validation_command: list[str] = Field(default_factory=list)
+    teardown_command: list[str] = Field(default_factory=list)
     has_patched_counterfactual: bool = False

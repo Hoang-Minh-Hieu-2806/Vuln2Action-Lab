@@ -1,0 +1,84 @@
+{
+  "version": "1.0.0",
+  "description": "CVE description -> CWE relevance judgements from NVD. Query is the NVD description; labels are the CWE ids assigned by NVD.",
+  "labels_source": "NVD 2.0 API, downloaded 2026-10-27",
+  "k": 3,
+  "cases": [
+    {
+      "case_id": "RET-001",
+      "cve_id": "CVE-2014-6271",
+      "query": "GNU Bash through 4.3 processes trailing strings after function definitions in the values of environment variables, which allows remote attackers to execute arbitrary code via a crafted environment, as demonstrated by vectors involving the ForceCommand feature in OpenSSH sshd, the mod_cgi and mod_cgid modules in the Apache HTTP Server, scripts executed by unspecified DHCP clients, and other situations in which setting the environment occurs across a privilege boundary from Bash execution, aka \"ShellShock.\"  NOTE: the original fix for this issue was incorrect; CVE-2014-7169 has been assigned to cover the vulnerability that is still present after the incorrect fix.",
+      "relevant": [
+        "CWE-78"
+      ]
+    },
+    {
+      "case_id": "RET-002",
+      "cve_id": "CVE-2017-5638",
+      "query": "The Jakarta Multipart parser in Apache Struts 2 2.3.x before 2.3.32 and 2.5.x before 2.5.10.1 has incorrect exception handling and error-message generation during file-upload attempts, which allows remote attackers to execute arbitrary commands via a crafted Content-Type, Content-Disposition, or Content-Length HTTP header, as exploited in the wild in March 2017 with a Content-Type header containing a #cmd= string.",
+      "relevant": [
+        "CWE-755"
+      ]
+    },
+    {
+      "case_id": "RET-003",
+      "cve_id": "CVE-2018-7600",
+      "query": "Drupal before 7.58, 8.x before 8.3.9, 8.4.x before 8.4.6, and 8.5.x before 8.5.1 allows remote attackers to execute arbitrary code because of an issue affecting multiple subsystems with default or common module configurations.",
+      "relevant": [
+        "CWE-20"
+      ]
+    },
+    {
+      "case_id": "RET-004",
+      "cve_id": "CVE-2019-11043",
+      "query": "In PHP versions 7.1.x below 7.1.33, 7.2.x below 7.2.24 and 7.3.x below 7.3.11 in certain configurations of FPM setup it is possible to cause FPM module to write past allocated buffers into the space reserved for FCGI protocol data, thus opening the possibility of remote code execution.",
+      "relevant": [
+        "CWE-120",
+        "CWE-787"
+      ]
+    },
+    {
+      "case_id": "RET-005",
+      "cve_id": "CVE-2020-0601",
+      "query": "A spoofing vulnerability exists in the way Windows CryptoAPI (Crypt32.dll) validates Elliptic Curve Cryptography (ECC) certificates.An attacker could exploit the vulnerability by using a spoofed code-signing certificate to sign a malicious executable, making it appear the file was from a trusted, legitimate source, aka 'Windows CryptoAPI Spoofing Vulnerability'.",
+      "relevant": [
+        "CWE-295"
+      ]
+    },
+    {
+      "case_id": "RET-006",
+      "cve_id": "CVE-2021-41773",
+      "query": "A flaw was found in a change made to path normalization in Apache HTTP Server 2.4.49. An attacker could use a path traversal attack to map URLs to files outside the directories configured by Alias-like directives. If files outside of these directories are not protected by the usual default configuration \"require all denied\", these requests can succeed. If CGI scripts are also enabled for these aliased pathes, this could allow for remote code execution. This issue is known to be exploited in the wild. This issue only affects Apache 2.4.49 and not earlier versions. The fix in Apache HTTP Server 2.4.50 was found to be incomplete, see CVE-2021-42013.",
+      "relevant": [
+        "CWE-22"
+      ]
+    },
+    {
+      "case_id": "RET-007",
+      "cve_id": "CVE-2021-44228",
+      "query": "Apache Log4j2 2.0-beta9 through 2.15.0 (excluding security releases 2.12.2, 2.12.3, and 2.3.1) JNDI features used in configuration, log messages, and parameters do not protect against attacker controlled LDAP and other JNDI related endpoints. An attacker who can control log messages or log message parameters can execute arbitrary code loaded from LDAP servers when message lookup substitution is enabled. From log4j 2.15.0, this behavior has been disabled by default. From version 2.16.0 (along with 2.12.2, 2.12.3, and 2.3.1), this functionality has been completely removed. Note that this vulnerability is specific to log4j-core and does not affect log4net, log4cxx, or other Apache Logging Services projects.",
+      "relevant": [
+        "CWE-20",
+        "CWE-400",
+        "CWE-502",
+        "CWE-917"
+      ]
+    },
+    {
+      "case_id": "RET-008",
+      "cve_id": "CVE-2022-22965",
+      "query": "A Spring MVC or Spring WebFlux application running on JDK 9+ may be vulnerable to remote code execution (RCE) via data binding. The specific exploit requires the application to run on Tomcat as a WAR deployment. If the application is deployed as a Spring Boot executable jar, i.e. the default, it is not vulnerable to the exploit. However, the nature of the vulnerability is more general, and there may be other ways to exploit it.",
+      "relevant": [
+        "CWE-94"
+      ]
+    },
+    {
+      "case_id": "RET-009",
+      "cve_id": "CVE-2023-44487",
+      "query": "The HTTP/2 protocol allows a denial of service (server resource consumption) because request cancellation can reset many streams quickly, as exploited in the wild in August through October 2023.",
+      "relevant": [
+        "CWE-400"
+      ]
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-.PHONY: install test pipeline eval lint clean docker-up docker-down
+.PHONY: install test pipeline eval retrieval-context lint clean docker-up docker-down
 
 install:
 	pip install -r requirements.txt
@@ -10,7 +10,10 @@ pipeline:
 	python scripts/run_pipeline.py --sample CVE-2024-0001 --provider rule_based
 
 eval:
-	python scripts/run_evaluation.py --help
+	python scripts/run_evaluation.py --stage retrieval
+
+retrieval-context:
+	python scripts/build_retrieval_context.py
 
 lint:
 	python -m compileall -q src api scripts tests evaluation

@@ -3,7 +3,13 @@
 from vuln2action.domain.cve import CpeRecord, CveRecord
 from vuln2action.domain.evidence import EvidenceBundle, HttpEvidence
 from vuln2action.domain.execution import ExecutionPlan, ExecutionResult, PlanStep
-from vuln2action.domain.knowledge import CapecRecord, CweRecord, ExploitReference, RetrievedContext
+from vuln2action.domain.knowledge import (
+    CapecRecord,
+    CweRecord,
+    ExploitReference,
+    KnowledgeDocument,
+    RetrievedContext,
+)
 from vuln2action.domain.lab import LabManifest
 from vuln2action.domain.workflow import (
     ReproductionResult,
@@ -22,6 +28,7 @@ __all__ = [
     "ExecutionResult",
     "ExploitReference",
     "HttpEvidence",
+    "KnowledgeDocument",
     "LabManifest",
     "PlanStep",
     "ReproductionResult",

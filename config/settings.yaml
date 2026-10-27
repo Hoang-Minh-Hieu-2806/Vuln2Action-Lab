@@ -6,13 +6,14 @@
     "simulate_execution": true
   },
   "retrieval": {
-    "backends": ["keyword", "tfidf"],
+    "default_backend": "semantic",
+    "backends": ["keyword", "tfidf", "semantic"],
     "top_k": 3
   },
   "labs": {
     "network": "vuln2action-lab-net",
     "allowed_hosts": ["localhost", "127.0.0.1"],
-    "timeout_seconds": 120
+    "timeout_seconds": 600
   },
   "evidence": {
     "output_dir": "results",

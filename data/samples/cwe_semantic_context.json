@@ -1,0 +1,1459 @@
+{
+  "version": "1.0.0",
+  "source": "MITRE CWE and CAPEC local snapshots",
+  "documents": [
+    {
+      "doc_id": "CWE-20",
+      "alternate_terms": [],
+      "related_attack_patterns": [
+        {
+          "capec_id": "CAPEC-10",
+          "name": "Buffer Overflow via Environment Variables"
+        },
+        {
+          "capec_id": "CAPEC-101",
+          "name": "Server Side Include (SSI) Injection"
+        },
+        {
+          "capec_id": "CAPEC-104",
+          "name": "Cross Zone Scripting"
+        },
+        {
+          "capec_id": "CAPEC-108",
+          "name": "Command Line Execution through SQL Injection"
+        },
+        {
+          "capec_id": "CAPEC-109",
+          "name": "Object Relational Mapping Injection"
+        },
+        {
+          "capec_id": "CAPEC-110",
+          "name": "SQL Injection through SOAP Parameter Tampering"
+        },
+        {
+          "capec_id": "CAPEC-120",
+          "name": "Double Encoding"
+        },
+        {
+          "capec_id": "CAPEC-13",
+          "name": "Subverting Environment Variable Values"
+        },
+        {
+          "capec_id": "CAPEC-135",
+          "name": "Format String Injection"
+        },
+        {
+          "capec_id": "CAPEC-136",
+          "name": "LDAP Injection"
+        },
+        {
+          "capec_id": "CAPEC-14",
+          "name": "Client-side Injection-induced Buffer Overflow"
+        },
+        {
+          "capec_id": "CAPEC-153",
+          "name": "Input Data Manipulation"
+        },
+        {
+          "capec_id": "CAPEC-182",
+          "name": "Flash Injection"
+        },
+        {
+          "capec_id": "CAPEC-209",
+          "name": "XSS Using MIME Type Mismatch"
+        },
+        {
+          "capec_id": "CAPEC-22",
+          "name": "Exploiting Trust in Client"
+        },
+        {
+          "capec_id": "CAPEC-23",
+          "name": "File Content Injection"
+        },
+        {
+          "capec_id": "CAPEC-230",
+          "name": "Serialized Data with Nested Payloads"
+        },
+        {
+          "capec_id": "CAPEC-231",
+          "name": "Oversized Serialized Data Payloads"
+        },
+        {
+          "capec_id": "CAPEC-24",
+          "name": "Filter Failure through Buffer Overflow"
+        },
+        {
+          "capec_id": "CAPEC-250",
+          "name": "XML Injection"
+        },
+        {
+          "capec_id": "CAPEC-261",
+          "name": "Fuzzing for garnering other adjacent user/sensitive data"
+        },
+        {
+          "capec_id": "CAPEC-267",
+          "name": "Leverage Alternate Encoding"
+        },
+        {
+          "capec_id": "CAPEC-28",
+          "name": "Fuzzing"
+        },
+        {
+          "capec_id": "CAPEC-3",
+          "name": "Using Leading 'Ghost' Character Sequences to Bypass Input Filters"
+        },
+        {
+          "capec_id": "CAPEC-31",
+          "name": "Accessing/Intercepting/Modifying HTTP Cookies"
+        },
+        {
+          "capec_id": "CAPEC-42",
+          "name": "MIME Conversion"
+        },
+        {
+          "capec_id": "CAPEC-43",
+          "name": "Exploiting Multiple Input Interpretation Layers"
+        },
+        {
+          "capec_id": "CAPEC-45",
+          "name": "Buffer Overflow via Symbolic Links"
+        },
+        {
+          "capec_id": "CAPEC-46",
+          "name": "Overflow Variables and Tags"
+        },
+        {
+          "capec_id": "CAPEC-47",
+          "name": "Buffer Overflow via Parameter Expansion"
+        },
+        {
+          "capec_id": "CAPEC-473",
+          "name": "Signature Spoof"
+        },
+        {
+          "capec_id": "CAPEC-52",
+          "name": "Embedding NULL Bytes"
+        },
+        {
+          "capec_id": "CAPEC-53",
+          "name": "Postfix, Null Terminate, and Backslash"
+        },
+        {
+          "capec_id": "CAPEC-588",
+          "name": "DOM-Based XSS"
+        },
+        {
+          "capec_id": "CAPEC-63",
+          "name": "Cross-Site Scripting (XSS)"
+        },
+        {
+          "capec_id": "CAPEC-64",
+          "name": "Using Slashes and URL Encoding Combined to Bypass Validation Logic"
+        },
+        {
+          "capec_id": "CAPEC-664",
+          "name": "Server Side Request Forgery"
+        },
+        {
+          "capec_id": "CAPEC-67",
+          "name": "String Format Overflow in syslog()"
+        },
+        {
+          "capec_id": "CAPEC-7",
+          "name": "Blind SQL Injection"
+        },
+        {
+          "capec_id": "CAPEC-71",
+          "name": "Using Unicode Encoding to Bypass Validation Logic"
+        },
+        {
+          "capec_id": "CAPEC-72",
+          "name": "URL Encoding"
+        },
+        {
+          "capec_id": "CAPEC-73",
+          "name": "User-Controlled Filename"
+        },
+        {
+          "capec_id": "CAPEC-78",
+          "name": "Using Escaped Slashes in Alternate Encoding"
+        },
+        {
+          "capec_id": "CAPEC-79",
+          "name": "Using Slashes in Alternate Encoding"
+        },
+        {
+          "capec_id": "CAPEC-8",
+          "name": "Buffer Overflow in an API Call"
+        },
+        {
+          "capec_id": "CAPEC-80",
+          "name": "Using UTF-8 Encoding to Bypass Validation Logic"
+        },
+        {
+          "capec_id": "CAPEC-81",
+          "name": "Web Server Logs Tampering"
+        },
+        {
+          "capec_id": "CAPEC-83",
+          "name": "XPath Injection"
+        },
+        {
+          "capec_id": "CAPEC-85",
+          "name": "AJAX Footprinting"
+        },
+        {
+          "capec_id": "CAPEC-88",
+          "name": "OS Command Injection"
+        },
+        {
+          "capec_id": "CAPEC-9",
+          "name": "Buffer Overflow in Local Command-Line Utilities"
+        }
+      ],
+      "parents": [
+        {
+          "cwe_id": "CWE-707",
+          "name": "Improper Neutralization",
+          "description": "The product does not ensure or incorrectly ensures that structured messages or data are well-formed and that certain security properties are met before being read from an upstream component or sent to a downstream component."
+        }
+      ]
+    },
+    {
+      "doc_id": "CWE-22",
+      "alternate_terms": [
+        "Path traversal",
+        "Directory traversal",
+        "Path transversal"
+      ],
+      "related_attack_patterns": [
+        {
+          "capec_id": "CAPEC-126",
+          "name": "Path Traversal"
+        },
+        {
+          "capec_id": "CAPEC-64",
+          "name": "Using Slashes and URL Encoding Combined to Bypass Validation Logic"
+        },
+        {
+          "capec_id": "CAPEC-76",
+          "name": "Manipulating Web Input to File System Calls"
+        },
+        {
+          "capec_id": "CAPEC-78",
+          "name": "Using Escaped Slashes in Alternate Encoding"
+        },
+        {
+          "capec_id": "CAPEC-79",
+          "name": "Using Slashes in Alternate Encoding"
+        }
+      ],
+      "parents": [
+        {
+          "cwe_id": "CWE-706",
+          "name": "Use of Incorrectly-Resolved Name or Reference",
+          "description": "The product uses a name or reference to access a resource, but the name/reference resolves to a resource that is outside of the intended control sphere."
+        }
+      ]
+    },
+    {
+      "doc_id": "CWE-78",
+      "alternate_terms": [
+        "Shell injection",
+        "Shell metacharacters",
+        "OS Command Injection"
+      ],
+      "related_attack_patterns": [
+        {
+          "capec_id": "CAPEC-108",
+          "name": "Command Line Execution through SQL Injection"
+        },
+        {
+          "capec_id": "CAPEC-15",
+          "name": "Command Delimiters"
+        },
+        {
+          "capec_id": "CAPEC-43",
+          "name": "Exploiting Multiple Input Interpretation Layers"
+        },
+        {
+          "capec_id": "CAPEC-6",
+          "name": "Argument Injection"
+        },
+        {
+          "capec_id": "CAPEC-88",
+          "name": "OS Command Injection"
+        }
+      ],
+      "parents": [
+        {
+          "cwe_id": "CWE-77",
+          "name": "Improper Neutralization of Special Elements used in a Command ('Command Injection')",
+          "description": "The product constructs all or part of a command using externally-influenced input from an upstream component, but it does not neutralize or incorrectly neutralizes special elements that could modify the intended command when it is sent to a downstream component."
+        },
+        {
+          "cwe_id": "CWE-74",
+          "name": "Improper Neutralization of Special Elements in Output Used by a Downstream Component ('Injection')",
+          "description": "The product constructs all or part of a command, data structure, or record using externally-influenced input from an upstream component, but it does not neutralize or incorrectly neutralizes special elements that could modify how it is parsed or interpreted when it is sent to a downstream component."
+        }
+      ]
+    },
+    {
+      "doc_id": "CWE-79",
+      "alternate_terms": [
+        "XSS",
+        "HTML Injection",
+        "Reflected XSS / Non-Persistent XSS / Type 1 XSS",
+        "Stored XSS / Persistent XSS / Type 2 XSS",
+        "DOM-Based XSS / Type 0 XSS",
+        "CSS"
+      ],
+      "related_attack_patterns": [
+        {
+          "capec_id": "CAPEC-209",
+          "name": "XSS Using MIME Type Mismatch"
+        },
+        {
+          "capec_id": "CAPEC-588",
+          "name": "DOM-Based XSS"
+        },
+        {
+          "capec_id": "CAPEC-591",
+          "name": "Reflected XSS"
+        },
+        {
+          "capec_id": "CAPEC-592",
+          "name": "Stored XSS"
+        },
+        {
+          "capec_id": "CAPEC-63",
+          "name": "Cross-Site Scripting (XSS)"
+        },
+        {
+          "capec_id": "CAPEC-85",
+          "name": "AJAX Footprinting"
+        }
+      ],
+      "parents": [
+        {
+          "cwe_id": "CWE-74",
+          "name": "Improper Neutralization of Special Elements in Output Used by a Downstream Component ('Injection')",
+          "description": "The product constructs all or part of a command, data structure, or record using externally-influenced input from an upstream component, but it does not neutralize or incorrectly neutralizes special elements that could modify how it is parsed or interpreted when it is sent to a downstream component."
+        }
+      ]
+    },
+    {
+      "doc_id": "CWE-89",
+      "alternate_terms": [
+        "SQL injection",
+        "SQLi"
+      ],
+      "related_attack_patterns": [
+        {
+          "capec_id": "CAPEC-108",
+          "name": "Command Line Execution through SQL Injection"
+        },
+        {
+          "capec_id": "CAPEC-109",
+          "name": "Object Relational Mapping Injection"
+        },
+        {
+          "capec_id": "CAPEC-110",
+          "name": "SQL Injection through SOAP Parameter Tampering"
+        },
+        {
+          "capec_id": "CAPEC-470",
+          "name": "Expanding Control over the Operating System from the Database"
+        },
+        {
+          "capec_id": "CAPEC-66",
+          "name": "SQL Injection"
+        },
+        {
+          "capec_id": "CAPEC-7",
+          "name": "Blind SQL Injection"
+        }
+      ],
+      "parents": [
+        {
+          "cwe_id": "CWE-943",
+          "name": "Improper Neutralization of Special Elements in Data Query Logic",
+          "description": "The product generates a query intended to access or manipulate data in a data store such as a database, but it does not neutralize or incorrectly neutralizes special elements that can modify the intended logic of the query."
+        },
+        {
+          "cwe_id": "CWE-74",
+          "name": "Improper Neutralization of Special Elements in Output Used by a Downstream Component ('Injection')",
+          "description": "The product constructs all or part of a command, data structure, or record using externally-influenced input from an upstream component, but it does not neutralize or incorrectly neutralizes special elements that could modify how it is parsed or interpreted when it is sent to a downstream component."
+        }
+      ]
+    },
+    {
+      "doc_id": "CWE-94",
+      "alternate_terms": [
+        "Code Injection"
+      ],
+      "related_attack_patterns": [
+        {
+          "capec_id": "CAPEC-242",
+          "name": "Code Injection"
+        },
+        {
+          "capec_id": "CAPEC-35",
+          "name": "Leverage Executable Code in Non-Executable Files"
+        },
+        {
+          "capec_id": "CAPEC-77",
+          "name": "Manipulating User-Controlled Variables"
+        }
+      ],
+      "parents": [
+        {
+          "cwe_id": "CWE-74",
+          "name": "Improper Neutralization of Special Elements in Output Used by a Downstream Component ('Injection')",
+          "description": "The product constructs all or part of a command, data structure, or record using externally-influenced input from an upstream component, but it does not neutralize or incorrectly neutralizes special elements that could modify how it is parsed or interpreted when it is sent to a downstream component."
+        },
+        {
+          "cwe_id": "CWE-913",
+          "name": "Improper Control of Dynamically-Managed Code Resources",
+          "description": "The product does not properly restrict reading from or writing to dynamically-managed code resources such as variables, objects, classes, attributes, functions, or executable instructions or statements."
+        }
+      ]
+    },
+    {
+      "doc_id": "CWE-119",
+      "alternate_terms": [
+        "Buffer Overflow",
+        "buffer overrun",
+        "memory safety"
+      ],
+      "related_attack_patterns": [
+        {
+          "capec_id": "CAPEC-10",
+          "name": "Buffer Overflow via Environment Variables"
+        },
+        {
+          "capec_id": "CAPEC-100",
+          "name": "Overflow Buffers"
+        },
+        {
+          "capec_id": "CAPEC-123",
+          "name": "Buffer Manipulation"
+        },
+        {
+          "capec_id": "CAPEC-14",
+          "name": "Client-side Injection-induced Buffer Overflow"
+        },
+        {
+          "capec_id": "CAPEC-24",
+          "name": "Filter Failure through Buffer Overflow"
+        },
+        {
+          "capec_id": "CAPEC-42",
+          "name": "MIME Conversion"
+        },
+        {
+          "capec_id": "CAPEC-44",
+          "name": "Overflow Binary Resource File"
+        },
+        {
+          "capec_id": "CAPEC-45",
+          "name": "Buffer Overflow via Symbolic Links"
+        },
+        {
+          "capec_id": "CAPEC-46",
+          "name": "Overflow Variables and Tags"
+        },
+        {
+          "capec_id": "CAPEC-47",
+          "name": "Buffer Overflow via Parameter Expansion"
+        },
+        {
+          "capec_id": "CAPEC-8",
+          "name": "Buffer Overflow in an API Call"
+        },
+        {
+          "capec_id": "CAPEC-9",
+          "name": "Buffer Overflow in Local Command-Line Utilities"
+        }
+      ],
+      "parents": [
+        {
+          "cwe_id": "CWE-118",
+          "name": "Incorrect Access of Indexable Resource ('Range Error')",
+          "description": "The product does not restrict or incorrectly restricts operations within the boundaries of a resource that is accessed using an index or pointer, such as memory or files."
+        },
+        {
+          "cwe_id": "CWE-20",
+          "name": "Improper Input Validation",
+          "description": "The product receives input or data, but it does not validate or incorrectly validates that the input has the properties that are required to process the data safely and correctly."
+        }
+      ]
+    },
+    {
+      "doc_id": "CWE-120",
+      "alternate_terms": [
+        "Classic Buffer Overflow",
+        "Unbounded Transfer"
+      ],
+      "related_attack_patterns": [
+        {
+          "capec_id": "CAPEC-10",
+          "name": "Buffer Overflow via Environment Variables"
+        },
+        {
+          "capec_id": "CAPEC-100",
+          "name": "Overflow Buffers"
+        },
+        {
+          "capec_id": "CAPEC-14",
+          "name": "Client-side Injection-induced Buffer Overflow"
+        },
+        {
+          "capec_id": "CAPEC-24",
+          "name": "Filter Failure through Buffer Overflow"
+        },
+        {
+          "capec_id": "CAPEC-42",
+          "name": "MIME Conversion"
+        },
+        {
+          "capec_id": "CAPEC-44",
+          "name": "Overflow Binary Resource File"
+        },
+        {
+          "capec_id": "CAPEC-45",
+          "name": "Buffer Overflow via Symbolic Links"
+        },
+        {
+          "capec_id": "CAPEC-46",
+          "name": "Overflow Variables and Tags"
+        },
+        {
+          "capec_id": "CAPEC-47",
+          "name": "Buffer Overflow via Parameter Expansion"
+        },
+        {
+          "capec_id": "CAPEC-67",
+          "name": "String Format Overflow in syslog()"
+        },
+        {
+          "capec_id": "CAPEC-8",
+          "name": "Buffer Overflow in an API Call"
+        },
+        {
+          "capec_id": "CAPEC-9",
+          "name": "Buffer Overflow in Local Command-Line Utilities"
+        },
+        {
+          "capec_id": "CAPEC-92",
+          "name": "Forced Integer Overflow"
+        }
+      ],
+      "parents": [
+        {
+          "cwe_id": "CWE-787",
+          "name": "Out-of-bounds Write",
+          "description": "The product writes data past the end, or before the beginning, of the intended buffer."
+        },
+        {
+          "cwe_id": "CWE-119",
+          "name": "Improper Restriction of Operations within the Bounds of a Memory Buffer",
+          "description": "The product performs operations on a memory buffer, but it reads from or writes to a memory location outside the buffer's intended boundary. This may result in read or write operations on unexpected memory locations that could be linked to other variables, data structures, or internal program data."
+        },
+        {
+          "cwe_id": "CWE-20",
+          "name": "Improper Input Validation",
+          "description": "The product receives input or data, but it does not validate or incorrectly validates that the input has the properties that are required to process the data safely and correctly."
+        }
+      ]
+    },
+    {
+      "doc_id": "CWE-125",
+      "alternate_terms": [
+        "OOB read"
+      ],
+      "related_attack_patterns": [
+        {
+          "capec_id": "CAPEC-540",
+          "name": "Overread Buffers"
+        }
+      ],
+      "parents": [
+        {
+          "cwe_id": "CWE-119",
+          "name": "Improper Restriction of Operations within the Bounds of a Memory Buffer",
+          "description": "The product performs operations on a memory buffer, but it reads from or writes to a memory location outside the buffer's intended boundary. This may result in read or write operations on unexpected memory locations that could be linked to other variables, data structures, or internal program data."
+        }
+      ]
+    },
+    {
+      "doc_id": "CWE-190",
+      "alternate_terms": [
+        "Overflow",
+        "Wraparound",
+        "wrap, wrap-around, wrap around"
+      ],
+      "related_attack_patterns": [
+        {
+          "capec_id": "CAPEC-92",
+          "name": "Forced Integer Overflow"
+        }
+      ],
+      "parents": [
+        {
+          "cwe_id": "CWE-682",
+          "name": "Incorrect Calculation",
+          "description": "The product performs a calculation that generates incorrect or unintended results that are later used in security-critical decisions or resource management."
+        },
+        {
+          "cwe_id": "CWE-20",
+          "name": "Improper Input Validation",
+          "description": "The product receives input or data, but it does not validate or incorrectly validates that the input has the properties that are required to process the data safely and correctly."
+        }
+      ]
+    },
+    {
+      "doc_id": "CWE-200",
+      "alternate_terms": [
+        "Information Disclosure",
+        "Information Leak"
+      ],
+      "related_attack_patterns": [
+        {
+          "capec_id": "CAPEC-116",
+          "name": "Excavation"
+        },
+        {
+          "capec_id": "CAPEC-13",
+          "name": "Subverting Environment Variable Values"
+        },
+        {
+          "capec_id": "CAPEC-169",
+          "name": "Footprinting"
+        },
+        {
+          "capec_id": "CAPEC-22",
+          "name": "Exploiting Trust in Client"
+        },
+        {
+          "capec_id": "CAPEC-224",
+          "name": "Fingerprinting"
+        },
+        {
+          "capec_id": "CAPEC-285",
+          "name": "ICMP Echo Request Ping"
+        },
+        {
+          "capec_id": "CAPEC-287",
+          "name": "TCP SYN Scan"
+        },
+        {
+          "capec_id": "CAPEC-290",
+          "name": "Enumerate Mail Exchange (MX) Records"
+        },
+        {
+          "capec_id": "CAPEC-291",
+          "name": "DNS Zone Transfers"
+        },
+        {
+          "capec_id": "CAPEC-292",
+          "name": "Host Discovery"
+        },
+        {
+          "capec_id": "CAPEC-293",
+          "name": "Traceroute Route Enumeration"
+        },
+        {
+          "capec_id": "CAPEC-294",
+          "name": "ICMP Address Mask Request"
+        },
+        {
+          "capec_id": "CAPEC-295",
+          "name": "Timestamp Request"
+        },
+        {
+          "capec_id": "CAPEC-296",
+          "name": "ICMP Information Request"
+        },
+        {
+          "capec_id": "CAPEC-297",
+          "name": "TCP ACK Ping"
+        },
+        {
+          "capec_id": "CAPEC-298",
+          "name": "UDP Ping"
+        },
+        {
+          "capec_id": "CAPEC-299",
+          "name": "TCP SYN Ping"
+        },
+        {
+          "capec_id": "CAPEC-300",
+          "name": "Port Scanning"
+        },
+        {
+          "capec_id": "CAPEC-301",
+          "name": "TCP Connect Scan"
+        },
+        {
+          "capec_id": "CAPEC-302",
+          "name": "TCP FIN Scan"
+        },
+        {
+          "capec_id": "CAPEC-303",
+          "name": "TCP Xmas Scan"
+        },
+        {
+          "capec_id": "CAPEC-304",
+          "name": "TCP Null Scan"
+        },
+        {
+          "capec_id": "CAPEC-305",
+          "name": "TCP ACK Scan"
+        },
+        {
+          "capec_id": "CAPEC-306",
+          "name": "TCP Window Scan"
+        },
+        {
+          "capec_id": "CAPEC-307",
+          "name": "TCP RPC Scan"
+        },
+        {
+          "capec_id": "CAPEC-308",
+          "name": "UDP Scan"
+        },
+        {
+          "capec_id": "CAPEC-309",
+          "name": "Network Topology Mapping"
+        },
+        {
+          "capec_id": "CAPEC-310",
+          "name": "Scanning for Vulnerable Software"
+        },
+        {
+          "capec_id": "CAPEC-312",
+          "name": "Active OS Fingerprinting"
+        },
+        {
+          "capec_id": "CAPEC-313",
+          "name": "Passive OS Fingerprinting"
+        },
+        {
+          "capec_id": "CAPEC-317",
+          "name": "IP ID Sequencing Probe"
+        },
+        {
+          "capec_id": "CAPEC-318",
+          "name": "IP 'ID' Echoed Byte-Order Probe"
+        },
+        {
+          "capec_id": "CAPEC-319",
+          "name": "IP (DF) 'Don't Fragment Bit' Echoing Probe"
+        },
+        {
+          "capec_id": "CAPEC-320",
+          "name": "TCP Timestamp Probe"
+        },
+        {
+          "capec_id": "CAPEC-321",
+          "name": "TCP Sequence Number Probe"
+        },
+        {
+          "capec_id": "CAPEC-322",
+          "name": "TCP (ISN) Greatest Common Divisor Probe"
+        },
+        {
+          "capec_id": "CAPEC-323",
+          "name": "TCP (ISN) Counter Rate Probe"
+        },
+        {
+          "capec_id": "CAPEC-324",
+          "name": "TCP (ISN) Sequence Predictability Probe"
+        },
+        {
+          "capec_id": "CAPEC-325",
+          "name": "TCP Congestion Control Flag (ECN) Probe"
+        },
+        {
+          "capec_id": "CAPEC-326",
+          "name": "TCP Initial Window Size Probe"
+        },
+        {
+          "capec_id": "CAPEC-327",
+          "name": "TCP Options Probe"
+        },
+        {
+          "capec_id": "CAPEC-328",
+          "name": "TCP 'RST' Flag Checksum Probe"
+        },
+        {
+          "capec_id": "CAPEC-329",
+          "name": "ICMP Error Message Quoting Probe"
+        },
+        {
+          "capec_id": "CAPEC-330",
+          "name": "ICMP Error Message Echoing Integrity Probe"
+        },
+        {
+          "capec_id": "CAPEC-472",
+          "name": "Browser Fingerprinting"
+        },
+        {
+          "capec_id": "CAPEC-497",
+          "name": "File Discovery"
+        },
+        {
+          "capec_id": "CAPEC-508",
+          "name": "Shoulder Surfing"
+        },
+        {
+          "capec_id": "CAPEC-573",
+          "name": "Process Footprinting"
+        },
+        {
+          "capec_id": "CAPEC-574",
+          "name": "Services Footprinting"
+        },
+        {
+          "capec_id": "CAPEC-575",
+          "name": "Account Footprinting"
+        },
+        {
+          "capec_id": "CAPEC-576",
+          "name": "Group Permission Footprinting"
+        },
+        {
+          "capec_id": "CAPEC-577",
+          "name": "Owner Footprinting"
+        },
+        {
+          "capec_id": "CAPEC-59",
+          "name": "Session Credential Falsification through Prediction"
+        },
+        {
+          "capec_id": "CAPEC-60",
+          "name": "Reusing Session IDs (aka Session Replay)"
+        },
+        {
+          "capec_id": "CAPEC-616",
+          "name": "Establish Rogue Location"
+        },
+        {
+          "capec_id": "CAPEC-643",
+          "name": "Identify Shared Files/Directories on System"
+        },
+        {
+          "capec_id": "CAPEC-646",
+          "name": "Peripheral Footprinting"
+        },
+        {
+          "capec_id": "CAPEC-651",
+          "name": "Eavesdropping"
+        },
+        {
+          "capec_id": "CAPEC-79",
+          "name": "Using Slashes in Alternate Encoding"
+        }
+      ],
+      "parents": [
+        {
+          "cwe_id": "CWE-668",
+          "name": "Exposure of Resource to Wrong Sphere",
+          "description": "The product exposes a resource to the wrong control sphere, providing unintended actors with inappropriate access to the resource."
+        }
+      ]
+    },
+    {
+      "doc_id": "CWE-269",
+      "alternate_terms": [],
+      "related_attack_patterns": [
+        {
+          "capec_id": "CAPEC-122",
+          "name": "Privilege Abuse"
+        },
+        {
+          "capec_id": "CAPEC-233",
+          "name": "Privilege Escalation"
+        },
+        {
+          "capec_id": "CAPEC-58",
+          "name": "Restful Privilege Elevation"
+        }
+      ],
+      "parents": [
+        {
+          "cwe_id": "CWE-284",
+          "name": "Improper Access Control",
+          "description": "The product does not restrict or incorrectly restricts access to a resource from an unauthorized actor."
+        }
+      ]
+    },
+    {
+      "doc_id": "CWE-287",
+      "alternate_terms": [
+        "authentification",
+        "AuthN",
+        "AuthC"
+      ],
+      "related_attack_patterns": [
+        {
+          "capec_id": "CAPEC-114",
+          "name": "Authentication Abuse"
+        },
+        {
+          "capec_id": "CAPEC-115",
+          "name": "Authentication Bypass"
+        },
+        {
+          "capec_id": "CAPEC-151",
+          "name": "Identity Spoofing"
+        },
+        {
+          "capec_id": "CAPEC-194",
+          "name": "Fake the Source of Data"
+        },
+        {
+          "capec_id": "CAPEC-22",
+          "name": "Exploiting Trust in Client"
+        },
+        {
+          "capec_id": "CAPEC-57",
+          "name": "Utilizing REST's Trust in the System Resource to Obtain Sensitive Data"
+        },
+        {
+          "capec_id": "CAPEC-593",
+          "name": "Session Hijacking"
+        },
+        {
+          "capec_id": "CAPEC-633",
+          "name": "Token Impersonation"
+        },
+        {
+          "capec_id": "CAPEC-650",
+          "name": "Upload a Web Shell to a Web Server"
+        },
+        {
+          "capec_id": "CAPEC-94",
+          "name": "Adversary in the Middle (AiTM)"
+        }
+      ],
+      "parents": [
+        {
+          "cwe_id": "CWE-284",
+          "name": "Improper Access Control",
+          "description": "The product does not restrict or incorrectly restricts access to a resource from an unauthorized actor."
+        }
+      ]
+    },
+    {
+      "doc_id": "CWE-295",
+      "alternate_terms": [],
+      "related_attack_patterns": [
+        {
+          "capec_id": "CAPEC-459",
+          "name": "Creating a Rogue Certification Authority Certificate"
+        },
+        {
+          "capec_id": "CAPEC-475",
+          "name": "Signature Spoofing by Improper Validation"
+        }
+      ],
+      "parents": [
+        {
+          "cwe_id": "CWE-287",
+          "name": "Improper Authentication",
+          "description": "When an actor claims to have a given identity, the product does not prove or insufficiently proves that the claim is correct."
+        }
+      ]
+    },
+    {
+      "doc_id": "CWE-306",
+      "alternate_terms": [],
+      "related_attack_patterns": [
+        {
+          "capec_id": "CAPEC-12",
+          "name": "Choosing Message Identifier"
+        },
+        {
+          "capec_id": "CAPEC-166",
+          "name": "Force the System to Reset Values"
+        },
+        {
+          "capec_id": "CAPEC-216",
+          "name": "Communication Channel Manipulation"
+        },
+        {
+          "capec_id": "CAPEC-36",
+          "name": "Using Unpublished Interfaces or Functionality"
+        },
+        {
+          "capec_id": "CAPEC-62",
+          "name": "Cross Site Request Forgery"
+        }
+      ],
+      "parents": [
+        {
+          "cwe_id": "CWE-287",
+          "name": "Improper Authentication",
+          "description": "When an actor claims to have a given identity, the product does not prove or insufficiently proves that the claim is correct."
+        }
+      ]
+    },
+    {
+      "doc_id": "CWE-352",
+      "alternate_terms": [
+        "Session Riding",
+        "Cross Site Reference Forgery",
+        "XSRF",
+        "CSRF"
+      ],
+      "related_attack_patterns": [
+        {
+          "capec_id": "CAPEC-111",
+          "name": "JSON Hijacking (aka JavaScript Hijacking)"
+        },
+        {
+          "capec_id": "CAPEC-462",
+          "name": "Cross-Domain Search Timing"
+        },
+        {
+          "capec_id": "CAPEC-467",
+          "name": "Cross Site Identification"
+        },
+        {
+          "capec_id": "CAPEC-62",
+          "name": "Cross Site Request Forgery"
+        }
+      ],
+      "parents": [
+        {
+          "cwe_id": "CWE-345",
+          "name": "Insufficient Verification of Data Authenticity",
+          "description": "The product does not sufficiently verify the origin or authenticity of data, in a way that causes it to accept invalid data."
+        }
+      ]
+    },
+    {
+      "doc_id": "CWE-400",
+      "alternate_terms": [
+        "Resource Exhaustion"
+      ],
+      "related_attack_patterns": [
+        {
+          "capec_id": "CAPEC-147",
+          "name": "XML Ping of the Death"
+        },
+        {
+          "capec_id": "CAPEC-227",
+          "name": "Sustained Client Engagement"
+        },
+        {
+          "capec_id": "CAPEC-492",
+          "name": "Regular Expression Exponential Blowup"
+        }
+      ],
+      "parents": [
+        {
+          "cwe_id": "CWE-664",
+          "name": "Improper Control of a Resource Through its Lifetime",
+          "description": "The product does not maintain or incorrectly maintains control over a resource throughout its lifetime of creation, use, and release."
+        }
+      ]
+    },
+    {
+      "doc_id": "CWE-416",
+      "alternate_terms": [
+        "Dangling pointer",
+        "UAF",
+        "Use-After-Free"
+      ],
+      "related_attack_patterns": [],
+      "parents": [
+        {
+          "cwe_id": "CWE-825",
+          "name": "Expired Pointer Dereference",
+          "description": "The product dereferences a pointer that contains a location for memory that was previously valid, but is no longer valid."
+        },
+        {
+          "cwe_id": "CWE-672",
+          "name": "Operation on a Resource after Expiration or Release",
+          "description": "The product uses, accesses, or otherwise operates on a resource after that resource has been expired, released, or revoked."
+        }
+      ]
+    },
+    {
+      "doc_id": "CWE-434",
+      "alternate_terms": [
+        "Unrestricted File Upload"
+      ],
+      "related_attack_patterns": [
+        {
+          "capec_id": "CAPEC-1",
+          "name": "Accessing Functionality Not Properly Constrained by ACLs"
+        }
+      ],
+      "parents": [
+        {
+          "cwe_id": "CWE-669",
+          "name": "Incorrect Resource Transfer Between Spheres",
+          "description": "The product does not properly transfer a resource/behavior to another sphere, or improperly imports a resource/behavior from another sphere, in a manner that provides unintended control over that resource."
+        }
+      ]
+    },
+    {
+      "doc_id": "CWE-476",
+      "alternate_terms": [
+        "NPD",
+        "null deref",
+        "NPE",
+        "nil pointer dereference"
+      ],
+      "related_attack_patterns": [],
+      "parents": [
+        {
+          "cwe_id": "CWE-710",
+          "name": "Improper Adherence to Coding Standards",
+          "description": "The product does not follow certain coding rules for development, which can lead to resultant weaknesses or increase the severity of the associated vulnerabilities."
+        },
+        {
+          "cwe_id": "CWE-754",
+          "name": "Improper Check for Unusual or Exceptional Conditions",
+          "description": "The product does not check or incorrectly checks for unusual or exceptional conditions that are not expected to occur frequently during day to day operation of the product."
+        }
+      ]
+    },
+    {
+      "doc_id": "CWE-502",
+      "alternate_terms": [
+        "Marshaling/Marshalling, Unmarshaling/Unmarshalling",
+        "Pickling, Unpickling",
+        "PHP Object Injection"
+      ],
+      "related_attack_patterns": [
+        {
+          "capec_id": "CAPEC-586",
+          "name": "Object Injection"
+        }
+      ],
+      "parents": [
+        {
+          "cwe_id": "CWE-913",
+          "name": "Improper Control of Dynamically-Managed Code Resources",
+          "description": "The product does not properly restrict reading from or writing to dynamically-managed code resources such as variables, objects, classes, attributes, functions, or executable instructions or statements."
+        }
+      ]
+    },
+    {
+      "doc_id": "CWE-522",
+      "alternate_terms": [],
+      "related_attack_patterns": [
+        {
+          "capec_id": "CAPEC-102",
+          "name": "Session Sidejacking"
+        },
+        {
+          "capec_id": "CAPEC-474",
+          "name": "Signature Spoofing by Key Theft"
+        },
+        {
+          "capec_id": "CAPEC-50",
+          "name": "Password Recovery Exploitation"
+        },
+        {
+          "capec_id": "CAPEC-509",
+          "name": "Kerberoasting"
+        },
+        {
+          "capec_id": "CAPEC-551",
+          "name": "Modify Existing Service"
+        },
+        {
+          "capec_id": "CAPEC-555",
+          "name": "Remote Services with Stolen Credentials"
+        },
+        {
+          "capec_id": "CAPEC-560",
+          "name": "Use of Known Domain Credentials"
+        },
+        {
+          "capec_id": "CAPEC-561",
+          "name": "Windows Admin Shares with Stolen Credentials"
+        },
+        {
+          "capec_id": "CAPEC-600",
+          "name": "Credential Stuffing"
+        },
+        {
+          "capec_id": "CAPEC-644",
+          "name": "Use of Captured Hashes (Pass The Hash)"
+        },
+        {
+          "capec_id": "CAPEC-645",
+          "name": "Use of Captured Tickets (Pass The Ticket)"
+        },
+        {
+          "capec_id": "CAPEC-652",
+          "name": "Use of Known Kerberos Credentials"
+        },
+        {
+          "capec_id": "CAPEC-653",
+          "name": "Use of Known Operating System Credentials"
+        }
+      ],
+      "parents": [
+        {
+          "cwe_id": "CWE-1390",
+          "name": "Weak Authentication",
+          "description": "The product uses an authentication mechanism to restrict access to specific users or identities, but the mechanism does not sufficiently prove that the claimed identity is correct."
+        },
+        {
+          "cwe_id": "CWE-287",
+          "name": "Improper Authentication",
+          "description": "When an actor claims to have a given identity, the product does not prove or insufficiently proves that the claim is correct."
+        },
+        {
+          "cwe_id": "CWE-668",
+          "name": "Exposure of Resource to Wrong Sphere",
+          "description": "The product exposes a resource to the wrong control sphere, providing unintended actors with inappropriate access to the resource."
+        }
+      ]
+    },
+    {
+      "doc_id": "CWE-611",
+      "alternate_terms": [
+        "XXE"
+      ],
+      "related_attack_patterns": [
+        {
+          "capec_id": "CAPEC-221",
+          "name": "Data Serialization External Entities Blowup"
+        }
+      ],
+      "parents": [
+        {
+          "cwe_id": "CWE-610",
+          "name": "Externally Controlled Reference to a Resource in Another Sphere",
+          "description": "The product uses an externally controlled name or reference that resolves to a resource that is outside of the intended control sphere."
+        }
+      ]
+    },
+    {
+      "doc_id": "CWE-732",
+      "alternate_terms": [],
+      "related_attack_patterns": [
+        {
+          "capec_id": "CAPEC-1",
+          "name": "Accessing Functionality Not Properly Constrained by ACLs"
+        },
+        {
+          "capec_id": "CAPEC-122",
+          "name": "Privilege Abuse"
+        },
+        {
+          "capec_id": "CAPEC-127",
+          "name": "Directory Indexing"
+        },
+        {
+          "capec_id": "CAPEC-17",
+          "name": "Using Malicious Files"
+        },
+        {
+          "capec_id": "CAPEC-180",
+          "name": "Exploiting Incorrectly Configured Access Control Security Levels"
+        },
+        {
+          "capec_id": "CAPEC-206",
+          "name": "Signing Malicious Code"
+        },
+        {
+          "capec_id": "CAPEC-234",
+          "name": "Hijacking a privileged process"
+        },
+        {
+          "capec_id": "CAPEC-60",
+          "name": "Reusing Session IDs (aka Session Replay)"
+        },
+        {
+          "capec_id": "CAPEC-61",
+          "name": "Session Fixation"
+        },
+        {
+          "capec_id": "CAPEC-62",
+          "name": "Cross Site Request Forgery"
+        },
+        {
+          "capec_id": "CAPEC-642",
+          "name": "Replace Binaries"
+        }
+      ],
+      "parents": [
+        {
+          "cwe_id": "CWE-285",
+          "name": "Improper Authorization",
+          "description": "The product does not perform or incorrectly performs an authorization check when an actor attempts to access a resource or perform an action."
+        },
+        {
+          "cwe_id": "CWE-668",
+          "name": "Exposure of Resource to Wrong Sphere",
+          "description": "The product exposes a resource to the wrong control sphere, providing unintended actors with inappropriate access to the resource."
+        }
+      ]
+    },
+    {
+      "doc_id": "CWE-755",
+      "alternate_terms": [],
+      "related_attack_patterns": [],
+      "parents": [
+        {
+          "cwe_id": "CWE-703",
+          "name": "Improper Check or Handling of Exceptional Conditions",
+          "description": "The product does not properly anticipate or handle exceptional conditions that rarely occur during normal operation of the product."
+        }
+      ]
+    },
+    {
+      "doc_id": "CWE-787",
+      "alternate_terms": [
+        "Memory Corruption"
+      ],
+      "related_attack_patterns": [],
+      "parents": [
+        {
+          "cwe_id": "CWE-119",
+          "name": "Improper Restriction of Operations within the Bounds of a Memory Buffer",
+          "description": "The product performs operations on a memory buffer, but it reads from or writes to a memory location outside the buffer's intended boundary. This may result in read or write operations on unexpected memory locations that could be linked to other variables, data structures, or internal program data."
+        }
+      ]
+    },
+    {
+      "doc_id": "CWE-798",
+      "alternate_terms": [],
+      "related_attack_patterns": [
+        {
+          "capec_id": "CAPEC-191",
+          "name": "Read Sensitive Constants Within an Executable"
+        },
+        {
+          "capec_id": "CAPEC-70",
+          "name": "Try Common or Default Usernames and Passwords"
+        }
+      ],
+      "parents": [
+        {
+          "cwe_id": "CWE-1391",
+          "name": "Use of Weak Credentials",
+          "description": "The product uses weak credentials (such as a default key or hard-coded password) that can be calculated, derived, reused, or guessed by an attacker."
+        },
+        {
+          "cwe_id": "CWE-287",
+          "name": "Improper Authentication",
+          "description": "When an actor claims to have a given identity, the product does not prove or insufficiently proves that the claim is correct."
+        },
+        {
+          "cwe_id": "CWE-344",
+          "name": "Use of Invariant Value in Dynamically Changing Context",
+          "description": "The product uses a constant value, name, or reference, but this value can (or should) vary across different environments."
+        },
+        {
+          "cwe_id": "CWE-671",
+          "name": "Lack of Administrator Control over Security",
+          "description": "The product uses security features in a way that prevents the product's administrator from tailoring security settings to reflect the environment in which the product is being used. This introduces resultant weaknesses or prevents it from operating at a level of security that is desired by the administrator."
+        }
+      ]
+    },
+    {
+      "doc_id": "CWE-863",
+      "alternate_terms": [
+        "AuthZ"
+      ],
+      "related_attack_patterns": [],
+      "parents": [
+        {
+          "cwe_id": "CWE-285",
+          "name": "Improper Authorization",
+          "description": "The product does not perform or incorrectly performs an authorization check when an actor attempts to access a resource or perform an action."
+        },
+        {
+          "cwe_id": "CWE-284",
+          "name": "Improper Access Control",
+          "description": "The product does not restrict or incorrectly restricts access to a resource from an unauthorized actor."
+        }
+      ]
+    },
+    {
+      "doc_id": "CWE-917",
+      "alternate_terms": [
+        "EL Injection"
+      ],
+      "related_attack_patterns": [],
+      "parents": [
+        {
+          "cwe_id": "CWE-77",
+          "name": "Improper Neutralization of Special Elements used in a Command ('Command Injection')",
+          "description": "The product constructs all or part of a command using externally-influenced input from an upstream component, but it does not neutralize or incorrectly neutralizes special elements that could modify the intended command when it is sent to a downstream component."
+        },
+        {
+          "cwe_id": "CWE-74",
+          "name": "Improper Neutralization of Special Elements in Output Used by a Downstream Component ('Injection')",
+          "description": "The product constructs all or part of a command, data structure, or record using externally-influenced input from an upstream component, but it does not neutralize or incorrectly neutralizes special elements that could modify how it is parsed or interpreted when it is sent to a downstream component."
+        }
+      ]
+    },
+    {
+      "doc_id": "CWE-918",
+      "alternate_terms": [
+        "XSPA",
+        "SSRF"
+      ],
+      "related_attack_patterns": [
+        {
+          "capec_id": "CAPEC-664",
+          "name": "Server Side Request Forgery"
+        }
+      ],
+      "parents": [
+        {
+          "cwe_id": "CWE-441",
+          "name": "Unintended Proxy or Intermediary ('Confused Deputy')",
+          "description": "The product receives a request, message, or directive from an upstream component, but the product does not sufficiently preserve the original source of the request before forwarding the request to an external actor that is outside of the product's control sphere. This causes the product to appear to be the source of the request, leading it to act as a proxy or other intermediary between the upstream component and the external actor."
+        },
+        {
+          "cwe_id": "CWE-610",
+          "name": "Externally Controlled Reference to a Resource in Another Sphere",
+          "description": "The product uses an externally controlled name or reference that resolves to a resource that is outside of the intended control sphere."
+        }
+      ]
+    },
+    {
+      "doc_id": "CWE-1321",
+      "alternate_terms": [],
+      "related_attack_patterns": [
+        {
+          "capec_id": "CAPEC-1",
+          "name": "Accessing Functionality Not Properly Constrained by ACLs"
+        },
+        {
+          "capec_id": "CAPEC-180",
+          "name": "Exploiting Incorrectly Configured Access Control Security Levels"
+        },
+        {
+          "capec_id": "CAPEC-77",
+          "name": "Manipulating User-Controlled Variables"
+        }
+      ],
+      "parents": [
+        {
+          "cwe_id": "CWE-915",
+          "name": "Improperly Controlled Modification of Dynamically-Determined Object Attributes",
+          "description": "The product receives input from an upstream component that specifies multiple attributes, properties, or fields that are to be initialized or updated in an object, but it does not properly control which attributes can be modified."
+        },
+        {
+          "cwe_id": "CWE-913",
+          "name": "Improper Control of Dynamically-Managed Code Resources",
+          "description": "The product does not properly restrict reading from or writing to dynamically-managed code resources such as variables, objects, classes, attributes, functions, or executable instructions or statements."
+        }
+      ]
+    }
+  ]
+}

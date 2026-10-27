@@ -1,12 +1,49 @@
-# Dataset registry. No automatic downloads: use scripts/download_data.py explicitly.
+# Dataset registry. No automatic downloads: use scripts/download_data.py explicitly,
+# then scripts/build_dataset.py to normalise raw snapshots into data/processed/.
 datasets:
   samples:
     path: data/samples/sample_cves.json
     description: Fake sample CVEs for offline pipeline smoke tests.
   benchmark:
     path: evaluation/datasets/benchmark.json
-    description: Placeholder benchmark schema (to be extended in Phase 7).
-  # Future (Phase 2+), all opt-in:
-  # nvd_snapshot:
-  #   path: data/raw/nvd_snapshot.json
-  #   source: https://nvd.nist.gov/  # download manually via script
+    description: Placeholder generation/reproduction benchmark schema (Phase 7).
+
+  # Phase 3 — tracked retrieval corpus + relevance judgements
+  retrieval_corpus:
+    path: data/samples/knowledge_corpus.json
+    source: https://cwe.mitre.org/
+    description: Small tracked CWE seed corpus for offline retrieval and evaluation.
+  retrieval_semantic_context:
+    path: data/samples/cwe_semantic_context.json
+    source: MITRE CWE and CAPEC local snapshots
+    description: Tracked alternate terms, CAPEC names, and parent definitions for semantic retrieval.
+    regenerate: python scripts/build_retrieval_context.py
+  retrieval_benchmark:
+    path: evaluation/datasets/retrieval_benchmark.json
+    source: NVD 2.0 API (CWE assignments)
+    description: CVE description -> CWE relevance judgements for 9 CVEs.
+
+  # Phase 2 — opt-in raw snapshots (git-ignored)
+  nvd_snapshot:
+    path: data/raw/nvd
+    source: https://services.nvd.nist.gov/rest/json/cves/2.0
+    description: Raw NVD 2.0 JSON snapshots downloaded via scripts/download_data.py.
+  cwe_catalog:
+    path: data/raw/cwe/cwec_latest.xml
+    source: https://cwe.mitre.org/data/xml/cwec_latest.xml.zip
+    description: CWE XML catalog snapshot.
+  capec_catalog:
+    path: data/raw/capec/capec_latest.xml
+    source: https://capec.mitre.org/data/xml/capec_latest.xml
+    description: CAPEC XML catalog snapshot.
+
+  # Phase 2 — processed outputs (git-ignored)
+  processed_cves:
+    path: data/processed/cves.json
+    description: Normalised CveRecord list built from NVD snapshots.
+  processed_cwe:
+    path: data/processed/cwe.json
+    description: Normalised CweRecord list built from the CWE catalog.
+  processed_capec:
+    path: data/processed/capec.json
+    description: Normalised CapecRecord list built from the CAPEC catalog.

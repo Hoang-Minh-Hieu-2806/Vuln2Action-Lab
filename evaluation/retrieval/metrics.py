@@ -1,13 +1,13 @@
-"""Retrieval metrics: precision, recall, F1, Recall@K, MRR (no fabricated scores)."""
+"""Retrieval metrics: precision@k, recall@k, F1@k, and MRR (no fabricated scores)."""
 
 from __future__ import annotations
 
 
 def precision_at_k(retrieved: list[str], relevant: set[str], k: int) -> float:
-    top = retrieved[:k]
-    if not top:
+    if k <= 0:
         return 0.0
-    return sum(1 for r in top if r in relevant) / len(top)
+    top = retrieved[:k]
+    return sum(1 for r in top if r in relevant) / k
 
 
 def recall_at_k(retrieved: list[str], relevant: set[str], k: int) -> float:

@@ -51,5 +51,10 @@ jobs:
           vuln2action --sample CVE-2024-0001 --json-only > smoke-output.json
           python -c "import json; data=json.load(open('smoke-output.json', encoding='utf-8')); assert data['result']['status'] == 'SIMULATED'"
 
+      - name: Run retrieval evaluation
+        run: |
+          python scripts/run_evaluation.py --stage retrieval --json-only > retrieval-report.json
+          python -c "import json; data=json.load(open('retrieval-report.json', encoding='utf-8')); assert set(data['results']) == {'keyword', 'tfidf', 'semantic'}; assert data['results']['tfidf']['precision'] > 0; assert data['results']['semantic']['precision'] > 0"
+
       - name: Build distribution
         run: python -m build

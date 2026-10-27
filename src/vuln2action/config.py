@@ -23,7 +23,8 @@ class PipelineSettings(BaseModel):
 
 class RetrievalSettings(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    backends: list[str] = Field(default_factory=lambda: ["keyword", "tfidf"])
+    default_backend: str = "semantic"
+    backends: list[str] = Field(default_factory=lambda: ["keyword", "tfidf", "semantic"])
     top_k: int = Field(default=3, ge=1)
 
 

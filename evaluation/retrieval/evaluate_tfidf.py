@@ -1,17 +1,21 @@
-"""Evaluate TF-IDF retrieval on the placeholder benchmark (Phase 3/7).
-
-TODO: extend benchmark.json with relevance judgements, then report P/R/F1/MRR.
-"""
+"""Evaluate TF-IDF retrieval (thin wrapper around the shared harness)."""
 
 from __future__ import annotations
 
-from vuln2action.retrieval.tfidf import tfidf_search
+import sys
+from pathlib import Path
+
+_ROOT = Path(__file__).resolve().parents[2]
+for _entry in (_ROOT, _ROOT / "src"):
+    if str(_entry) not in sys.path:
+        sys.path.insert(0, str(_entry))
+
+from evaluation.retrieval.evaluate_retrieval import main as evaluate_main
 
 
-def main() -> None:
-    docs = ["XSS search endpoint", "SQL login bypass", "path traversal download"]
-    print(tfidf_search("xss search", docs, top_k=2))
+def main(argv: list[str] | None = None) -> int:
+    return evaluate_main(["--backends", "tfidf", *(argv or [])])
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

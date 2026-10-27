@@ -1,0 +1,224 @@
+{
+  "version": "1.0.0",
+  "description": "Small tracked CWE seed corpus for offline retrieval and evaluation. Descriptions are from the MITRE CWE catalog.",
+  "source": "https://cwe.mitre.org/",
+  "documents": [
+    {
+      "doc_id": "CWE-20",
+      "kind": "cwe",
+      "name": "Improper Input Validation",
+      "text": "CWE-20 Improper Input Validation: The product receives input or data, but it does not validate or incorrectly validates that the input has the properties that are required to process the data safely and correctly.",
+      "source": "https://cwe.mitre.org/data/definitions/20.html"
+    },
+    {
+      "doc_id": "CWE-400",
+      "kind": "cwe",
+      "name": "Uncontrolled Resource Consumption",
+      "text": "CWE-400 Uncontrolled Resource Consumption: The product does not properly control the allocation and maintenance of a limited resource.",
+      "source": "https://cwe.mitre.org/data/definitions/400.html"
+    },
+    {
+      "doc_id": "CWE-502",
+      "kind": "cwe",
+      "name": "Deserialization of Untrusted Data",
+      "text": "CWE-502 Deserialization of Untrusted Data: The product deserializes untrusted data without sufficiently ensuring that the resulting data will be valid.",
+      "source": "https://cwe.mitre.org/data/definitions/502.html"
+    },
+    {
+      "doc_id": "CWE-917",
+      "kind": "cwe",
+      "name": "Improper Neutralization of Special Elements used in an Expression Language Statement ('Expression Language Injection')",
+      "text": "CWE-917 Improper Neutralization of Special Elements used in an Expression Language Statement ('Expression Language Injection'): The product constructs all or part of an expression language (EL) statement in a framework such as a Java Server Page (JSP) using externally-influenced input from an upstream component, but it does not neutralize or incorrectly neutralizes special elements that could modify the intended EL statement before it is executed.",
+      "source": "https://cwe.mitre.org/data/definitions/917.html"
+    },
+    {
+      "doc_id": "CWE-755",
+      "kind": "cwe",
+      "name": "Improper Handling of Exceptional Conditions",
+      "text": "CWE-755 Improper Handling of Exceptional Conditions: The product does not handle or incorrectly handles an exceptional condition.",
+      "source": "https://cwe.mitre.org/data/definitions/755.html"
+    },
+    {
+      "doc_id": "CWE-78",
+      "kind": "cwe",
+      "name": "Improper Neutralization of Special Elements used in an OS Command ('OS Command Injection')",
+      "text": "CWE-78 Improper Neutralization of Special Elements used in an OS Command ('OS Command Injection'): The product constructs all or part of an OS command using externally-influenced input from an upstream component, but it does not neutralize or incorrectly neutralizes special elements that could modify the intended OS command when it is sent to a downstream component.",
+      "source": "https://cwe.mitre.org/data/definitions/78.html"
+    },
+    {
+      "doc_id": "CWE-120",
+      "kind": "cwe",
+      "name": "Buffer Copy without Checking Size of Input ('Classic Buffer Overflow')",
+      "text": "CWE-120 Buffer Copy without Checking Size of Input ('Classic Buffer Overflow'): The product copies an input buffer to an output buffer without verifying that the size of the input buffer is less than the size of the output buffer.",
+      "source": "https://cwe.mitre.org/data/definitions/120.html"
+    },
+    {
+      "doc_id": "CWE-787",
+      "kind": "cwe",
+      "name": "Out-of-bounds Write",
+      "text": "CWE-787 Out-of-bounds Write: The product writes data past the end, or before the beginning, of the intended buffer.",
+      "source": "https://cwe.mitre.org/data/definitions/787.html"
+    },
+    {
+      "doc_id": "CWE-22",
+      "kind": "cwe",
+      "name": "Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal')",
+      "text": "CWE-22 Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal'): The product uses external input to construct a pathname that is intended to identify a file or directory that is located underneath a restricted parent directory, but the product does not properly neutralize special elements within the pathname that can cause the pathname to resolve to a location that is outside of the restricted directory.",
+      "source": "https://cwe.mitre.org/data/definitions/22.html"
+    },
+    {
+      "doc_id": "CWE-94",
+      "kind": "cwe",
+      "name": "Improper Control of Generation of Code ('Code Injection')",
+      "text": "CWE-94 Improper Control of Generation of Code ('Code Injection'): The product constructs all or part of a code segment using externally-influenced input from an upstream component, but it does not neutralize or incorrectly neutralizes special elements that could modify the syntax or behavior of the intended code segment.",
+      "source": "https://cwe.mitre.org/data/definitions/94.html"
+    },
+    {
+      "doc_id": "CWE-295",
+      "kind": "cwe",
+      "name": "Improper Certificate Validation",
+      "text": "CWE-295 Improper Certificate Validation: The product does not validate, or incorrectly validates, a certificate.",
+      "source": "https://cwe.mitre.org/data/definitions/295.html"
+    },
+    {
+      "doc_id": "CWE-79",
+      "kind": "cwe",
+      "name": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')",
+      "text": "CWE-79 Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting'): The product does not neutralize or incorrectly neutralizes user-controllable input before it is placed in output that is used as a web page that is served to other users.",
+      "source": "https://cwe.mitre.org/data/definitions/79.html"
+    },
+    {
+      "doc_id": "CWE-89",
+      "kind": "cwe",
+      "name": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')",
+      "text": "CWE-89 Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection'): The product constructs all or part of an SQL command using externally-influenced input from an upstream component, but it does not neutralize or incorrectly neutralizes special elements that could modify the intended SQL command when it is sent to a downstream component. Without sufficient removal or quoting of SQL syntax in user-controllable inputs, the generated SQL query can cause those inputs to be interpreted as SQL instead of ordinary user data.",
+      "source": "https://cwe.mitre.org/data/definitions/89.html"
+    },
+    {
+      "doc_id": "CWE-352",
+      "kind": "cwe",
+      "name": "Cross-Site Request Forgery (CSRF)",
+      "text": "CWE-352 Cross-Site Request Forgery (CSRF): The web application does not, or cannot, sufficiently verify whether a request was intentionally provided by the user who sent the request, which could have originated from an unauthorized actor.",
+      "source": "https://cwe.mitre.org/data/definitions/352.html"
+    },
+    {
+      "doc_id": "CWE-416",
+      "kind": "cwe",
+      "name": "Use After Free",
+      "text": "CWE-416 Use After Free: The product reuses or references memory after it has been freed. At some point afterward, the memory may be allocated again and saved in another pointer, while the original pointer references a location somewhere within the new allocation. Any operations using the original pointer are no longer valid because the memory \"belongs\" to the code that operates on the new pointer.",
+      "source": "https://cwe.mitre.org/data/definitions/416.html"
+    },
+    {
+      "doc_id": "CWE-125",
+      "kind": "cwe",
+      "name": "Out-of-bounds Read",
+      "text": "CWE-125 Out-of-bounds Read: The product reads data past the end, or before the beginning, of the intended buffer.",
+      "source": "https://cwe.mitre.org/data/definitions/125.html"
+    },
+    {
+      "doc_id": "CWE-119",
+      "kind": "cwe",
+      "name": "Improper Restriction of Operations within the Bounds of a Memory Buffer",
+      "text": "CWE-119 Improper Restriction of Operations within the Bounds of a Memory Buffer: The product performs operations on a memory buffer, but it reads from or writes to a memory location outside the buffer's intended boundary. This may result in read or write operations on unexpected memory locations that could be linked to other variables, data structures, or internal program data.",
+      "source": "https://cwe.mitre.org/data/definitions/119.html"
+    },
+    {
+      "doc_id": "CWE-476",
+      "kind": "cwe",
+      "name": "NULL Pointer Dereference",
+      "text": "CWE-476 NULL Pointer Dereference: The product dereferences a pointer that it expects to be valid but is NULL.",
+      "source": "https://cwe.mitre.org/data/definitions/476.html"
+    },
+    {
+      "doc_id": "CWE-190",
+      "kind": "cwe",
+      "name": "Integer Overflow or Wraparound",
+      "text": "CWE-190 Integer Overflow or Wraparound: The product performs a calculation that can produce an integer overflow or wraparound when the logic assumes that the resulting value will always be larger than the original value. This occurs when an integer value is incremented to a value that is too large to store in the associated representation. When this occurs, the value may become a very small or negative number.",
+      "source": "https://cwe.mitre.org/data/definitions/190.html"
+    },
+    {
+      "doc_id": "CWE-434",
+      "kind": "cwe",
+      "name": "Unrestricted Upload of File with Dangerous Type",
+      "text": "CWE-434 Unrestricted Upload of File with Dangerous Type: The product allows the upload or transfer of dangerous file types that are automatically processed within its environment.",
+      "source": "https://cwe.mitre.org/data/definitions/434.html"
+    },
+    {
+      "doc_id": "CWE-611",
+      "kind": "cwe",
+      "name": "Improper Restriction of XML External Entity Reference",
+      "text": "CWE-611 Improper Restriction of XML External Entity Reference: The product processes an XML document that can contain XML entities with URIs that resolve to documents outside of the intended sphere of control, causing the product to embed incorrect documents into its output.",
+      "source": "https://cwe.mitre.org/data/definitions/611.html"
+    },
+    {
+      "doc_id": "CWE-918",
+      "kind": "cwe",
+      "name": "Server-Side Request Forgery (SSRF)",
+      "text": "CWE-918 Server-Side Request Forgery (SSRF): The web server receives a URL or similar request from an upstream component and retrieves the contents of this URL, but it does not sufficiently ensure that the request is being sent to the expected destination.",
+      "source": "https://cwe.mitre.org/data/definitions/918.html"
+    },
+    {
+      "doc_id": "CWE-1321",
+      "kind": "cwe",
+      "name": "Improperly Controlled Modification of Object Prototype Attributes ('Prototype Pollution')",
+      "text": "CWE-1321 Improperly Controlled Modification of Object Prototype Attributes ('Prototype Pollution'): The product receives input from an upstream component that specifies attributes that are to be initialized or updated in an object, but it does not properly control modifications of attributes of the object prototype.",
+      "source": "https://cwe.mitre.org/data/definitions/1321.html"
+    },
+    {
+      "doc_id": "CWE-269",
+      "kind": "cwe",
+      "name": "Improper Privilege Management",
+      "text": "CWE-269 Improper Privilege Management: The product does not properly assign, modify, track, or check privileges for an actor, creating an unintended sphere of control for that actor.",
+      "source": "https://cwe.mitre.org/data/definitions/269.html"
+    },
+    {
+      "doc_id": "CWE-306",
+      "kind": "cwe",
+      "name": "Missing Authentication for Critical Function",
+      "text": "CWE-306 Missing Authentication for Critical Function: The product does not perform any authentication for functionality that requires a provable user identity or consumes a significant amount of resources.",
+      "source": "https://cwe.mitre.org/data/definitions/306.html"
+    },
+    {
+      "doc_id": "CWE-732",
+      "kind": "cwe",
+      "name": "Incorrect Permission Assignment for Critical Resource",
+      "text": "CWE-732 Incorrect Permission Assignment for Critical Resource: The product specifies permissions for a security-critical resource in a way that allows that resource to be read or modified by unintended actors.",
+      "source": "https://cwe.mitre.org/data/definitions/732.html"
+    },
+    {
+      "doc_id": "CWE-522",
+      "kind": "cwe",
+      "name": "Insufficiently Protected Credentials",
+      "text": "CWE-522 Insufficiently Protected Credentials: The product transmits or stores authentication credentials, but it uses an insecure method that is susceptible to unauthorized interception and/or retrieval.",
+      "source": "https://cwe.mitre.org/data/definitions/522.html"
+    },
+    {
+      "doc_id": "CWE-798",
+      "kind": "cwe",
+      "name": "Use of Hard-coded Credentials",
+      "text": "CWE-798 Use of Hard-coded Credentials: The product contains hard-coded credentials, such as a password or cryptographic key.",
+      "source": "https://cwe.mitre.org/data/definitions/798.html"
+    },
+    {
+      "doc_id": "CWE-200",
+      "kind": "cwe",
+      "name": "Exposure of Sensitive Information to an Unauthorized Actor",
+      "text": "CWE-200 Exposure of Sensitive Information to an Unauthorized Actor: The product exposes sensitive information to an actor that is not explicitly authorized to have access to that information.",
+      "source": "https://cwe.mitre.org/data/definitions/200.html"
+    },
+    {
+      "doc_id": "CWE-863",
+      "kind": "cwe",
+      "name": "Incorrect Authorization",
+      "text": "CWE-863 Incorrect Authorization: The product performs an authorization check when an actor attempts to access a resource or perform an action, but it does not correctly perform the check.",
+      "source": "https://cwe.mitre.org/data/definitions/863.html"
+    },
+    {
+      "doc_id": "CWE-287",
+      "kind": "cwe",
+      "name": "Improper Authentication",
+      "text": "CWE-287 Improper Authentication: When an actor claims to have a given identity, the product does not prove or insufficiently proves that the claim is correct.",
+      "source": "https://cwe.mitre.org/data/definitions/287.html"
+    }
+  ]
+}

@@ -1,5 +1,7 @@
 """Typed execution-plan contracts."""
 
+from typing import Any
+
 from pydantic import BaseModel, ConfigDict, Field
 
 
@@ -26,3 +28,4 @@ class ExecutionResult(BaseModel):
     log: list[str] = Field(default_factory=list)
     steps_executed: int = Field(default=0, ge=0)
     error: str | None = None
+    validation: dict[str, Any] | None = None

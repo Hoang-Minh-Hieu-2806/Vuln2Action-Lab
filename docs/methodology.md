@@ -2,19 +2,44 @@
 
 1. **Foundation (now):** scaffold structure, schemas, baselines, sample
    pipeline, tests. Everything runs offline on fake data.
-2. **Ingestion:** add NVD CVE API client + CWE/CAPEC parsers over local
-   snapshots (opt-in download via `scripts/download_data.py`, never automatic).
-3. **Retrieval:** build a small local corpus; compare keyword vs TF-IDF with
-   `evaluation/retrieval/`; add embeddings only if baselines underperform.
+2. **Ingestion (implemented):** NVD 2.0 client, local snapshots, CWE/CAPEC XML
+   parsers, and a dataset builder. Downloads remain opt-in via
+   `scripts/download_data.py`; `scripts/build_dataset.py` only reads local files.
+3. **Retrieval (implemented):** a small tracked CWE corpus
+   (`data/samples/knowledge_corpus.json`) plus a CVE→CWE benchmark with NVD
+   labels. The corpus contains the 11 CWE entries used as labels plus 20 common
+   distractor CWEs; queries are raw NVD descriptions and labels are NVD's CWE
+   assignments (not hand-written). Keyword, TF-IDF, and semantic retrieval
+   share one backend interface and the same stopword-filtered text
+   normalisation. TF-IDF adds word bigrams/sublinear TF and a light CWE/CAPEC
+   name boost. Semantic retrieval additionally indexes MITRE alternate terms,
+   related CAPEC attack-pattern names, and direct parent-weakness definitions,
+   splits CamelCase names, and blends word and character n-gram TF-IDF. The
+   enrichment comes from MITRE catalog metadata only, never from NVD labels.
+   The tracked `data/samples/cwe_semantic_context.json` keeps the seed subset
+   reproducible offline; raw MITRE snapshots extend it to the full catalog when
+   present. The pipeline merges record-known CWEs, retrieved contexts, and
+   reference metadata. The harness excludes zero-score hits and reports P@k /
+   R@k / F1@k at the cutoff plus MRR over the full ranking (and MRR@k); code
+   lives in `evaluation/retrieval/`. Rejected variants are recorded rather than
+   silently tuned away: full CAPEC descriptions and CWE `Extended_Description`
+   created hub documents (especially CWE-20/CWE-78); CWE
+   `Observed_Examples` were excluded because they can name benchmark CVEs; and
+   an alternate-term max-fusion variant improved the 9-case benchmark but was
+   not stable under leave-one-out evaluation, so it is not the default. Neural
+   embeddings remain a stub until a measured experiment justifies their cost.
 4. **Generation:** freeze the `GenerationProvider` interface; improve the
    rule-based templates; then experiment with LLM-API prompts and/or a small
    local T5 fine-tune. Track with `evaluation/generation/`.
 5. **Reproduction:** implement 1-3 Docker labs (`labs/cve-00x/`) with explicit
    validation scripts; wire the executor to run lab-scoped commands only.
+   `cve-001` is live (vulnerable + patched, real PASS/FAIL); `cve-002`/`003`
+   remain placeholders.
 6. **Validation/evidence:** reserve PASS/FAIL for lab evidence; simulations are
    labelled SIMULATED and stored with a typed report schema.
-7. **Evaluation:** run `evaluation/` harnesses on the placeholder benchmark,
-   then extend the benchmark — never fabricate scores.
+7. **Evaluation:** the retrieval harness runs on a tracked benchmark with real
+   labels; extend generation/reproduction benchmarks next. Never fabricate
+   scores.
 8. **Integration/demo:** optional FastAPI endpoints + notebook walkthrough.
 
 All experiments run against **team-owned isolated labs**. Findings are

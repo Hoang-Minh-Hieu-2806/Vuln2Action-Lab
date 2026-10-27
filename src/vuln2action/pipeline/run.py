@@ -38,10 +38,18 @@ def run_pipeline(
     settings: ApplicationSettings,
     provider: str | None = None,
     top_k: int | None = None,
+    simulate: bool | None = None,
+    backend: str | None = None,
 ) -> PipelineResult:
     selected_provider = provider or settings.pipeline.default_provider
     selected_top_k = top_k or settings.pipeline.retrieval_top_k
-    outcome = analyze_cve(cve, provider=selected_provider, top_k=selected_top_k)
+    selected_backend = backend or settings.retrieval.default_backend
+    outcome = analyze_cve(
+        cve,
+        provider=selected_provider,
+        top_k=selected_top_k,
+        backend=selected_backend,
+    )
     lab_id = cve.lab_id or settings.pipeline.lab_id
     lab = load_lab_manifest(lab_id)
     if lab.vulnerability_id != cve.cve_id:
@@ -50,10 +58,12 @@ def run_pipeline(
         )
     plan = ReproductionPlanner().plan(outcome.workflow, lab_id=lab_id)
     allowed_hosts = set(settings.labs.allowed_hosts) | {"lab", "local"}
+    simulate_execution = settings.pipeline.simulate_execution if simulate is None else simulate
     execution = ReproductionExecutor(
-        simulate=settings.pipeline.simulate_execution,
+        simulate=simulate_execution,
         allowed_hosts=allowed_hosts,
-    ).execute(plan)
+        timeout_seconds=settings.labs.timeout_seconds,
+    ).execute(plan, manifest=lab)
     result = Validator().validate(cve.cve_id, lab_id, execution)
     collector = EvidenceCollector()
     collector.add_log(f"Pipeline run for {cve.cve_id} with provider {outcome.provider}")

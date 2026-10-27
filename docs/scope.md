@@ -3,12 +3,18 @@
 ## In scope
 
 - Local CVE/CWE/CPE/CAPEC schema parsing and sample data.
-- Keyword + TF-IDF retrieval baselines over a local knowledge base.
+- Opt-in NVD 2.0 snapshot ingestion plus CWE/CAPEC catalog parsing
+  (`scripts/download_data.py` → `scripts/build_dataset.py`). No automatic
+  downloads and no bulk fetching during setup.
+- Keyword, TF-IDF, and MITRE-enriched semantic retrieval over a local
+  knowledge base (no model download or network call at query time).
 - Rule-based reproduction-workflow generation (human-readable steps).
 - Simulated/placeholder execution against **isolated Docker labs on localhost**.
 - Truthful `SIMULATED` outcomes and typed evidence/report contracts; real
-  `PASS`/`FAIL` remains unavailable until lab-specific validation exists.
-- Evaluation harnesses (metrics + placeholder benchmarks).
+  `PASS`/`FAIL` is limited to labs with a checked-in validator and a patched
+  counterfactual (`labs/cve-001` today).
+- Evaluation harnesses: measured retrieval metrics over a tracked CVE→CWE
+  benchmark; generation/reproduction benchmarks remain placeholders.
 - Optional local FastAPI scaffold for demo purposes.
 
 ## Out of scope (will not be built in this project)

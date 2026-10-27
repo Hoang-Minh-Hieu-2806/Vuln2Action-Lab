@@ -18,5 +18,6 @@ def analyze(request: CveRecord) -> dict[str, object]:
         request,
         provider=settings.pipeline.default_provider,
         top_k=settings.pipeline.retrieval_top_k,
+        backend=settings.retrieval.default_backend,
     )
     return outcome.model_dump(mode="json")

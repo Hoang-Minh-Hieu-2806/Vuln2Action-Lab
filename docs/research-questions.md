@@ -2,7 +2,8 @@
 
 - **RQ1 (retrieval):** How effectively can relevant vulnerability context
   (CWE/CAPEC/references) be retrieved for a given CVE with lightweight
-  methods (keyword, TF-IDF) before using embeddings?
+  methods (keyword, TF-IDF, and MITRE-enriched semantic retrieval) before
+  using neural embeddings?
 - **RQ2 (generation):** How accurately can a model (or rule baseline) generate
   a *reproducible* workflow — complete, ordered, lab-grounded steps — from
   CVE + retrieved context?
