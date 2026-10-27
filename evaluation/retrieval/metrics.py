@@ -1,4 +1,5 @@
 """Retrieval metrics: precision, recall, F1, Recall@K, MRR (no fabricated scores)."""
+
 from __future__ import annotations
 
 

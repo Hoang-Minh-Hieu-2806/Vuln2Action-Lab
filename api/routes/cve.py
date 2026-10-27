@@ -1,4 +1,5 @@
 """Read-only sample CVE routes."""
+
 from __future__ import annotations
 
 from fastapi import APIRouter, HTTPException

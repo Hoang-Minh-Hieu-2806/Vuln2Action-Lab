@@ -17,7 +17,7 @@ def load_sample_cves(path: str | Path | None = None) -> list[CveRecord]:
     sample_path = Path(path) if path else repo_path("data", "samples", "sample_cves.json")
     records = read_json(sample_path)
     if not isinstance(records, list):
-        raise ValueError(f"Expected a list of records in {sample_path}")
+        raise TypeError(f"Expected a list of records in {sample_path}")
     return [parse_cve_dict(item) for item in records]
 
 

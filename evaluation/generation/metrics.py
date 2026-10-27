@@ -3,6 +3,7 @@
 Phase 1 ships only a dependency-free token-F1 helper; BLEU/ROUGE wiring is
 TODO(Phase 7) so we add no heavy deps now. Never fabricate scores.
 """
+
 from __future__ import annotations
 
 import re

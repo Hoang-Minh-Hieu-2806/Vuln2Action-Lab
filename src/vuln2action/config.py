@@ -58,7 +58,7 @@ def load_yaml(path: str | Path) -> dict[str, object]:
     if raw is None:
         return {}
     if not isinstance(raw, dict):
-        raise ValueError(f"Expected mapping in YAML file: {path}")
+        raise TypeError(f"Expected mapping in YAML file: {path}")
     return raw
 
 

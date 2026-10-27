@@ -1,4 +1,5 @@
 """Unit tests for ingestion schemas/parsers."""
+
 from vuln2action.connectors import (
     get_sample_cve,
     load_sample_cves,

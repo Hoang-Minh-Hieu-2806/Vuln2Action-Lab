@@ -1,4 +1,5 @@
 """Evaluate workflow generation (stub). TODO(Phase 7): wire benchmark + metrics."""
+
 from __future__ import annotations
 
 

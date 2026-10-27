@@ -2,9 +2,10 @@
 
 TODO: extend benchmark.json with relevance judgements, then report P/R/F1/MRR.
 """
+
 from __future__ import annotations
 
-from vuln2action.retrieval.tfidf import tfidf_search  # noqa: E402
+from vuln2action.retrieval.tfidf import tfidf_search
 
 
 def main() -> None:

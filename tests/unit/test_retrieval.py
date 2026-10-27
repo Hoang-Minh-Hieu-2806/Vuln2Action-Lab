@@ -1,4 +1,5 @@
 """Unit tests for retrieval baselines + ranker."""
+
 from vuln2action.connectors import get_sample_cve
 from vuln2action.domain import RetrievedContext
 from vuln2action.retrieval.keyword import keyword_search

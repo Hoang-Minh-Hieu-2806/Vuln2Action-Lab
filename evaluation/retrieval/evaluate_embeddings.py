@@ -2,6 +2,7 @@
 
 TODO(Phase 3): implement only if TF-IDF baselines underperform.
 """
+
 from __future__ import annotations
 
 

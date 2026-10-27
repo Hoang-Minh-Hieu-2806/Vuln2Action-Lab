@@ -1,7 +1,8 @@
 """Reproduction metrics: success rate, validation rate, timing, false positives."""
+
 from __future__ import annotations
 
-from typing import Iterable
+from collections.abc import Iterable
 
 
 def success_rate(statuses: Iterable[str]) -> float:

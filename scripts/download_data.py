@@ -3,6 +3,7 @@
 TODO(Phase 2): implement NVD/CWE snapshot download with --source/--out flags.
 Currently prints guidance only — no network calls, no large downloads.
 """
+
 from __future__ import annotations
 
 

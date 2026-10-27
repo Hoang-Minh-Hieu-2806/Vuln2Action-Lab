@@ -1,4 +1,5 @@
 """Read previously generated local reports."""
+
 from __future__ import annotations
 
 import re

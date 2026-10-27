@@ -2,7 +2,6 @@
 
 from vuln2action.domain import CpeRecord, CweRecord
 
-
 _KNOWN_CWES: dict[str, CweRecord] = {
     "CWE-79": CweRecord(
         cwe_id="CWE-79",
