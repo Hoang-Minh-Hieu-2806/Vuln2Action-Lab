@@ -1,8 +1,9 @@
 """Unit tests for retrieval baselines + ranker."""
-from src.ingestion.cve import get_sample_cve
-from src.retrieval.keyword import keyword_search
-from src.retrieval.ranker import build_contexts_for_cve, rank_contexts, RetrievedContext
-from src.retrieval.tfidf import tfidf_search
+from vuln2action.connectors import get_sample_cve
+from vuln2action.domain import RetrievedContext
+from vuln2action.retrieval.keyword import keyword_search
+from vuln2action.retrieval.ranker import build_contexts_for_cve, rank_contexts
+from vuln2action.retrieval.tfidf import tfidf_search
 
 
 def test_keyword_search_orders():
@@ -21,5 +22,8 @@ def test_ranker_dedupes_and_build_contexts():
     cve = get_sample_cve("CVE-2024-0001")
     ctxs = build_contexts_for_cve(cve, top_k=3)
     assert any(c.source == "CWE-79" for c in ctxs)
-    dupes = [RetrievedContext("A", "t", 0.1), RetrievedContext("A", "t", 0.9)]
+    dupes = [
+        RetrievedContext(source="A", text="t", score=0.1),
+        RetrievedContext(source="A", text="t", score=0.9),
+    ]
     assert rank_contexts(dupes, top_k=2)[0].score == 0.9

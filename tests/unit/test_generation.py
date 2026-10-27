@@ -1,17 +1,18 @@
-"""Unit tests for the generation abstraction (provider-swappable)."""
+"""Generation contracts and provider swapping."""
+
 import pytest
 
-from src.generation import GenerationProvider, RuleBasedGenerator, get_generator
-from src.generation.parser import parse_workflow
-from src.ingestion.cve import get_sample_cve
-from src.retrieval.ranker import build_contexts_for_cve
+from vuln2action.connectors import get_sample_cve
+from vuln2action.generation import GenerationProvider, RuleBasedGenerator, get_generator
+from vuln2action.generation.parser import parse_workflow
+from vuln2action.retrieval.ranker import build_contexts_for_cve
 
 
 def test_rule_based_generates_valid_workflow():
     cve = get_sample_cve("CVE-2024-0002")
-    wf = RuleBasedGenerator().generate(cve, build_contexts_for_cve(cve))
-    assert parse_workflow(wf)["cve_id"] == "CVE-2024-0002"
-    assert len(wf["steps"]) >= 3
+    workflow = RuleBasedGenerator().generate(cve, build_contexts_for_cve(cve))
+    assert parse_workflow(workflow).cve_id == "CVE-2024-0002"
+    assert len(workflow.steps) >= 3
 
 
 def test_factory_returns_interface_and_unknown_raises():

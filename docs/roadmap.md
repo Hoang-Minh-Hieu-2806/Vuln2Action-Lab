@@ -1,8 +1,9 @@
 # Roadmap
 
-- **Phase 1 — Foundation (current):** structure, schemas, config, baselines,
+- **Phase 1 — Foundation (complete):** installable package, typed contracts,
+  validated config, lab manifests, baselines,
   sample pipeline, tests, docs. Done when `pytest` and
-  `python scripts/run_pipeline.py --sample CVE-2024-0001` pass offline.
+  `vuln2action --sample CVE-2024-0001` returns SIMULATED offline.
 - **Phase 2 — CVE ingestion:** NVD API client, local snapshots, CWE/CPE/CAPEC
   parsers, dataset builder (`scripts/build_dataset.py`).
 - **Phase 3 — Retrieval:** local corpus + keyword/TFIDF comparison with

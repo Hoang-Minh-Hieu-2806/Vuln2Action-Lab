@@ -1,6 +1,6 @@
 """Dataset builder stub (Phase 2): raw snapshots -> processed records.
 
-TODO(Phase 2): read data/raw/*, normalise via src/ingestion, write data/processed/.
+TODO(Phase 2): read data/raw/* through vuln2action.connectors and write data/processed/.
 """
 from __future__ import annotations
 

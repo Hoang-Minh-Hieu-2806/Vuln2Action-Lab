@@ -11,7 +11,8 @@
    local T5 fine-tune. Track with `evaluation/generation/`.
 5. **Reproduction:** implement 1-3 Docker labs (`labs/cve-00x/`) with explicit
    validation scripts; wire the executor to run lab-scoped commands only.
-6. **Validation/evidence:** harden PASS/FAIL criteria; standardise report schema.
+6. **Validation/evidence:** reserve PASS/FAIL for lab evidence; simulations are
+   labelled SIMULATED and stored with a typed report schema.
 7. **Evaluation:** run `evaluation/` harnesses on the placeholder benchmark,
    then extend the benchmark — never fabricate scores.
 8. **Integration/demo:** optional FastAPI endpoints + notebook walkthrough.

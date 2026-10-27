@@ -4,12 +4,7 @@ TODO: extend benchmark.json with relevance judgements, then report P/R/F1/MRR.
 """
 from __future__ import annotations
 
-import sys
-from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-
-from src.retrieval.tfidf import tfidf_search  # noqa: E402
+from vuln2action.retrieval.tfidf import tfidf_search  # noqa: E402
 
 
 def main() -> None:

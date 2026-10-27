@@ -1,7 +1,11 @@
 """Unit tests for ingestion schemas/parsers."""
-from src.ingestion.cpe import parse_cpe
-from src.ingestion.cve import get_sample_cve, load_sample_cves, parse_cve_dict
-from src.ingestion.cwe import lookup_cwe
+from vuln2action.connectors import (
+    get_sample_cve,
+    load_sample_cves,
+    lookup_cwe,
+    parse_cpe,
+    parse_cve_dict,
+)
 
 
 def test_parse_cve_dict_minimal():

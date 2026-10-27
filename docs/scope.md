@@ -6,7 +6,8 @@
 - Keyword + TF-IDF retrieval baselines over a local knowledge base.
 - Rule-based reproduction-workflow generation (human-readable steps).
 - Simulated/placeholder execution against **isolated Docker labs on localhost**.
-- PASS/FAIL validation stubs and evidence/report scaffolds.
+- Truthful `SIMULATED` outcomes and typed evidence/report contracts; real
+  `PASS`/`FAIL` remains unavailable until lab-specific validation exists.
 - Evaluation harnesses (metrics + placeholder benchmarks).
 - Optional local FastAPI scaffold for demo purposes.
 
@@ -25,4 +26,4 @@
 ## Safety rule
 
 If a target is not `localhost` / `127.0.0.1` / the isolated lab network,
-the executor must refuse to run. See `src/reproduction/executor.py`.
+the executor must refuse to run. See `src/vuln2action/reproduction/executor.py`.

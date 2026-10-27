@@ -21,7 +21,7 @@ Reproduction Workflow
     v
 Isolated Docker Vulnerability Lab (localhost only)
     v
-Validation -> PASS / FAIL
+Validation -> SIMULATED / PASS / FAIL / ERROR
     v
 Evidence Collection -> Report
 ```
@@ -39,14 +39,15 @@ Vuln2Action-Lab/
   docs/            # problem, objectives, scope, architecture, methodology, ...
   config/          # settings.yaml, models.yaml, datasets.yaml
   data/samples/    # small FAKE sample CVEs for pipeline smoke tests
-  src/
-    ingestion/     # cve, cwe, cpe, capec, exploit (parsers/schemas)
-    retrieval/     # keyword, tfidf, embeddings, ranker
-    generation/    # GenerationProvider ABC: rule-based / llm / t5 + prompts/parser
-    reproduction/  # planner -> executor -> validator -> result
-    evidence/      # collector, logger, reporter
-    pipeline/      # analyze.py + pipeline.py (end-to-end orchestration)
-    utils/         # config, logging, filesystem
+  src/vuln2action/
+    domain/        # strict Pydantic contracts shared by every stage
+    connectors/    # sample/catalog/lab-manifest adapters
+    retrieval/     # keyword, TF-IDF, optional embeddings, ranker
+    generation/    # provider interface + rule-based/LLM/T5 backends
+    reproduction/  # planner -> guarded executor -> truthful validator
+    evidence/      # typed collector and run-scoped reports
+    pipeline/      # analysis + end-to-end orchestration
+    cli.py         # installed `vuln2action` command
   api/             # optional FastAPI layer (scaffold only)
   labs/            # isolated Docker labs: cve-001, cve-002, cve-003
   evaluation/      # retrieval / generation / reproduction metrics scaffolds
@@ -56,13 +57,14 @@ Vuln2Action-Lab/
   notebooks/       # exploratory experiments
 ```
 
-## Current implementation status (Phase 1: Foundation)
+## Current implementation status (foundation refactor complete)
 
-- [x] Package structure, config loading, logging, filesystem utils
-- [x] Data models/schemas (ingestion + reproduction result)
+- [x] Installable `src/vuln2action` package and CLI entry point
+- [x] Validated settings, domain contracts, lab manifests, logging, filesystem utils
 - [x] Generation abstraction (`GenerationProvider`: rule-based works; LLM/T5 are stubs)
 - [x] Retrieval baselines (keyword works; TF-IDF works if sklearn installed; embeddings stub)
-- [x] Reproduction planner/executor/validator **placeholders** (simulated, localhost-only)
+- [x] Reproduction planner/executor/validator boundary (simulated, localhost-only)
+- [x] Simulation reports `SIMULATED`; only real lab validators may report `PASS`
 - [x] Sample end-to-end CLI pipeline over fake sample CVEs
 - [ ] Real CVE ingestion (NVD API), real retrieval corpus, real Docker labs (Phases 2-5)
 
@@ -71,13 +73,13 @@ Vuln2Action-Lab/
 Requires **Python 3.11+**.
 
 ```bash
-pip install -r requirements.txt
+python -m pip install -e ".[test]"
 ```
 
 Optional (API server):
 
 ```bash
-pip install fastapi "uvicorn[standard]"
+python -m pip install -e ".[api,test]"
 ```
 
 Copy env template (only needed for future LLM/API generation):
@@ -99,13 +101,13 @@ python -m pytest -v
 Rule-based baseline over a fake sample CVE (no network, no Docker needed):
 
 ```bash
-python scripts/run_pipeline.py --sample CVE-2024-0001 --provider rule_based
+vuln2action --sample CVE-2024-0001 --provider rule_based
 ```
 
 List available sample CVEs:
 
 ```bash
-python scripts/run_pipeline.py --list-samples
+vuln2action --list-samples
 ```
 
 Other providers (`llm`, `t5`) are accepted as arguments but currently raise a
@@ -121,15 +123,17 @@ the pipeline never hard-codes T5 as the only model.
 Load via:
 
 ```python
-from src.utils.config import load_settings
-s = load_settings()
+from vuln2action.config import load_settings
+
+settings = load_settings()
 ```
 
 ## Security / safety scope
 
 - Operates **only** against intentionally vulnerable, isolated Docker labs
   (`labs/`, localhost / `vuln2action-lab-net`).
-- The executor **refuses** non-local targets (see `src/reproduction/executor.py`).
+- The executor **refuses** non-local targets (see `src/vuln2action/reproduction/executor.py`).
+- Simulated plans can never produce a `PASS` verdict.
 - No real exploit code is shipped. Sample data under `data/samples/` is **fake**.
 - Never commit secrets: `.env` is git-ignored; use `.env.example` as a template.
 - Do not point the framework at real-world systems. Ever.
