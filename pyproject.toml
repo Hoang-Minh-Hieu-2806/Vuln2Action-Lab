@@ -19,6 +19,7 @@ dependencies = [
 [project.optional-dependencies]
 api = ["fastapi>=0.110", "uvicorn[standard]>=0.29"]
 test = ["pytest>=8.0"]
+dev = ["pytest>=8.0", "ruff>=0.6", "build>=1.2"]
 
 [project.scripts]
 vuln2action = "vuln2action.cli:main"
@@ -34,3 +35,4 @@ pythonpath = ["src", "."]
 [tool.ruff]
 line-length = 100
 target-version = "py311"
+extend-exclude = ["notebooks"]

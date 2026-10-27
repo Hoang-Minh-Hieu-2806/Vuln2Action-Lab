@@ -96,6 +96,10 @@ pytest -v
 python -m pytest -v
 ```
 
+GitHub Actions runs Ruff, byte-compilation, the complete test suite, CLI smoke
+tests, and package builds on Python 3.11 and 3.12 for every pull request and
+for pushes to `main` or `codex/**` branches.
+
 ## Running the sample pipeline
 
 Rule-based baseline over a fake sample CVE (no network, no Docker needed):

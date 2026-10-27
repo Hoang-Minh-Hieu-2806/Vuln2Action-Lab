@@ -18,6 +18,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--provider", default=None, help="rule_based | llm | t5")
     parser.add_argument("--list-samples", action="store_true")
     parser.add_argument("--save", default="", help="Optional run id for a report directory.")
+    parser.add_argument(
+        "--json-only",
+        action="store_true",
+        help="Print only machine-readable JSON without a verdict summary.",
+    )
     args = parser.parse_args(argv)
     log = get_logger("vuln2action.cli")
     if args.list_samples:
@@ -33,10 +38,11 @@ def main(argv: list[str] | None = None) -> int:
         return 2
     payload = outcome.to_dict()
     print(json.dumps(payload, indent=2, ensure_ascii=False))
-    print(
-        f"\nVerdict for {cve.cve_id}: {outcome.result.status.value} "
-        f"({outcome.result.steps_executed} steps, provider={outcome.provider})"
-    )
+    if not args.json_only:
+        print(
+            f"\nVerdict for {cve.cve_id}: {outcome.result.status.value} "
+            f"({outcome.result.steps_executed} steps, provider={outcome.provider})"
+        )
     if args.save:
         paths = save_report(args.save, payload, output_dir=settings.evidence.output_dir)
         print(f"Report written under: {paths.run_dir}")
