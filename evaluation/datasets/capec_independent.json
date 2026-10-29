@@ -1,0 +1,849 @@
+{
+  "version": "1.0.0",
+  "kind": "independent",
+  "description": "Independent CVE -> CAPEC evaluation set. Labels are MITRE CAPEC Example_Instances 'See also: CVE-...' links, not a CWE->CAPEC closure.",
+  "labels_source": "MITRE CAPEC catalog Example_Instances (patterns that name a CVE)",
+  "query_source": "NVD 2.0 descriptions (bulk feed or API, cached in data/external)",
+  "candidate_source": "MITRE CAPEC Related_Weakness expansion (615 patterns)",
+  "labeling_criteria": "A label is accepted only when the CAPEC entry's Example_Instances text explicitly names the CVE. Labels are copied verbatim from MITRE and are never edited or inferred. The example text is stored per case so a reviewer can accept or reject the mapping.",
+  "uncertainty": "MITRE examples are illustrative, not exhaustive: a CVE may exhibit attack patterns MITRE never wrote down, so absence of a label is not evidence of incorrectness. Some examples are old (1999-2007) and their NVD records often lack CWE assignments; those cases rely on the CWE catalog's Observed_Examples for candidates (recorded in cwe_source).",
+  "built_at": "2026-10-29T16:28:54.025805+00:00",
+  "sample_stats": {
+    "cve_ids_with_mitre_examples": 59,
+    "skipped_no_nvd_record": 0,
+    "skipped_no_cwe": 29,
+    "skipped_too_few_candidates": 9,
+    "label_unreachable": 9,
+    "label_partially_reachable": 0,
+    "cwe_from_nvd": 19,
+    "cwe_from_cwe_observed_examples": 2,
+    "evaluable": 21
+  },
+  "k": 1,
+  "cases": [
+    {
+      "case_id": "IND-001",
+      "cve_id": "CVE-1999-0046",
+      "query": "Buffer overflow of rlogin program using TERM environmental variable.",
+      "cwe_ids": [
+        "CWE-120"
+      ],
+      "cwe_source": "nvd",
+      "capec_label": [
+        "CAPEC-10"
+      ],
+      "candidates": [
+        "CAPEC-10",
+        "CAPEC-100",
+        "CAPEC-14",
+        "CAPEC-24",
+        "CAPEC-42",
+        "CAPEC-44",
+        "CAPEC-45",
+        "CAPEC-46",
+        "CAPEC-47",
+        "CAPEC-67",
+        "CAPEC-8",
+        "CAPEC-9",
+        "CAPEC-92"
+      ],
+      "label_evidence": [
+        {
+          "capec_id": "CAPEC-10",
+          "capec_name": "Buffer Overflow via Environment Variables",
+          "text": "A buffer overflow in the rlogin program involves its consumption of the $TERM environmental variable. See also: CVE-1999-0046"
+        }
+      ],
+      "label_reachable_in_candidates": [
+        "CAPEC-10"
+      ],
+      "label_fully_reachable": true
+    },
+    {
+      "case_id": "IND-002",
+      "cve_id": "CVE-1999-0073",
+      "query": "Telnet allows a remote client to specify environment variables including LD_LIBRARY_PATH, allowing an attacker to bypass the normal system libraries and gain root access.",
+      "cwe_ids": [
+        "CWE-642"
+      ],
+      "cwe_source": "cwe-observed-examples",
+      "capec_label": [
+        "CAPEC-13"
+      ],
+      "candidates": [
+        "CAPEC-21",
+        "CAPEC-31"
+      ],
+      "label_evidence": [
+        {
+          "capec_id": "CAPEC-13",
+          "capec_name": "Subverting Environment Variable Values",
+          "text": "Changing the LD_LIBRARY_PATH environment variable in TELNET will cause TELNET to use an alternate (possibly Trojan) version of a function library. The Trojan library must be accessible using the target file system and should include Trojan code that will allow the user to log in with a bad password. This requires that the adversary upload the Trojan library to a specific location on the target. As"
+        }
+      ],
+      "label_reachable_in_candidates": [],
+      "label_fully_reachable": false
+    },
+    {
+      "case_id": "IND-003",
+      "cve_id": "CVE-1999-0428",
+      "query": "OpenSSL and SSLeay allow remote attackers to reuse SSL sessions and bypass access controls.",
+      "cwe_ids": [
+        "CWE-384"
+      ],
+      "cwe_source": "nvd",
+      "capec_label": [
+        "CAPEC-60"
+      ],
+      "candidates": [
+        "CAPEC-196",
+        "CAPEC-21",
+        "CAPEC-31",
+        "CAPEC-39",
+        "CAPEC-59",
+        "CAPEC-60",
+        "CAPEC-61"
+      ],
+      "label_evidence": [
+        {
+          "capec_id": "CAPEC-60",
+          "capec_name": "Reusing Session IDs (aka Session Replay)",
+          "text": "OpenSSL and SSLeay allow remote attackers to reuse SSL sessions and bypass access controls. See also: CVE-1999-0428"
+        }
+      ],
+      "label_reachable_in_candidates": [
+        "CAPEC-60"
+      ],
+      "label_fully_reachable": true
+    },
+    {
+      "case_id": "IND-004",
+      "cve_id": "CVE-2000-0972",
+      "query": "HP-UX 11.00 crontab allows local users to read arbitrary files via the -e option by creating a symlink to the target file during the crontab session, quitting the session, and reading the error messages that crontab generates.",
+      "cwe_ids": [
+        "CWE-59"
+      ],
+      "cwe_source": "nvd",
+      "capec_label": [
+        "CAPEC-27"
+      ],
+      "candidates": [
+        "CAPEC-132",
+        "CAPEC-17",
+        "CAPEC-35",
+        "CAPEC-76"
+      ],
+      "label_evidence": [
+        {
+          "capec_id": "CAPEC-27",
+          "capec_name": "Leveraging Race Conditions via Symbolic Links",
+          "text": "Setuid product allows file reading by replacing a file being edited with a symlink to the targeted file, leaking the result in error messages when parsing fails. See also: CVE-2000-0972"
+        }
+      ],
+      "label_reachable_in_candidates": [],
+      "label_fully_reachable": false
+    },
+    {
+      "case_id": "IND-005",
+      "cve_id": "CVE-2001-0249",
+      "query": "Heap overflow in FTP daemon in Solaris 8 allows remote attackers to execute arbitrary commands by creating a long pathname and calling the LIST command, which uses glob to generate long strings.",
+      "cwe_ids": [
+        "CWE-131"
+      ],
+      "cwe_source": "nvd",
+      "capec_label": [
+        "CAPEC-47"
+      ],
+      "candidates": [
+        "CAPEC-100",
+        "CAPEC-47"
+      ],
+      "label_evidence": [
+        {
+          "capec_id": "CAPEC-47",
+          "capec_name": "Buffer Overflow via Parameter Expansion",
+          "text": "Attack Example: FTP glob() The glob() function in FTP servers has been susceptible to attack as a result of incorrect resizing. This is an ftpd glob() Expansion LIST Heap Overflow Vulnerability. ftp daemon contains a heap-based buffer overflow condition. The overflow occurs when the LIST command is issued with an argument that expands into an oversized string after being processed by glob(). This "
+        }
+      ],
+      "label_reachable_in_candidates": [
+        "CAPEC-47"
+      ],
+      "label_fully_reachable": true
+    },
+    {
+      "case_id": "IND-006",
+      "cve_id": "CVE-2001-1534",
+      "query": "mod_usertrack in Apache 1.3.11 through 1.3.20 generates session ID's using predictable information including host IP address, system time and server process ID, which allows local users to obtain session ID's and bypass authentication when these session ID's are used for authentication.",
+      "cwe_ids": [
+        "CWE-384"
+      ],
+      "cwe_source": "nvd",
+      "capec_label": [
+        "CAPEC-59"
+      ],
+      "candidates": [
+        "CAPEC-196",
+        "CAPEC-21",
+        "CAPEC-31",
+        "CAPEC-39",
+        "CAPEC-59",
+        "CAPEC-60",
+        "CAPEC-61"
+      ],
+      "label_evidence": [
+        {
+          "capec_id": "CAPEC-59",
+          "capec_name": "Session Credential Falsification through Prediction",
+          "text": "mod_usertrack in Apache 1.3.11 through 1.3.20 generates session ID's using predictable information including host IP address, system time and server process ID, which allows local users to obtain session ID's and bypass authentication when these session ID's are used for authentication. See also: CVE-2001-1534"
+        }
+      ],
+      "label_reachable_in_candidates": [
+        "CAPEC-59"
+      ],
+      "label_fully_reachable": true
+    },
+    {
+      "case_id": "IND-007",
+      "cve_id": "CVE-2004-2182",
+      "query": "Session fixation vulnerability in Macromedia JRun 4.0 allows remote attackers to hijack user sessions by pre-setting the user session ID information used by the session server.",
+      "cwe_ids": [
+        "CWE-287"
+      ],
+      "cwe_source": "nvd",
+      "capec_label": [
+        "CAPEC-61"
+      ],
+      "candidates": [
+        "CAPEC-114",
+        "CAPEC-115",
+        "CAPEC-151",
+        "CAPEC-194",
+        "CAPEC-22",
+        "CAPEC-57",
+        "CAPEC-593",
+        "CAPEC-633",
+        "CAPEC-650",
+        "CAPEC-94"
+      ],
+      "label_evidence": [
+        {
+          "capec_id": "CAPEC-61",
+          "capec_name": "Session Fixation",
+          "text": "An attacker can hijack user sessions, bypass authentication controls and possibly gain administrative privilege by fixating the session of a user authenticating to the Management Console on certain versions of Macromedia JRun 4.0. This can be achieved by setting the session identifier in the user's browser and having the user authenticate to the Management Console. Session fixation is possible sin"
+        }
+      ],
+      "label_reachable_in_candidates": [],
+      "label_fully_reachable": false
+    },
+    {
+      "case_id": "IND-008",
+      "cve_id": "CVE-2004-2761",
+      "query": "The MD5 Message-Digest Algorithm is not collision resistant, which makes it easier for context-dependent attackers to conduct spoofing attacks, as demonstrated by attacks on the use of MD5 in the signature algorithm of an X.509 certificate.",
+      "cwe_ids": [
+        "CWE-310",
+        "CWE-328"
+      ],
+      "cwe_source": "nvd",
+      "capec_label": [
+        "CAPEC-459"
+      ],
+      "candidates": [
+        "CAPEC-461",
+        "CAPEC-68"
+      ],
+      "label_evidence": [
+        {
+          "capec_id": "CAPEC-459",
+          "capec_name": "Creating a Rogue Certification Authority Certificate",
+          "text": "MD5 Collisions The MD5 algorithm is not collision resistant, allowing attackers to use spoofing attacks to create rogue certificate Authorities. See also: CVE-2004-2761"
+        }
+      ],
+      "label_reachable_in_candidates": [],
+      "label_fully_reachable": false
+    },
+    {
+      "case_id": "IND-009",
+      "cve_id": "CVE-2005-2088",
+      "query": "The Apache HTTP server before 1.3.34, and 2.0.x before 2.0.55, when acting as an HTTP proxy, allows remote attackers to poison the web cache, bypass web application firewall protection, and conduct XSS attacks via an HTTP request with both a \"Transfer-Encoding: chunked\" header and a Content-Length header, which causes Apache to incorrectly handle and forward the body of the request in a way that causes the receiving server to process it as a separate HTTP request, aka \"HTTP Request Smuggling.\"",
+      "cwe_ids": [
+        "CWE-444"
+      ],
+      "cwe_source": "nvd",
+      "capec_label": [
+        "CAPEC-33"
+      ],
+      "candidates": [
+        "CAPEC-273",
+        "CAPEC-33"
+      ],
+      "label_evidence": [
+        {
+          "capec_id": "CAPEC-33",
+          "capec_name": "HTTP Request Smuggling",
+          "text": "Apache server 2.0.45 and version before 1.3.34, when used as a proxy, easily lead to web cache poisoning and bypassing of application firewall restrictions because of non-standard HTTP behavior. Although the HTTP/1.1 specification clearly states that a request with both \"Content-Length\" and a \"Transfer-Encoding: chunked\" headers is invalid, vulnerable versions of Apache accept such requests and re"
+        }
+      ],
+      "label_reachable_in_candidates": [
+        "CAPEC-33"
+      ],
+      "label_fully_reachable": true
+    },
+    {
+      "case_id": "IND-010",
+      "cve_id": "CVE-2005-4900",
+      "query": "SHA-1 is not collision resistant, which makes it easier for context-dependent attackers to conduct spoofing attacks, as demonstrated by attacks on the use of SHA-1 in TLS 1.2.  NOTE: this CVE exists to provide a common identifier for referencing this SHA-1 issue; the existence of an identifier is not, by itself, a technology recommendation.",
+      "cwe_ids": [
+        "CWE-326",
+        "CWE-327"
+      ],
+      "cwe_source": "nvd",
+      "capec_label": [
+        "CAPEC-459"
+      ],
+      "candidates": [
+        "CAPEC-112",
+        "CAPEC-192",
+        "CAPEC-20",
+        "CAPEC-459",
+        "CAPEC-473",
+        "CAPEC-475",
+        "CAPEC-608",
+        "CAPEC-614",
+        "CAPEC-97"
+      ],
+      "label_evidence": [
+        {
+          "capec_id": "CAPEC-459",
+          "capec_name": "Creating a Rogue Certification Authority Certificate",
+          "text": "SHA1 Collisions The SHA1 algorithm is not collision resistant, allowing attackers to use spoofing attacks to create rogue certificate Authorities. See also: CVE-2005-4900"
+        }
+      ],
+      "label_reachable_in_candidates": [
+        "CAPEC-459"
+      ],
+      "label_fully_reachable": true
+    },
+    {
+      "case_id": "IND-011",
+      "cve_id": "CVE-2006-0207",
+      "query": "Multiple HTTP response splitting vulnerabilities in PHP 5.1.1 allow remote attackers to inject arbitrary HTTP headers via a crafted Set-Cookie header, related to the (1) session extension (aka ext/session) and the (2) header function.",
+      "cwe_ids": [
+        "CWE-94"
+      ],
+      "cwe_source": "nvd",
+      "capec_label": [
+        "CAPEC-34"
+      ],
+      "candidates": [
+        "CAPEC-242",
+        "CAPEC-35",
+        "CAPEC-77"
+      ],
+      "label_evidence": [
+        {
+          "capec_id": "CAPEC-34",
+          "capec_name": "HTTP Response Splitting",
+          "text": "In the PHP 5 session extension mechanism, a user-supplied session ID is sent back to the user within the Set-Cookie HTTP header. Since the contents of the user-supplied session ID are not validated, it is possible to inject arbitrary HTTP headers into the response body. This immediately enables HTTP Response Splitting by simply terminating the HTTP response header from within the session ID used i"
+        }
+      ],
+      "label_reachable_in_candidates": [],
+      "label_fully_reachable": false
+    },
+    {
+      "case_id": "IND-012",
+      "cve_id": "CVE-2006-5525",
+      "query": "Incomplete blacklist vulnerability in mainfile.php in PHP-Nuke 7.9 and earlier allows remote attackers to conduct SQL injection attacks via (1) \"/**/UNION \" or (2) \" UNION/**/\" sequences, which are not rejected by the protection mechanism, as demonstrated by a SQL injection via the eid parameter in a search action in the Encyclopedia module in modules.php.",
+      "cwe_ids": [
+        "CWE-20"
+      ],
+      "cwe_source": "cwe-observed-examples",
+      "capec_label": [
+        "CAPEC-66"
+      ],
+      "candidates": [
+        "CAPEC-10",
+        "CAPEC-101",
+        "CAPEC-104",
+        "CAPEC-108",
+        "CAPEC-109",
+        "CAPEC-110",
+        "CAPEC-120",
+        "CAPEC-13",
+        "CAPEC-135",
+        "CAPEC-136",
+        "CAPEC-14",
+        "CAPEC-153",
+        "CAPEC-182",
+        "CAPEC-209",
+        "CAPEC-22",
+        "CAPEC-23",
+        "CAPEC-230",
+        "CAPEC-231",
+        "CAPEC-24",
+        "CAPEC-250",
+        "CAPEC-261",
+        "CAPEC-267",
+        "CAPEC-28",
+        "CAPEC-3",
+        "CAPEC-31",
+        "CAPEC-42",
+        "CAPEC-43",
+        "CAPEC-45",
+        "CAPEC-46",
+        "CAPEC-47",
+        "CAPEC-473",
+        "CAPEC-52",
+        "CAPEC-53",
+        "CAPEC-588",
+        "CAPEC-63",
+        "CAPEC-64",
+        "CAPEC-664",
+        "CAPEC-67",
+        "CAPEC-7",
+        "CAPEC-71",
+        "CAPEC-72",
+        "CAPEC-73",
+        "CAPEC-78",
+        "CAPEC-79",
+        "CAPEC-8",
+        "CAPEC-80",
+        "CAPEC-81",
+        "CAPEC-83",
+        "CAPEC-85",
+        "CAPEC-88",
+        "CAPEC-9"
+      ],
+      "label_evidence": [
+        {
+          "capec_id": "CAPEC-66",
+          "capec_name": "SQL Injection",
+          "text": "With PHP-Nuke versions 7.9 and earlier, an attacker can successfully access and modify data, including sensitive contents such as usernames and password hashes, and compromise the application through SQL Injection. The protection mechanism against SQL Injection employs a denylist approach to input validation. However, because of an improper denylist, it is possible to inject content such as \"foo'/"
+        }
+      ],
+      "label_reachable_in_candidates": [],
+      "label_fully_reachable": false
+    },
+    {
+      "case_id": "IND-013",
+      "cve_id": "CVE-2006-6276",
+      "query": "HTTP request smuggling vulnerability in Sun Java System Proxy Server before 20061130, when used with Sun Java System Application Server or Sun Java System Web Server, allows remote attackers to bypass HTTP request filtering, hijack web sessions, perform cross-site scripting (XSS), and poison web caches via unspecified attack vectors.",
+      "cwe_ids": [
+        "CWE-444"
+      ],
+      "cwe_source": "nvd",
+      "capec_label": [
+        "CAPEC-33"
+      ],
+      "candidates": [
+        "CAPEC-273",
+        "CAPEC-33"
+      ],
+      "label_evidence": [
+        {
+          "capec_id": "CAPEC-33",
+          "capec_name": "HTTP Request Smuggling",
+          "text": "When using Sun Java System Web Proxy Server 3.x or 4.x in conjunction with Sun ONE/iPlanet 6.x, Sun Java System Application Server 7.x or 8.x, it is possible to bypass certain application firewall protections, hijack web sessions, perform Cross Site Scripting or poison the web proxy cache using HTTP Request Smuggling. Differences in the way HTTP requests are parsed by the Proxy Server and the Appl"
+        }
+      ],
+      "label_reachable_in_candidates": [
+        "CAPEC-33"
+      ],
+      "label_fully_reachable": true
+    },
+    {
+      "case_id": "IND-014",
+      "cve_id": "CVE-2006-6652",
+      "query": "Buffer overflow in the glob implementation (glob.c) in libc in NetBSD-current before 20050914, NetBSD 2.* and 3.* before 20061203, and Apple Mac OS X before 2007-004, as used by the FTP daemon and tnftpd, allows remote authenticated users to execute arbitrary code via a long pathname that results from path expansion.",
+      "cwe_ids": [
+        "CWE-119"
+      ],
+      "cwe_source": "nvd",
+      "capec_label": [
+        "CAPEC-47"
+      ],
+      "candidates": [
+        "CAPEC-10",
+        "CAPEC-100",
+        "CAPEC-123",
+        "CAPEC-14",
+        "CAPEC-24",
+        "CAPEC-42",
+        "CAPEC-44",
+        "CAPEC-45",
+        "CAPEC-46",
+        "CAPEC-47",
+        "CAPEC-8",
+        "CAPEC-9"
+      ],
+      "label_evidence": [
+        {
+          "capec_id": "CAPEC-47",
+          "capec_name": "Buffer Overflow via Parameter Expansion",
+          "text": "Buffer overflow in the glob implementation in libc in NetBSD-current before 20050914, and NetBSD 2.* and 3.* before 20061203, as used by the FTP daemon, allows remote authenticated users to execute arbitrary code via a long pathname that results from path expansion. The limit computation of an internal buffer was done incorrectly. The size of the buffer in byte was used as element count, even thou"
+        }
+      ],
+      "label_reachable_in_candidates": [
+        "CAPEC-47"
+      ],
+      "label_fully_reachable": true
+    },
+    {
+      "case_id": "IND-015",
+      "cve_id": "CVE-2007-2027",
+      "query": "Untrusted search path vulnerability in the add_filename_to_string function in intl/gettext/loadmsgcat.c for Elinks 0.11.1 allows local users to cause Elinks to use an untrusted gettext message catalog (.po file) in a \"../po\" directory, which can be leveraged to conduct format string attacks.",
+      "cwe_ids": [
+        "CWE-134"
+      ],
+      "cwe_source": "nvd",
+      "capec_label": [
+        "CAPEC-135"
+      ],
+      "candidates": [
+        "CAPEC-135",
+        "CAPEC-67"
+      ],
+      "label_evidence": [
+        {
+          "capec_id": "CAPEC-135",
+          "capec_name": "Format String Injection",
+          "text": "Untrusted search path vulnerability in the add_filename_to_string function in intl/gettext/loadmsgcat.c for Elinks 0.11.1 allows local users to cause Elinks to use an untrusted gettext message catalog (.po file) in a \"../po\" directory, which can be leveraged to conduct format string attacks. See also: CVE-2007-2027"
+        }
+      ],
+      "label_reachable_in_candidates": [
+        "CAPEC-135"
+      ],
+      "label_fully_reachable": true
+    },
+    {
+      "case_id": "IND-016",
+      "cve_id": "CVE-2010-0488",
+      "query": "Microsoft Internet Explorer 5.01 SP4, 6, 6 SP1, and 7 does not properly handle unspecified \"encoding strings,\" which allows remote attackers to bypass the Same Origin Policy and obtain sensitive information via a crafted web site, aka \"Post Encoding Information Disclosure Vulnerability.\"",
+      "cwe_ids": [
+        "CWE-200",
+        "CWE-732"
+      ],
+      "cwe_source": "nvd",
+      "capec_label": [
+        "CAPEC-267"
+      ],
+      "candidates": [
+        "CAPEC-1",
+        "CAPEC-116",
+        "CAPEC-122",
+        "CAPEC-127",
+        "CAPEC-13",
+        "CAPEC-169",
+        "CAPEC-17",
+        "CAPEC-180",
+        "CAPEC-206",
+        "CAPEC-22",
+        "CAPEC-224",
+        "CAPEC-234",
+        "CAPEC-285",
+        "CAPEC-287",
+        "CAPEC-290",
+        "CAPEC-291",
+        "CAPEC-292",
+        "CAPEC-293",
+        "CAPEC-294",
+        "CAPEC-295",
+        "CAPEC-296",
+        "CAPEC-297",
+        "CAPEC-298",
+        "CAPEC-299",
+        "CAPEC-300",
+        "CAPEC-301",
+        "CAPEC-302",
+        "CAPEC-303",
+        "CAPEC-304",
+        "CAPEC-305",
+        "CAPEC-306",
+        "CAPEC-307",
+        "CAPEC-308",
+        "CAPEC-309",
+        "CAPEC-310",
+        "CAPEC-312",
+        "CAPEC-313",
+        "CAPEC-317",
+        "CAPEC-318",
+        "CAPEC-319",
+        "CAPEC-320",
+        "CAPEC-321",
+        "CAPEC-322",
+        "CAPEC-323",
+        "CAPEC-324",
+        "CAPEC-325",
+        "CAPEC-326",
+        "CAPEC-327",
+        "CAPEC-328",
+        "CAPEC-329",
+        "CAPEC-330",
+        "CAPEC-472",
+        "CAPEC-497",
+        "CAPEC-508",
+        "CAPEC-573",
+        "CAPEC-574",
+        "CAPEC-575",
+        "CAPEC-576",
+        "CAPEC-577",
+        "CAPEC-59",
+        "CAPEC-60",
+        "CAPEC-61",
+        "CAPEC-616",
+        "CAPEC-62",
+        "CAPEC-642",
+        "CAPEC-643",
+        "CAPEC-646",
+        "CAPEC-651",
+        "CAPEC-79"
+      ],
+      "label_evidence": [
+        {
+          "capec_id": "CAPEC-267",
+          "capec_name": "Leverage Alternate Encoding",
+          "text": "Microsoft Internet Explorer 5.01 SP4, 6, 6 SP1, and 7 does not properly handle unspecified \"encoding strings,\" which allows remote adversaries to bypass the Same Origin Policy and obtain sensitive information via a crafted web site, aka \"Post Encoding Information Disclosure Vulnerability.\" Related Vulnerabilities CVE-2010-0488"
+        }
+      ],
+      "label_reachable_in_candidates": [],
+      "label_fully_reachable": false
+    },
+    {
+      "case_id": "IND-017",
+      "cve_id": "CVE-2012-0584",
+      "query": "The Internationalized Domain Name (IDN) feature in Apple Safari before 5.1.4 on Windows does not properly restrict the characters in URLs, which allows remote attackers to spoof a domain name via unspecified homoglyphs.",
+      "cwe_ids": [
+        "CWE-20"
+      ],
+      "cwe_source": "nvd",
+      "capec_label": [
+        "CAPEC-632"
+      ],
+      "candidates": [
+        "CAPEC-10",
+        "CAPEC-101",
+        "CAPEC-104",
+        "CAPEC-108",
+        "CAPEC-109",
+        "CAPEC-110",
+        "CAPEC-120",
+        "CAPEC-13",
+        "CAPEC-135",
+        "CAPEC-136",
+        "CAPEC-14",
+        "CAPEC-153",
+        "CAPEC-182",
+        "CAPEC-209",
+        "CAPEC-22",
+        "CAPEC-23",
+        "CAPEC-230",
+        "CAPEC-231",
+        "CAPEC-24",
+        "CAPEC-250",
+        "CAPEC-261",
+        "CAPEC-267",
+        "CAPEC-28",
+        "CAPEC-3",
+        "CAPEC-31",
+        "CAPEC-42",
+        "CAPEC-43",
+        "CAPEC-45",
+        "CAPEC-46",
+        "CAPEC-47",
+        "CAPEC-473",
+        "CAPEC-52",
+        "CAPEC-53",
+        "CAPEC-588",
+        "CAPEC-63",
+        "CAPEC-64",
+        "CAPEC-664",
+        "CAPEC-67",
+        "CAPEC-7",
+        "CAPEC-71",
+        "CAPEC-72",
+        "CAPEC-73",
+        "CAPEC-78",
+        "CAPEC-79",
+        "CAPEC-8",
+        "CAPEC-80",
+        "CAPEC-81",
+        "CAPEC-83",
+        "CAPEC-85",
+        "CAPEC-88",
+        "CAPEC-9"
+      ],
+      "label_evidence": [
+        {
+          "capec_id": "CAPEC-632",
+          "capec_name": "Homograph Attack via Homoglyphs",
+          "text": "An adversary sends an email, impersonating bankofamerica.com to a user stating that they have just received a new deposit and to click the given link to confirm the deposit. However, the link the in email is bankofamerica.com, where the 'a' and 'e' characters are Cyrillic and not ASCII, instead of bankofamerica.com (all ASCII), which the user clicks after carefully reading the URL, making sure tha"
+        }
+      ],
+      "label_reachable_in_candidates": [],
+      "label_fully_reachable": false
+    },
+    {
+      "case_id": "IND-018",
+      "cve_id": "CVE-2016-0353",
+      "query": "IBM Security Privileged Identity Manager 2.0 before 2.0.2 FP8, when Virtual Appliance is used, does not set the secure flag for the session cookie in an https session, which makes it easier for remote attackers to capture this cookie by intercepting its transmission within an http session.",
+      "cwe_ids": [
+        "CWE-200",
+        "CWE-254"
+      ],
+      "cwe_source": "nvd",
+      "capec_label": [
+        "CAPEC-31"
+      ],
+      "candidates": [
+        "CAPEC-116",
+        "CAPEC-13",
+        "CAPEC-169",
+        "CAPEC-22",
+        "CAPEC-224",
+        "CAPEC-285",
+        "CAPEC-287",
+        "CAPEC-290",
+        "CAPEC-291",
+        "CAPEC-292",
+        "CAPEC-293",
+        "CAPEC-294",
+        "CAPEC-295",
+        "CAPEC-296",
+        "CAPEC-297",
+        "CAPEC-298",
+        "CAPEC-299",
+        "CAPEC-300",
+        "CAPEC-301",
+        "CAPEC-302",
+        "CAPEC-303",
+        "CAPEC-304",
+        "CAPEC-305",
+        "CAPEC-306",
+        "CAPEC-307",
+        "CAPEC-308",
+        "CAPEC-309",
+        "CAPEC-310",
+        "CAPEC-312",
+        "CAPEC-313",
+        "CAPEC-317",
+        "CAPEC-318",
+        "CAPEC-319",
+        "CAPEC-320",
+        "CAPEC-321",
+        "CAPEC-322",
+        "CAPEC-323",
+        "CAPEC-324",
+        "CAPEC-325",
+        "CAPEC-326",
+        "CAPEC-327",
+        "CAPEC-328",
+        "CAPEC-329",
+        "CAPEC-330",
+        "CAPEC-472",
+        "CAPEC-497",
+        "CAPEC-508",
+        "CAPEC-573",
+        "CAPEC-574",
+        "CAPEC-575",
+        "CAPEC-576",
+        "CAPEC-577",
+        "CAPEC-59",
+        "CAPEC-60",
+        "CAPEC-616",
+        "CAPEC-643",
+        "CAPEC-646",
+        "CAPEC-651",
+        "CAPEC-79"
+      ],
+      "label_evidence": [
+        {
+          "capec_id": "CAPEC-31",
+          "capec_name": "Accessing/Intercepting/Modifying HTTP Cookies",
+          "text": "There are two main attack vectors for exploiting poorly protected session variables like cookies. One is the local machine itself which can be exploited directly at the physical level or indirectly through XSS and phishing. In addition, the adversary in the middle attack (CAPEC-94) relies on a network sniffer, proxy, or other intermediary to intercept the subject's credentials and use them to impe"
+        }
+      ],
+      "label_reachable_in_candidates": [],
+      "label_fully_reachable": false
+    },
+    {
+      "case_id": "IND-019",
+      "cve_id": "CVE-2017-2666",
+      "query": "It was discovered in Undertow that the code that parsed the HTTP request line permitted invalid characters. This could be exploited, in conjunction with a proxy that also permitted the invalid characters but with a different interpretation, to inject data into the HTTP response. By manipulating the HTTP response the attacker could poison a web-cache, perform an XSS attack, or obtain sensitive information from requests other than their own.",
+      "cwe_ids": [
+        "CWE-444"
+      ],
+      "cwe_source": "nvd",
+      "capec_label": [
+        "CAPEC-273"
+      ],
+      "candidates": [
+        "CAPEC-273",
+        "CAPEC-33"
+      ],
+      "label_evidence": [
+        {
+          "capec_id": "CAPEC-273",
+          "capec_name": "HTTP Response Smuggling",
+          "text": "When using Undertow, a Java-based web server in Red Hat's Jboss Enterprise Application Platform version 7.0, the code responsible for parsing HTTP requests permitted invalid characters, that could allow the injection of data into HTTP responses from Undertow to clients when used in tandem with a proxy; allowing for web-cache poisoning, XSS, and confidentiality violation of sensitive information fr"
+        }
+      ],
+      "label_reachable_in_candidates": [
+        "CAPEC-273"
+      ],
+      "label_fully_reachable": true
+    },
+    {
+      "case_id": "IND-020",
+      "cve_id": "CVE-2020-0601",
+      "query": "A spoofing vulnerability exists in the way Windows CryptoAPI (Crypt32.dll) validates Elliptic Curve Cryptography (ECC) certificates.An attacker could exploit the vulnerability by using a spoofed code-signing certificate to sign a malicious executable, making it appear the file was from a trusted, legitimate source, aka 'Windows CryptoAPI Spoofing Vulnerability'.",
+      "cwe_ids": [
+        "CWE-295"
+      ],
+      "cwe_source": "nvd",
+      "capec_label": [
+        "CAPEC-475"
+      ],
+      "candidates": [
+        "CAPEC-459",
+        "CAPEC-475"
+      ],
+      "label_evidence": [
+        {
+          "capec_id": "CAPEC-475",
+          "capec_name": "Signature Spoofing by Improper Validation",
+          "text": "The Windows CryptoAPI (Crypt32.dll) was shown to be vulnerable to signature spoofing by failing to properly validate Elliptic Curve Cryptography (ECC) certificates. If the CryptoAPI's signature validator allows the specification of a nonstandard base point (G): \"An adversary can create a custom ECDSA certificate with an elliptic curve (ECC) signature that appears to match a known standard curve, l"
+        }
+      ],
+      "label_reachable_in_candidates": [
+        "CAPEC-475"
+      ],
+      "label_fully_reachable": true
+    },
+    {
+      "case_id": "IND-021",
+      "cve_id": "CVE-2020-8287",
+      "query": "Node.js versions before 10.23.1, 12.20.1, 14.15.4, 15.5.1 allow two copies of a header field in an HTTP request (for example, two Transfer-Encoding header fields). In this case, Node.js identifies the first header field and ignores the second. This can lead to HTTP Request Smuggling.",
+      "cwe_ids": [
+        "CWE-444"
+      ],
+      "cwe_source": "nvd",
+      "capec_label": [
+        "CAPEC-33"
+      ],
+      "candidates": [
+        "CAPEC-273",
+        "CAPEC-33"
+      ],
+      "label_evidence": [
+        {
+          "capec_id": "CAPEC-33",
+          "capec_name": "HTTP Request Smuggling",
+          "text": "When using Haproxy 1.5.3 version as front-end proxy server with with Node.js version 14.13.1 or 12.19.0 as the back-end web server it is possible to use two same header fields for example: two Transfer-Encoding, Transfer-Encoding: chunked and Transfer-Encoding: chunked-false, to bypass Haproxy /flag URI restriction and receive the Haproxy flag value, since Node.js identifies the first header but i"
+        }
+      ],
+      "label_reachable_in_candidates": [
+        "CAPEC-33"
+      ],
+      "label_fully_reachable": true
+    }
+  ]
+}

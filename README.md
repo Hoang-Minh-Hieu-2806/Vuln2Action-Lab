@@ -326,18 +326,67 @@ reward the method that always answers.
 
 Measured with the commands above (re-run to reproduce; nothing hard-coded):
 
-| Method | Top-1 (label) | NDCG | Top-1 CWE cov. | Best-cand | R@5 | MRR | Empty |
+| Method | Top-1 (label) | NDCG* | Top-1 CWE cov. | Best-cand | R@5 | MRR | Empty |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| tfidf (120 cases) | 0.9417 | 0.8244 | 0.9609 | 0.9826 | 0.9583 | 0.9500 | 5 |
-| word2vec (120 cases) | 0.9833 | 0.8901 | 0.9667 | 0.9917 | 0.9917 | 0.9884 | 0 |
-| tfidf (115 common) | 0.9826 | 0.8244 | 0.9609 | 0.9826 | 1.0000 | 0.9913 | 0 |
-| word2vec (115 common) | 0.9826 | 0.8901 | 0.9652 | 0.9913 | 0.9913 | 0.9879 | 0 |
+| tfidf (120 cases) | 0.9417 | 0.8244* | 0.9609 | 0.9826 | 0.9583 | 0.9500 | 5 |
+| word2vec (120 cases) | 0.9833 | 0.8901* | 0.9667 | 0.9917 | 0.9917 | 0.9884 | 0 |
+| tfidf (115 common) | 0.9826 | 0.8244* | 0.9609 | 0.9826 | 1.0000 | 0.9913 | 0 |
+| word2vec (115 common) | 0.9826 | 0.8901* | 0.9652 | 0.9913 | 0.9913 | 0.9879 | 0 |
+
+\* **NDCG is computed on only 2 of the 120 cases** (the rest have a single CWE, so
+every candidate gets the same graded gain and NDCG is undefined). Treat those
+NDCG values as anecdotal, not as evidence that Word2Vec ranks better. The report
+records `ndcg_base_cases` and `ndcg_is_representative` so the base cannot be
+mistaken for the full set.
 
 Reading it honestly: on the common subset both methods tie on the membership
-metric (0.9826), so **that metric does not separate them**. Word2Vec ranks better
-on NDCG (0.8901 vs 0.8244) and never returns an empty ranking, while TF-IDF keeps
-a marginally higher R@5. These are 120-case numbers on a small CPU-trained model
-— not a reproduction of the paper's 89/100 or its 0.84/0.94 similarity scores.
+metric (0.9826), so **that metric does not separate them**. The `top1_cwe_coverage`
+and `best-cand` columns are near-saturated for the reason above, and the NDCG
+difference rests on 2 cases. These are 120-case numbers on a small CPU-trained
+model — not a reproduction of the paper's 89/100 or its 0.84/0.94 similarity
+scores. For a comparison the labels cannot flatter, see the independent
+evaluation set below.
+
+## Independent CVE → CAPEC evaluation (P0.3)
+
+The 120-CVE benchmark above cannot falsify anything: its labels are the very
+CWE→CAPEC closure used to build the candidates, and its `top1_cwe_coverage`
+grading is derived from the same CWEs. `evaluation/datasets/capec_independent.json`
+is a small, deliberately independent set built by
+`scripts/build_capec_independent.py`:
+
+- **Labels:** MITRE CAPEC `Example_Instances` sentences that *name a CVE*
+  ("… See also: CVE-1999-0906"). MITRE analysts wrote these to describe the
+  attack pattern a real incident exhibits; they are not computed from CWE maps.
+  Each label keeps its verbatim evidence text (`label_evidence`) so a reviewer
+  can accept or reject it.
+- **Queries:** real NVD 2.0 descriptions.
+- **Candidates:** the same CWE→CAPEC expansion as the main benchmark. CWEs come
+  from NVD, or from the CWE catalog's `Observed_Examples` when NVD has none
+  (recorded per case in `cwe_source`).
+
+```bash
+python scripts/build_capec_independent.py          # reads cached NVD data
+python scripts/run_evaluation.py --stage capec-independent --save results/evaluation
+```
+
+Measured on 21 evaluable cases (`--stage capec-independent`):
+
+| Method | Split | Top-1 | R@5 | MRR | Empty | n |
+| --- | --- | --- | --- | --- | --- | --- |
+| tfidf | all | 0.3333 | 0.5714 | 0.4444 | 0 | 21 |
+| tfidf | reachable | 0.5833 | 1.0000 | 0.7778 | 0 | 12 |
+| word2vec | all | 0.1905 | 0.4762 | 0.3171 | 0 | 21 |
+| word2vec | reachable | 0.3333 | 0.8333 | 0.5549 | 0 | 12 |
+
+**The conclusion reverses.** On labels that are not derived from the CWE map,
+TF-IDF beats Word2Vec (Top-1 0.33 vs 0.19 over all cases; 0.58 vs 0.33 on cases
+where the label is reachable). Label coverage is only **12/21 = 0.571**: in 9
+cases the MITRE-written label is not in the CWE-derived candidate pool at all, so
+no ranking method could have found it. That coverage ceiling, not the ranker, is
+the dominant failure mode of this architecture. Details and failure analysis are
+in `docs/analysis.md`.
+
 
 
 ## Configuration

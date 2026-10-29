@@ -233,6 +233,8 @@ def summarise_rows(
             "discriminative": {
                 "protocol": "",
                 "evaluated_cases": 0,
+                "ndcg_base_cases": 0,
+                "ndcg_is_representative": False,
                 "top_1_cwe_coverage": 0.0,
                 "top_1_matches_best_candidate": 0.0,
                 "ndcg": 0.0,
@@ -252,7 +254,12 @@ def summarise_rows(
         },
         "discriminative": {
             "protocol": "ranking quality against NVD-CWE graded relevance",
+            # NDCG is undefined when every candidate has the same graded gain
+            # (the normal case for single-CWE CVEs), so it averages over far
+            # fewer cases than ``cases``. Always read the base count with it.
             "evaluated_cases": len(ndcgs),
+            "ndcg_base_cases": len(ndcgs),
+            "ndcg_is_representative": len(ndcgs) == total and total >= 10,
             "top_1_cwe_coverage": _mean(graded_top1),
             "top_1_matches_best_candidate": _mean(
                 [row["top1_is_best"] for row in selected if row["ranked"]]

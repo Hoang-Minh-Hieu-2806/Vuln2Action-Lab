@@ -171,6 +171,9 @@ def test_ndcg_is_none_when_graded_relevance_is_flat(index):
     result = evaluate(["tfidf"], benchmark, index)["results"]["tfidf"]
     assert result["rows"][0]["ndcg"] is None
     assert result["discriminative"]["evaluated_cases"] == 0
+    # The NDCG base must be visible, or 2-case averages look like 120-case ones.
+    assert result["discriminative"]["ndcg_base_cases"] == 0
+    assert result["discriminative"]["ndcg_is_representative"] is False
 
 
 def test_benchmark_validator_rejects_duplicate_and_blank_ids(index):
