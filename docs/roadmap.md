@@ -13,6 +13,13 @@
   `scripts/run_evaluation.py --stage retrieval`. Semantic enrichment improves
   all aggregate metrics on the seed benchmark. Neural embeddings remain an
   explicit stub until a measured experiment justifies their cost.
+- **Phase 3b — CVE→CAPEC (implemented):** CWE→CAPEC candidate expansion from the
+  MITRE catalog, ranked by TF-IDF and Word2Vec with cosine similarity, plus a
+  120-CVE tracked benchmark (`evaluation/datasets/capec_benchmark.json`) whose
+  labels come from Galeax/CVE2CAPEC and whose queries are real NVD text. The
+  harness reports the paper-compatible membership metric alongside
+  discriminative metrics, because the Galeax labels are exactly the CWE→CAPEC
+  closure and membership alone cannot compare ranking methods.
 - **Phase 4 — Generation:** richer rule templates + prompt library; LLM-API
   and/or local T5 behind the same `GenerationProvider` interface.
 - **Phase 5 — Docker reproduction (in progress):** `labs/cve-001` is live with

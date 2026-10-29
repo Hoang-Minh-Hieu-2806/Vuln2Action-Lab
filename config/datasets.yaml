@@ -23,6 +23,17 @@ datasets:
     source: NVD 2.0 API (CWE assignments)
     description: CVE description -> CWE relevance judgements for 9 CVEs.
 
+  # CVE -> CAPEC benchmark (labels from Galeax/CVE2CAPEC, queries from NVD)
+  capec_benchmark:
+    path: evaluation/datasets/capec_benchmark.json
+    source: Galeax/CVE2CAPEC labels + NVD 2.0 descriptive feed
+    description: 120 CVE -> CAPEC cases with traceable label sets and candidates.
+    regenerate: python scripts/build_capec_benchmark.py --download --year 2021 --size 120
+    notes: >
+      Galeax derives CAPEC from CWE, so the label set equals the CWE->CAPEC
+      closure. The evaluator reports both the paper-compatible membership
+      metric and discriminative metrics against NVD-CWE graded relevance.
+
   # Phase 2 — opt-in raw snapshots (git-ignored)
   nvd_snapshot:
     path: data/raw/nvd

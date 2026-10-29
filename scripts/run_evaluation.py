@@ -17,7 +17,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--stage",
         default="retrieval",
-        choices=["retrieval", "generation", "reproduction"],
+        choices=["retrieval", "capec", "generation", "reproduction"],
     )
     parser.add_argument("-h", "--help", action="store_true", dest="show_help")
     args, rest = parser.parse_known_args(argv)
@@ -25,6 +25,10 @@ def main(argv: list[str] | None = None) -> int:
         from evaluation.retrieval.evaluate_retrieval import main as run_retrieval
 
         return run_retrieval([*rest, "--help"] if args.show_help else rest)
+    if args.stage == "capec":
+        from evaluation.retrieval.evaluate_capec import main as run_capec
+
+        return run_capec([*rest, "--help"] if args.show_help else rest)
     if args.show_help:
         parser.print_help()
         return 0

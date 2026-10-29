@@ -1,4 +1,4 @@
-.PHONY: install test pipeline eval retrieval-context lint clean docker-up docker-down
+.PHONY: install test pipeline eval eval-capec capec-benchmark retrieval-context lint clean docker-up docker-down
 
 install:
 	pip install -r requirements.txt
@@ -11,6 +11,12 @@ pipeline:
 
 eval:
 	python scripts/run_evaluation.py --stage retrieval
+
+eval-capec:
+	python scripts/run_evaluation.py --stage capec --save results/evaluation
+
+capec-benchmark:
+	python scripts/build_capec_benchmark.py --download --year 2021 --size 120
 
 retrieval-context:
 	python scripts/build_retrieval_context.py

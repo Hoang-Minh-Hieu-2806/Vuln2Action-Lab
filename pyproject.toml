@@ -18,6 +18,9 @@ dependencies = [
 
 [project.optional-dependencies]
 api = ["fastapi>=0.110", "uvicorn[standard]>=0.29"]
+# Word2Vec ranking for the CVE -> CAPEC comparison. Optional on purpose: the
+# TF-IDF baseline only needs scikit-learn and CI must stay light.
+ranking = ["gensim>=4.3"]
 test = ["pytest>=8.0"]
 dev = ["pytest>=8.0", "ruff>=0.6", "build>=1.2"]
 

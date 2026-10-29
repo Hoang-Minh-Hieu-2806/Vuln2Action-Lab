@@ -71,6 +71,8 @@ Vuln2Action-Lab/
 - [x] Opt-in NVD 2.0 ingestion, local snapshots, CWE/CPE/CAPEC parsers, and a
       dataset builder
 - [x] Tracked CVE→CWE retrieval benchmark with measured P@k / R@k / F1@k / MRR
+- [x] CVE→CWE→CAPEC mapping (TF-IDF vs Word2Vec + cosine) with a tracked
+      120-CVE benchmark and a measured, caveated comparison
 - [x] Sample end-to-end CLI pipeline over fake sample CVEs
 - [ ] Live labs for `cve-002`/`cve-003`; generation and reproduction benchmarks
 
@@ -264,6 +266,79 @@ python scripts/run_evaluation.py --stage retrieval \
 The benchmark labels come from NVD; no score is hard-coded. If a label is
 missing from the chosen corpus, the report shows how many cases are fully
 covered instead of silently inflating recall.
+
+## CVE → CAPEC mapping (Phase 3b)
+
+`src/vuln2action/retrieval/capec.py` implements the paper's first stage: expand
+a CVE's CWE list into CAPEC candidates through the MITRE taxonomy, then rank
+those candidates against the CVE description with **TF-IDF + cosine** (baseline)
+and **Word2Vec + cosine**. Both methods see the identical candidate pool, ties
+break by CAPEC id, and a query with no shared vocabulary returns *no* ranking
+instead of an arbitrary pick.
+
+The CAPEC catalog is an opt-in download (`data/raw/`, git-ignored):
+
+```bash
+python scripts/download_data.py --source capec
+python scripts/build_capec_benchmark.py --download --year 2021 --size 120
+python scripts/run_evaluation.py --stage capec --save results/evaluation
+```
+
+`analyze_cve()` now attaches the mapping (`AnalysisOutcome.capec`); when the
+catalog or the optional `gensim` is missing it returns `capec=None` plus a
+`capec_note` explaining why, so offline runs and CI never break.
+
+Word2Vec needs the optional extra:
+
+```bash
+python -m pip install -e ".[ranking]"   # gensim
+```
+
+### Benchmark
+
+`evaluation/datasets/capec_benchmark.json` holds **120 real CVEs** (unique ids)
+built by `scripts/build_capec_benchmark.py` from two independent downloads:
+
+- **queries**: verbatim NVD descriptions (`nvdcve-2.0-2021.json.gz`);
+- **labels**: `Galeax/CVE2CAPEC` `database/CVE-2021.jsonl.gz` (commit recorded
+  in the file), the same reference the paper cites for its 89/100 accuracy.
+
+No label was written or edited by hand. Cases lacking a label, a CWE, or any
+candidate are dropped and counted in `sample_stats`.
+
+### Important caveat (measured, not assumed)
+
+Galeax builds each CVE's CAPEC set by expanding its CWEs, so **the label set is
+exactly the CWE→CAPEC closure**. Verified over all 18,540 joinable CVE-2021
+records: the published set matched the closure 100% of the time (a unit test
+re-checks this on the tracked file). A "is the prediction inside the label set?"
+metric is therefore close to free for any method ranking those same candidates —
+it measures candidate expansion, not ranking quality. We report it for
+comparability and never as an achievement claim.
+
+The harness also reports **discriminative** metrics that do not use the Galeax
+label: graded relevance from the CVE's own NVD CWEs (a CAPEC is relevant when it
+is related to more of them), then NDCG, Top-1 CWE coverage, Top-1-matches-best
+and R@5. Cases where every method ranks (the *common subset*) are aggregated
+separately, because TF-IDF legitimately returns empty rankings on zero-overlap
+text while Word2Vec always emits a weak score — comparing raw totals would
+reward the method that always answers.
+
+Measured with the commands above (re-run to reproduce; nothing hard-coded):
+
+| Method | Top-1 (label) | NDCG | Top-1 CWE cov. | Best-cand | R@5 | MRR | Empty |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| tfidf (120 cases) | 0.9417 | 0.8244 | 0.9609 | 0.9826 | 0.9583 | 0.9500 | 5 |
+| word2vec (120 cases) | 0.9833 | 0.8901 | 0.9667 | 0.9917 | 0.9917 | 0.9884 | 0 |
+| tfidf (115 common) | 0.9826 | 0.8244 | 0.9609 | 0.9826 | 1.0000 | 0.9913 | 0 |
+| word2vec (115 common) | 0.9826 | 0.8901 | 0.9652 | 0.9913 | 0.9913 | 0.9879 | 0 |
+
+Reading it honestly: on the common subset both methods tie on the membership
+metric (0.9826), so **that metric does not separate them**. Word2Vec ranks better
+on NDCG (0.8901 vs 0.8244) and never returns an empty ranking, while TF-IDF keeps
+a marginally higher R@5. These are 120-case numbers on a small CPU-trained model
+— not a reproduction of the paper's 89/100 or its 0.84/0.94 similarity scores.
+
 
 ## Configuration
 

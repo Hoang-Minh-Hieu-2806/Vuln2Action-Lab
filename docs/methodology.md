@@ -31,16 +31,29 @@
 4. **Generation:** freeze the `GenerationProvider` interface; improve the
    rule-based templates; then experiment with LLM-API prompts and/or a small
    local T5 fine-tune. Track with `evaluation/generation/`.
-5. **Reproduction:** implement 1-3 Docker labs (`labs/cve-00x/`) with explicit
+5. **CVE→CAPEC mapping (implemented):** expand a CVE's NVD CWE list into CAPEC
+   candidates using the catalog's `Related_Weakness` links, then rank the
+   candidates against the description with TF-IDF + cosine and Word2Vec +
+   cosine. Both methods rank the same pool; ties break by CAPEC id; a query
+   with no shared vocabulary yields no ranking rather than an arbitrary pick.
+   The 120-case tracked benchmark stores verbatim NVD queries and
+   Galeax/CVE2CAPEC label sets. Because Galeax labels are exactly the
+   CWE→CAPEC closure (verified on 18,540 CVEs), the harness reports the
+   paper-compatible membership metric *and* discriminative metrics (NDCG,
+   Top-1 CWE coverage, R@5) computed from NVD CWEs, plus a common-subset
+   aggregate so a method that always answers is not rewarded for coverage.
+   The stage degrades to `capec=None` + a reason when the opt-in catalog or
+   the optional `gensim` extra is absent.
+6. **Reproduction:** implement 1-3 Docker labs (`labs/cve-00x/`) with explicit
    validation scripts; wire the executor to run lab-scoped commands only.
    `cve-001` is live (vulnerable + patched, real PASS/FAIL); `cve-002`/`003`
    remain placeholders.
-6. **Validation/evidence:** reserve PASS/FAIL for lab evidence; simulations are
+7. **Validation/evidence:** reserve PASS/FAIL for lab evidence; simulations are
    labelled SIMULATED and stored with a typed report schema.
-7. **Evaluation:** the retrieval harness runs on a tracked benchmark with real
-   labels; extend generation/reproduction benchmarks next. Never fabricate
-   scores.
-8. **Integration/demo:** optional FastAPI endpoints + notebook walkthrough.
+8. **Evaluation:** the retrieval and CAPEC harnesses run on tracked benchmarks
+   with real labels; extend generation/reproduction benchmarks next. Never
+   fabricate scores.
+9. **Integration/demo:** optional FastAPI endpoints + notebook walkthrough.
 
 All experiments run against **team-owned isolated labs**. Findings are
 reported as reproduction evidence, not as operational exploits.
