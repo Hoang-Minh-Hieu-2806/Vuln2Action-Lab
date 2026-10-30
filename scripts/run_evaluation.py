@@ -33,6 +33,10 @@ def main(argv: list[str] | None = None) -> int:
         from evaluation.retrieval.evaluate_capec_independent import main as run_independent
 
         return run_independent([*rest, "--help"] if args.show_help else rest)
+    if args.stage == "generation":
+        from evaluation.generation.evaluate_generation import main as run_generation
+
+        return run_generation([*rest, "--help"] if args.show_help else rest)
     if args.show_help:
         parser.print_help()
         return 0

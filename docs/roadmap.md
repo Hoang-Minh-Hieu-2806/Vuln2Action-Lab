@@ -20,14 +20,24 @@
   harness reports the paper-compatible membership metric alongside
   discriminative metrics, because the Galeax labels are exactly the CWE→CAPEC
   closure and membership alone cannot compare ranking methods.
-- **Phase 4 — Generation:** richer rule templates + prompt library; LLM-API
-  and/or local T5 behind the same `GenerationProvider` interface.
+- **Phase 4 — Generation (T5 implemented):** local `t5-small` fine-tuning on
+  MITRE CAPEC execution-flow phases with CPU training, checkpointing and an
+  inference CLI, behind the existing `GenerationProvider` interface. A bounded
+  run completed (120 steps, train loss 2.44, val 2.48) but output quality is not
+  usable yet; see `docs/t5-training.md`. Rule-based remains the default; the
+  LLM-API provider is still a stub; evaluation is implemented in Phase 7.
+  Decoding controls and structural normalisation (P1.3) cut repetition from 0.60
+  to 0.007 and make every output three-phase; content quality remains low and the
+  training-target truncation is still unfixed (docs/generation-quality.md).
 - **Phase 5 — Docker reproduction (in progress):** `labs/cve-001` is live with
   vulnerable/patched services and a checked-in PASS/FAIL validator; `cve-002`
   and `cve-003` remain placeholders.
 - **Phase 6 — Validation/evidence:** strict PASS/FAIL criteria, evidence
   schema v1, Markdown/JSON reports under `results/`.
-- **Phase 7 — Evaluation (retrieval complete):** the tracked retrieval
-  benchmark reports P/R/F1/MRR; extend generation/reproduction benchmarks and
-  keep every score reproducible.
+- **Phase 7 — Evaluation (retrieval + generation complete):** the tracked
+  retrieval benchmark reports P/R/F1/MRR. Generation evaluation reports corpus
+  and sentence BLEU, ROUGE-1/2/L, phase-order accuracy, phase coverage,
+  repetition and per-phase step recall, with a train/validation leakage audit
+  (`docs/generation-evaluation.md`). Scores stay reproducible; nothing is
+  hard-coded.
 - **Phase 8 — Integration/demo:** optional FastAPI + notebooks + final report.

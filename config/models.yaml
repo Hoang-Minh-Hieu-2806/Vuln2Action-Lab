@@ -1,5 +1,5 @@
 # Generation provider configs. The pipeline selects via `default_provider`
-# in settings.yaml or --provider flag. T5/LLM entries are inert until Phase 4.
+# in settings.yaml or --provider flag.
 providers:
   rule_based:
     enabled: true
@@ -7,17 +7,26 @@ providers:
 
   llm:
     enabled: false
-    # TODO(Phase 4): wire an OpenAI-compatible client.
+    # TODO: wire an OpenAI-compatible client.
     api_base_env: LLM_API_BASE
     api_key_env: LLM_API_KEY
     model_env: LLM_MODEL
     default_model: gpt-4o-mini
     timeout_seconds: 60
 
+  # Local T5 generator (P1.1). torch/transformers are OPTIONAL extras:
+  #   python -m pip install -e ".[t5]"
+  # Nothing is downloaded unless allow_download is true or the checkpoint is
+  # already present in the local Hugging Face cache.
   t5:
-    enabled: false
-    # TODO(Phase 4): wire a local small T5 checkpoint (e.g. t5-small).
-    # Keep torch/transformers OPTIONAL; do not add to requirements.txt yet.
-    checkpoint: t5-small
-    max_length: 512
+    enabled: true
+    base_checkpoint: t5-small
+    # Path to a fine-tuned checkpoint produced by scripts/train_t5.py.
+    # Empty = use base_checkpoint (untuned) as a smoke-test fallback.
+    checkpoint: ""
+    max_input_length: 512
+    max_target_length: 512
+    max_new_tokens: 256
+    num_beams: 4
     device: cpu
+    allow_download: false

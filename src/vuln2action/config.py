@@ -41,12 +41,57 @@ class EvidenceSettings(BaseModel):
     formats: list[str] = Field(default_factory=lambda: ["json", "markdown"])
 
 
+class T5ProviderSettings(BaseModel):
+    """Local T5 generation settings (no download happens implicitly).
+
+    The decoding knobs exist because the first fine-tuned checkpoint loops inside
+    a step and runs into the token cap before reaching the Exploit phase
+    (see ``docs/generation-quality.md``). Defaults stay at the original values so
+    existing checkpoints reproduce their P1.2 numbers; P1.3 turns them on
+    explicitly and measures both.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+    enabled: bool = False
+    base_checkpoint: str = "t5-small"
+    checkpoint: str = ""
+    max_input_length: int = Field(default=512, ge=1)
+    max_target_length: int = Field(default=512, ge=1)
+    max_new_tokens: int = Field(default=256, ge=1)
+    num_beams: int = Field(default=4, ge=1)
+    device: str = "cpu"
+    allow_download: bool = False
+    # --- decoding controls (P1.3) ---
+    no_repeat_ngram_size: int = Field(default=0, ge=0)
+    repetition_penalty: float = Field(default=1.0, ge=0.0)
+    length_penalty: float = 1.0
+    early_stopping: bool = False
+    min_new_tokens: int = Field(default=0, ge=0)
+    # Reorder steps into Explore -> Experiment -> Exploit before building a
+    # Workflow. Reorders only: never inserts a missing phase, never drops or
+    # merges a step (two Experiment steps are legitimate).
+    normalise_output: bool = False
+
+
+class GenerationProvidersSettings(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    rule_based: dict[str, object] = Field(default_factory=lambda: {"enabled": True})
+    llm: dict[str, object] = Field(default_factory=dict)
+    t5: T5ProviderSettings = Field(default_factory=T5ProviderSettings)
+
+
+class GenerationSettings(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    providers: GenerationProvidersSettings = Field(default_factory=GenerationProvidersSettings)
+
+
 class ApplicationSettings(BaseModel):
     model_config = ConfigDict(extra="forbid")
     pipeline: PipelineSettings = Field(default_factory=PipelineSettings)
     retrieval: RetrievalSettings = Field(default_factory=RetrievalSettings)
     labs: LabSettings = Field(default_factory=LabSettings)
     evidence: EvidenceSettings = Field(default_factory=EvidenceSettings)
+    generation: GenerationSettings = Field(default_factory=GenerationSettings)
 
 
 def project_root() -> Path:
@@ -66,3 +111,9 @@ def load_yaml(path: str | Path) -> dict[str, object]:
 def load_settings(path: str | Path | None = None) -> ApplicationSettings:
     config_path = Path(path) if path else project_root() / "config" / "settings.yaml"
     return ApplicationSettings.model_validate(load_yaml(config_path))
+
+
+def load_model_settings(path: str | Path | None = None) -> GenerationSettings:
+    """Load ``config/models.yaml`` (generation provider settings only)."""
+    config_path = Path(path) if path else project_root() / "config" / "models.yaml"
+    return GenerationSettings.model_validate(load_yaml(config_path))

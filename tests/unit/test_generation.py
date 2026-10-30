@@ -21,9 +21,8 @@ def test_factory_returns_interface_and_unknown_raises():
         get_generator("nope")
 
 
-def test_llm_t5_stubs_raise_helpful_errors():
+def test_llm_stub_raises_helpful_error():
+    """The LLM provider is still a stub; T5 is real and covered in test_generation_t5."""
     cve = get_sample_cve("CVE-2024-0001")
     with pytest.raises(NotImplementedError):
         get_generator("llm").generate(cve, [])
-    with pytest.raises(NotImplementedError):
-        get_generator("t5").generate(cve, [])

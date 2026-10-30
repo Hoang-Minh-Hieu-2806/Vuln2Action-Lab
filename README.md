@@ -61,7 +61,8 @@ Vuln2Action-Lab/
 
 - [x] Installable `src/vuln2action` package and CLI entry point
 - [x] Validated settings, domain contracts, lab manifests, logging, filesystem utils
-- [x] Generation abstraction (`GenerationProvider`: rule-based works; LLM/T5 are stubs)
+- [x] Generation abstraction (`GenerationProvider`: rule-based baseline; local T5
+      fine-tune with CPU training + inference; LLM API still a stub)
 - [x] Retrieval backends (keyword, TF-IDF, and MITRE-enriched semantic retrieval,
       selectable from the CLI)
 - [x] Reproduction planner/executor/validator boundary (simulated, localhost-only)
@@ -122,9 +123,41 @@ List available sample CVEs:
 vuln2action --list-samples
 ```
 
-Other providers (`llm`, `t5`) are accepted as arguments but currently raise a
-clear "not configured" error until credentials/models are set up. This is intentional:
-the pipeline never hard-codes T5 as the only model.
+`t5` is a real local seq2seq generator (optional heavy extra):
+
+```bash
+python -m pip install -e ".[t5]"
+python scripts/download_data.py --source capec
+python scripts/build_t5_dataset.py
+python scripts/train_t5.py --allow-download --epochs 6 --batch-size 8 --max-steps 120
+python scripts/run_t5.py --sample CVE-2024-0002 --checkpoint models/t5-capec-flows
+```
+
+Training data, provenance, measured losses and quality caveats are documented in
+`docs/t5-training.md`. Output is textual guidance, never a validated exploit.
+
+Evaluate the generator against the rule-based baseline (BLEU, ROUGE, phase
+accuracy, repetition, leakage audit):
+
+```bash
+python scripts/run_evaluation.py --stage generation --systems rule_based,t5 \
+    --save results/evaluation/generation
+```
+
+Metrics, the leakage audit and a failure analysis are in
+`docs/generation-evaluation.md`. Decoding controls (n-gram blocking, repetition
+penalty, length-aware beam search) and structural normalisation are documented in
+`docs/generation-quality.md`; on the same 28 validation cases they cut repetition
+from 0.60 to 0.007 and raise corpus BLEU to 0.1337 (rule-based: 0.0010), with all
+three phases present in every output.
+
+```bash
+python scripts/run_evaluation.py --stage generation --systems t5-improved \
+    --save results/evaluation/generation
+```
+
+`llm` remains a stub until credentials are configured; the pipeline never
+hard-codes any single model as mandatory.
 
 Choose the retrieval backend explicitly (default comes from
 `config/settings.yaml`):
