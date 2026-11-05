@@ -71,11 +71,13 @@ Vuln2Action-Lab/
 - [x] Opt-in NVD 2.0 ingestion, local snapshots, CWE/CPE/CAPEC parsers, and a
       dataset builder
 - [x] Paper-reproduction dataset builder: CWE–CAPEC relations, CAPEC execution
-      flows, ExploitDB metadata, CVE2CAPEC references, and a deterministic
-      55k-CVE stratified sample
+      flows, ExploitDB metadata, CVE2CAPEC references, and deterministic
+      55k-CVE latest/stratified selection
+- [x] Best-CAPEC selection with TF-IDF and Word2Vec + cosine similarity
+      (78/100 top-1 on the CAPEC eval split)
 - [x] Tracked CVE→CWE retrieval benchmark with measured P@k / R@k / F1@k / MRR
 - [x] Sample end-to-end CLI pipeline over fake sample CVEs
-- [ ] CAPEC selection, T5 training, Flask GUI, and full evaluation
+- [ ] T5 training, Flask GUI, and full evaluation
 - [ ] Live labs for `cve-002`/`cve-003`; generation and reproduction benchmarks
 
 ## Paper-reproduction dataset (step 1)
@@ -109,6 +111,19 @@ The latest-mode snapshot is documented in
 `docs/reproduction-dataset-report-vi.md`; the earlier 2023 stratified snapshot
 is kept at `data/processed/reproduction_paper_2023/`.
 
+Best-CAPEC selection (step 2):
+
+```bash
+python scripts/select_capec.py --dataset data/processed/reproduction \
+  --method both --scope eval --split capec_eval_100
+python scripts/select_capec.py --dataset data/processed/reproduction \
+  --method word2vec --scope all
+```
+
+Measured on `capec_eval_100`: TF-IDF and Word2Vec both reach **78/100** top-1
+(97.5% among the 80 CVEs that have candidates); candidate recall is 80/100.
+See `docs/capec-selection-report-vi.md`.
+
 ## Installation
 
 Requires **Python 3.11+**.
@@ -121,6 +136,12 @@ Optional (API server):
 
 ```bash
 python -m pip install -e ".[api,test]"
+```
+
+Optional (Word2Vec CAPEC selection):
+
+```bash
+python -m pip install -e ".[nlp,test]"
 ```
 
 Copy env template (only needed for future LLM/API generation):

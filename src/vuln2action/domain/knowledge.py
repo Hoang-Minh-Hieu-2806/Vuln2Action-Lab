@@ -59,6 +59,36 @@ class CveCapecReference(BaseModel):
     source: str = "CVE2CAPEC"
 
 
+class CapecPrediction(BaseModel):
+    """One best-CAPEC prediction for a CVE, with evaluation-only labels."""
+
+    model_config = ConfigDict(extra="forbid")
+    cve_id: str
+    method: str
+    selected_capec_id: str | None = None
+    score: float = 0.0
+    candidate_capec_ids: list[str] = Field(default_factory=list)
+    reference_capec_ids: list[str] = Field(default_factory=list)
+    correct: bool | None = None
+
+
+class CapecSelectionMetrics(BaseModel):
+    """Top-1 and candidate-recall metrics for one selector and split."""
+
+    model_config = ConfigDict(extra="forbid")
+    method: str
+    split: str
+    cves: int
+    with_candidates: int
+    with_reference: int
+    evaluated: int
+    correct: int
+    accuracy: float
+    accuracy_answered: float
+    candidate_recall: float
+    mean_score: float
+
+
 class ExploitReference(BaseModel):
     """Reference metadata only; executable exploit code is intentionally excluded."""
 

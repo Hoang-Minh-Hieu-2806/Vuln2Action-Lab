@@ -4,7 +4,9 @@ from vuln2action.domain.cve import CpeRecord, CveRecord
 from vuln2action.domain.evidence import EvidenceBundle, HttpEvidence
 from vuln2action.domain.execution import ExecutionPlan, ExecutionResult, PlanStep
 from vuln2action.domain.knowledge import (
+    CapecPrediction,
     CapecRecord,
+    CapecSelectionMetrics,
     CapecStep,
     CveCapecReference,
     CweRecord,
@@ -22,7 +24,9 @@ from vuln2action.domain.workflow import (
 )
 
 __all__ = [
+    "CapecPrediction",
     "CapecRecord",
+    "CapecSelectionMetrics",
     "CapecStep",
     "CpeRecord",
     "CveCapecReference",

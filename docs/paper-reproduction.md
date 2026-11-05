@@ -152,6 +152,34 @@ rewritten to a modern CWE because that would introduce artificial labels.
 The measured 55k snapshot and its deviation table are in
 `docs/reproduction-dataset-report-vi.md`.
 
+## Step 2: best-CAPEC selection
+
+Candidates are the union of the CWE–CAPEC candidates for each CVE. The CVE
+description is compared with each candidate CAPEC's `name + description`.
+TF-IDF (unigram+bigram, sublinear TF) and Word2Vec (skip-gram, 100 dimensions,
+window 5, 10 epochs, seed 42) are both evaluated with cosine similarity.
+
+```bash
+python scripts/select_capec.py --dataset data/processed/reproduction \
+  --method both --scope eval --split capec_eval_100
+python scripts/select_capec.py --dataset data/processed/reproduction \
+  --method word2vec --scope all
+```
+
+Measured results:
+
+| Method | Candidate coverage | Candidate recall | Top-1 / 100 | Top-1 among answered |
+|---|---:|---:|---:|---:|
+| TF-IDF | 80 | 80 | 78 | 97.5% |
+| Word2Vec | 80 | 80 | 78 | 97.5% |
+
+The paper reports 89/100. This reproduction reports **78/100**, not 89/100.
+The main limit is candidate coverage: 20 of the 100 CVEs have no candidate
+CAPEC because their direct CWE has no relation in the current CAPEC catalog.
+On all 55,000 CVEs, Word2Vec selects a CAPEC for 39,181 CVEs and is correct on
+38,374 of 38,581 answered CVEs (99.46% conditional; 69.77% over all 55,000).
+Full details are in `docs/capec-selection-report-vi.md`.
+
 ## T4 x2 training configuration
 
 Kaggle provides 2 x T4 (16 GB each). Use:
