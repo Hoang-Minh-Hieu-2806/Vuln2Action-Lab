@@ -42,6 +42,7 @@ from vuln2action.connectors.reproduction import (
     make_splits,
     parse_catalogs,
     sample_records_by_year,
+    select_newest_records,
 )
 from vuln2action.utils.filesystem import write_json, write_jsonl
 
@@ -64,6 +65,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--target-cves", type=int, default=55_000)
     parser.add_argument("--start-year", type=int, default=2002)
     parser.add_argument("--end-year", type=int, default=2023)
+    parser.add_argument(
+        "--selection-strategy",
+        choices=["stratified", "newest"],
+        default="stratified",
+        help="stratified = paper-faithful sample by year; newest = latest published CVEs.",
+    )
     parser.add_argument("--seed", type=int, default=42)
     args = parser.parse_args(argv)
     if args.target_cves < 1:
@@ -91,11 +98,17 @@ def main(argv: list[str] | None = None) -> int:
     if not records_by_year:
         parser.error(f"no NVD annual feeds found under {feed_dir}")
 
-    selected = sample_records_by_year(records_by_year, args.target_cves, seed=args.seed)
+    if args.selection_strategy == "newest":
+        selected = select_newest_records(records_by_year, args.target_cves)
+    else:
+        selected = sample_records_by_year(records_by_year, args.target_cves, seed=args.seed)
     if not selected:
-        parser.error("NVD sampling produced no records")
+        parser.error("NVD selection produced no records")
     selected_ids = {record.cve_id for record in selected}
-    print(f"selected {len(selected)} CVEs from {sum(len(v) for v in records_by_year.values())}")
+    print(
+        f"selected {len(selected)} CVEs ({args.selection_strategy}) "
+        f"from {sum(len(v) for v in records_by_year.values())}"
+    )
 
     print("parsing CWE/CAPEC catalogs...")
     cwes, capecs = parse_catalogs(cwe_path, capec_path)
@@ -112,7 +125,8 @@ def main(argv: list[str] | None = None) -> int:
     exploits = parse_exploitdb_csv(exploitdb_path)
     exploit_rows = exploit_rows_for_selected(exploits, selected_ids)
 
-    splits = make_splits(selected_ids, references.keys(), seed=args.seed)
+    reference_ids = [cve_id for cve_id, reference in references.items() if reference.capec_ids]
+    splits = make_splits(selected_ids, reference_ids, seed=args.seed)
     stats = dataset_stats(
         records_by_year=records_by_year,
         selected=selected,
@@ -127,6 +141,7 @@ def main(argv: list[str] | None = None) -> int:
         splits=splits,
         target=args.target_cves,
         seed=args.seed,
+        selection_strategy=args.selection_strategy,
         cwe_meta=catalog_metadata(cwe_path),
         capec_meta=catalog_metadata(capec_path),
     )

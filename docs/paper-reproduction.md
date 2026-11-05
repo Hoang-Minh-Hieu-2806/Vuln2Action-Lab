@@ -34,7 +34,7 @@ Not claimed:
 
 | Item | Paper |
 | --- | --- |
-| CVE cutoff | CVEs indexed in 2023; exploits 1999-2023 |
+| CVE cutoff | CVEs indexed in 2023; exploits 1999-2023 (`latest` mode used here extends to 2026 as a user-requested deviation) |
 | CVE count | 114,560 |
 | CVE-CWE pairs | 28,831 |
 | CWE-CAPEC pairs | 46,575 |
@@ -88,14 +88,42 @@ public Kaggle dataset.
 
 ## Step 1: dataset build
 
-The NVD 2.0 annual feeds start at 2002, so the reproduction uses 2002-2023.
-The target is a **55,000-CVE stratified sample** (about half of the paper's
-114,560). Sampling is proportional by year and deterministic with `--seed`.
+The NVD 2.0 annual feeds start at 2002. Two selection modes are available:
+
+- `stratified`: paper-faithful proportional sample across 2002-2023.
+- `newest`: the latest 55,000 CVEs by NVD `published` timestamp, using all
+  downloaded feeds (including 2024-2026 when present).
+
+The target is **55,000 CVEs**, about half of the paper's 114,560.
+
+Paper-faithful mode:
 
 ```bash
 python scripts/download_reproduction_data.py --source all --start-year 2002 --end-year 2023
-python scripts/build_reproduction_dataset.py --target-cves 55000 --seed 42
+python scripts/build_reproduction_dataset.py --target-cves 55000 --seed 42 --selection-strategy stratified
 ```
+
+Latest-CVE mode:
+
+```bash
+python scripts/download_reproduction_data.py --source all --start-year 2002 --end-year 2026
+python scripts/build_reproduction_dataset.py --target-cves 55000 --selection-strategy newest
+```
+
+The generated `data/processed/reproduction/` uses the newest mode. The earlier
+paper-faithful snapshot is kept at `data/processed/reproduction_paper_2023/`.
+
+Latest mode is deliberately **not** the paper's 2023 cutoff. It selects the
+latest 55,000 NVD records by `published` time, including NVD 2024-2026. Two
+consequences must be reported in every result:
+
+- None of the paper's 20 human-evaluation CVEs is in this 55k sample, so the
+  20-CVE human-eval split is a deterministic latest-CVE fill. It is not the
+  paper's human-eval set.
+- Only 27 ExploitDB rows overlap the 55k sample, because recent CVEs rarely
+  have public ExploitDB entries. The exploit-mapping stage needs either a
+  historical exploit-linked subset or a future hybrid selection mode; it must
+  not be evaluated on 27 rows as if that were the paper setup.
 
 Outputs under `data/processed/reproduction/`:
 
@@ -155,11 +183,13 @@ independent experiments, not evade limits.
    SBERT threshold study.
 5. **Resource use**: inference latency and CPU/GPU memory on the available
    hardware, clearly labelled as T4 x2 rather than A100.
-6. **Human evaluation**: 20 CVEs, correctness/completeness/clarity. The
-   reproduction currently has one advisor reviewer, not the paper's three
-   independent experts. Report this as a **single-expert advisor review**, not
-   as a three-expert study. Optional internal sanity checks may be added, but
-   they must not be merged into the advisor's scores.
+6. **Human evaluation**: 20 CVEs, correctness/completeness/clarity. Latest
+   mode uses 20 deterministic recent CVEs, not the paper's 20 CVEs (none of the
+   paper CVEs is in the latest 55k sample). The reproduction currently has one
+   advisor reviewer, not the paper's three independent experts. Report this as
+   a **single-expert advisor review**, not as a three-expert study. Optional
+   internal sanity checks may be added, but they must not be merged into the
+   advisor's scores.
 
 ## Safety boundary
 

@@ -84,21 +84,30 @@ The reproduction track is documented in `docs/paper-reproduction.md`. It is
 offline by default; snapshots are fetched only by explicit scripts.
 
 ```bash
-python scripts/download_reproduction_data.py --source all --start-year 2002 --end-year 2023
-python scripts/build_reproduction_dataset.py --target-cves 55000 --seed 42
+# Latest 55k CVEs (current generated dataset)
+python scripts/download_reproduction_data.py --source all --start-year 2002 --end-year 2026
+python scripts/build_reproduction_dataset.py --target-cves 55000 --selection-strategy newest
 python scripts/audit_reproduction_dataset.py
+
+# Paper-faithful stratified alternative
+python scripts/build_reproduction_dataset.py --target-cves 55000 --seed 42 --selection-strategy stratified
 ```
 
-The NVD 2.0 annual feeds start at 2002, so the sample covers 2002–2023. The
-builder writes `cves.jsonl`, catalog/relation tables, CAPEC candidates,
-evaluation-only CVE2CAPEC references, ExploitDB metadata, leakage-free splits,
-and `stats.json` under `data/processed/reproduction/`. Exploit source code is
-never downloaded or written.
+The NVD 2.0 annual feeds start at 2002. The builder writes `cves.jsonl`,
+catalog/relation tables, CAPEC candidates, evaluation-only CVE2CAPEC
+references, ExploitDB metadata, leakage-free splits, and `stats.json` under
+`data/processed/reproduction/`. Exploit source code is never downloaded or
+written.
 
-Generated snapshot: **55,000 CVEs**, 42,897 with at least one CWE, 46,265
-CVE–CWE pairs, 1,212 unique CWE–CAPEC pairs, and 53,962 CVE2CAPEC references.
-See `docs/reproduction-dataset-report-vi.md` for the full report and deviations
-from the paper.
+Latest snapshot: **55,000 CVEs** (54,119 with a 2026 CVE ID), 49,650 with a
+CWE, 57,023 CVE-CWE pairs, 48,127 non-empty CVE2CAPEC references, and only **27**
+ExploitDB rows. The low ExploitDB overlap is expected for the newest CVEs and
+is flagged in the report; the exploit stage needs a historical exploit-linked
+subset or a hybrid selection mode.
+
+The latest-mode snapshot is documented in
+`docs/reproduction-dataset-report-vi.md`; the earlier 2023 stratified snapshot
+is kept at `data/processed/reproduction_paper_2023/`.
 
 ## Installation
 

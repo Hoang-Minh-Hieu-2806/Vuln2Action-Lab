@@ -11,6 +11,7 @@ anything. It fetches public snapshots only:
 Examples::
 
     python scripts/download_reproduction_data.py --source all
+    python scripts/download_reproduction_data.py --source all --start-year 2002 --end-year 2026
     python scripts/download_reproduction_data.py --source nvd --start-year 2002 --end-year 2023
 """
 

@@ -134,6 +134,21 @@ def sample_records_by_year(
     return selected
 
 
+def select_newest_records(
+    records_by_year: Mapping[int, list[CveRecord]],
+    target: int,
+) -> list[CveRecord]:
+    """Select the newest CVEs by NVD published timestamp, newest first."""
+    if target <= 0:
+        return []
+    records = [record for year in sorted(records_by_year) for record in records_by_year[year]]
+    records.sort(
+        key=lambda record: (record.published or "", record.cve_id),
+        reverse=True,
+    )
+    return records[:target]
+
+
 def build_cve_cwe_pairs(
     records: Iterable[CveRecord],
     known_cwe_ids: set[str] | None = None,
@@ -280,6 +295,7 @@ def dataset_stats(
     splits: Mapping[str, list[str]],
     target: int,
     seed: int,
+    selection_strategy: str,
     cwe_meta: Mapping[str, str],
     capec_meta: Mapping[str, str],
 ) -> dict[str, Any]:
@@ -293,6 +309,7 @@ def dataset_stats(
         "paper_cve_count": 114_560,
         "target_cves": target,
         "seed": seed,
+        "selection_strategy": selection_strategy,
         "raw_cves_by_year": {
             str(year): len(records) for year, records in sorted(records_by_year.items())
         },
@@ -319,6 +336,9 @@ def dataset_stats(
         ),
         "candidate_capec_links": sum(len(row["candidate_capec_ids"]) for row in candidate_rows),
         "cve2capec_reference_rows": len(references),
+        "cve2capec_reference_rows_with_capec": sum(
+            1 for reference in references.values() if reference.capec_ids
+        ),
         "cve2capec_matched_selected": len(set(references) & selected_ids),
         "exploit_rows_total": len(exploits),
         "exploit_rows_with_selected_cve": sum(1 for row in exploit_rows if row["cve_ids"]),

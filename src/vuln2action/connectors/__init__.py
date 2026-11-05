@@ -36,6 +36,7 @@ from vuln2action.connectors.reproduction import (
     load_nvd_feeds,
     make_splits,
     sample_records_by_year,
+    select_newest_records,
 )
 from vuln2action.connectors.reproduction import (
     parse_catalogs as parse_reproduction_catalogs,
@@ -77,6 +78,7 @@ __all__ = [
     "parse_reproduction_catalogs",
     "sample_records_by_year",
     "save_nvd_snapshot",
+    "select_newest_records",
     "write_capec_dataset",
     "write_cve_dataset",
     "write_cwe_dataset",

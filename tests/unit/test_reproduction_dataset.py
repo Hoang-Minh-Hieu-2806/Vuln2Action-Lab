@@ -15,6 +15,7 @@ from vuln2action.connectors.reproduction import (
     build_cwe_capec_pairs,
     make_splits,
     sample_records_by_year,
+    select_newest_records,
 )
 from vuln2action.domain import CveRecord
 
@@ -142,6 +143,32 @@ def test_sample_records_by_year_is_deterministic():
     assert len(first) == 10
 
 
+def test_select_newest_records_orders_by_published_date():
+    records = {
+        2022: [
+            CveRecord(
+                cve_id="CVE-2022-0001",
+                description="old",
+                published="2022-01-01T00:00:00",
+            ),
+            CveRecord(
+                cve_id="CVE-2022-0002",
+                description="newer",
+                published="2022-12-01T00:00:00",
+            ),
+        ],
+        2023: [
+            CveRecord(
+                cve_id="CVE-2023-0001",
+                description="newest",
+                published="2023-06-01T00:00:00",
+            )
+        ],
+    }
+    selected = select_newest_records(records, 2)
+    assert [record.cve_id for record in selected] == ["CVE-2023-0001", "CVE-2022-0002"]
+
+
 def test_build_cwe_capec_pairs_unions_both_directions():
     cwes = parse_cwe_xml(CWE_XML)
     capecs = parse_capec_xml(CAPEC_XML)
@@ -213,6 +240,8 @@ def test_build_reproduction_dataset_script_end_to_end(tmp_path):
             "2023",
             "--end-year",
             "2023",
+            "--selection-strategy",
+            "newest",
         ]
     )
     assert exit_code == 0
