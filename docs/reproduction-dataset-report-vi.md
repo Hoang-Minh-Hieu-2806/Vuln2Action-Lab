@@ -5,10 +5,9 @@ Nhánh: `codex/paper-reproduction`
 Mục tiêu: tái lập phần dataset của paper Vuln2Action, lấy khoảng một nửa
 quy mô CVE của paper (55.000 thay vì 114.560).
 
-Bản đang dùng là **latest mode**: chọn 55.000 CVE mới nhất theo ngày
-`published` của NVD, thay vì sample đều theo năm. Bản paper-faithful
-(stratified 2002–2023) vẫn được giữ ở
-`data/processed/reproduction_paper_2023/`.
+> **Lưu ý lịch sử:** báo cáo này mô tả bản **latest 2026** đã được lưu
+> trữ tại `data/processed/reproduction_latest/`. Dataset chính hiện nay là bản
+> paper-faithful 2002–2023, xem `docs/paper-dataset-report-vi.md`.
 
 ## 1. Kết quả tổng quan
 

@@ -3,7 +3,7 @@
 Ng?y ch?y: 2026-11-05  
 Nh?nh: `codex/paper-reproduction`  
 App: `gui/app.py`  
-Dataset: `data/processed/reproduction/`
+Dataset: `data/processed/reproduction/` (paper-faithful 55k)
 
 ## 1. Ch?y local
 
@@ -30,11 +30,11 @@ M? `http://127.0.0.1:5000`. App ch? bind localhost, kh?ng g?i m?ng ngo?i.
 /health:
   cves=55.000
   capecs=615
-  predictions=39.181
-  technique_mappings=665
+  predictions=33.539
+  technique_mappings=656
 
-/api/analyze?cve_id=CVE-2010-20125:
-  selected_capec=CAPEC-193
+/api/analyze?cve_id=CVE-1999-0001:
+  selected_capec=CAPEC-71
   method=precomputed Word2Vec
   phases=3
 ```

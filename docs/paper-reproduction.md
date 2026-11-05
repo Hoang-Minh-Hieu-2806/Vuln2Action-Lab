@@ -34,7 +34,7 @@ Not claimed:
 
 | Item | Paper |
 | --- | --- |
-| CVE cutoff | CVEs indexed in 2023; exploits 1999-2023 (`latest` mode used here extends to 2026 as a user-requested deviation) |
+| CVE cutoff | CVEs indexed in 2023; exploits 1999-2023 (paper-faithful stratified sample used here) |
 | CVE count | 114,560 |
 | CVE-CWE pairs | 28,831 |
 | CWE-CAPEC pairs | 46,575 |
@@ -96,34 +96,31 @@ The NVD 2.0 annual feeds start at 2002. Two selection modes are available:
 
 The target is **55,000 CVEs**, about half of the paper's 114,560.
 
-Paper-faithful mode:
+Paper-faithful mode (the generated primary dataset):
 
 ```bash
 python scripts/download_reproduction_data.py --source all --start-year 2002 --end-year 2023
-python scripts/build_reproduction_dataset.py --target-cves 55000 --seed 42 --selection-strategy stratified
+python scripts/build_reproduction_dataset.py \
+  --target-cves 55000 --seed 42 --selection-strategy stratified \
+  --start-year 2002 --end-year 2023 \
+  --exploit-start-year 1999 --exploit-end-year 2023
 ```
 
-Latest-CVE mode:
+Latest-CVE mode (archived, not the primary result):
 
 ```bash
 python scripts/download_reproduction_data.py --source all --start-year 2002 --end-year 2026
 python scripts/build_reproduction_dataset.py --target-cves 55000 --selection-strategy newest
 ```
 
-The generated `data/processed/reproduction/` uses the newest mode. The earlier
-paper-faithful snapshot is kept at `data/processed/reproduction_paper_2023/`.
+The generated `data/processed/reproduction/` uses the paper-faithful mode:
+CVE 2002-2023, ExploitDB only 1999-2023. The previous latest-2026 snapshot is
+preserved at `data/processed/reproduction_latest/` for comparison.
 
-Latest mode is deliberately **not** the paper's 2023 cutoff. It selects the
-latest 55,000 NVD records by `published` time, including NVD 2024-2026. Two
-consequences must be reported in every result:
-
-- None of the paper's 20 human-evaluation CVEs is in this 55k sample, so the
-  20-CVE human-eval split is a deterministic latest-CVE fill. It is not the
-  paper's human-eval set.
-- Only 27 ExploitDB rows overlap the 55k sample, because recent CVEs rarely
-  have public ExploitDB entries. The exploit-mapping stage needs either a
-  historical exploit-linked subset or a future hybrid selection mode; it must
-  not be evaluated on 27 rows as if that were the paper setup.
+The current primary dataset has 55,000 CVEs (42,897 with CWE), 46,265 CVE-CWE
+pairs, 38,837 non-empty CVE2CAPEC references, 6,474 ExploitDB rows matched to
+selected CVEs, and 45,538 ExploitDB descriptions in the 1999-2023 window. It is
+still half of the paper's 114,560 CVEs, so exact paper counts are not expected.
 
 Outputs under `data/processed/reproduction/`:
 
@@ -170,15 +167,16 @@ Measured results:
 
 | Method | Candidate coverage | Candidate recall | Top-1 / 100 | Top-1 among answered |
 |---|---:|---:|---:|---:|
-| TF-IDF | 80 | 80 | 78 | 97.5% |
-| Word2Vec | 80 | 80 | 78 | 97.5% |
+| TF-IDF | 91 | 90 | 87 | 95.6% |
+| Word2Vec | 91 | 90 | **88** | **96.7%** |
 
-The paper reports 89/100. This reproduction reports **78/100**, not 89/100.
-The main limit is candidate coverage: 20 of the 100 CVEs have no candidate
-CAPEC because their direct CWE has no relation in the current CAPEC catalog.
-On all 55,000 CVEs, Word2Vec selects a CAPEC for 39,181 CVEs and is correct on
-38,374 of 38,581 answered CVEs (99.46% conditional; 69.77% over all 55,000).
-Full details are in `docs/capec-selection-report-vi.md`.
+The paper reports 89/100. This reproduction reports **88/100**, within one CVE
+of the paper. The remaining limit is candidate coverage: 9 of the 100 CVEs have
+no candidate CAPEC because their direct CWE has no relation in the current
+CAPEC catalog. On all 55,000 CVEs, Word2Vec selects a CAPEC for 33,539 CVEs,
+answers 33,402 of the 38,837 reference CVEs, and is correct on 32,720
+(97.96% conditional; 59.49% over all 55,000). Full details are in
+`docs/capec-selection-report-vi.md`.
 
 ## Step 3: execution-flow dataset
 
@@ -192,14 +190,14 @@ python scripts/build_flow_dataset.py \
   --out data/processed/reproduction/flow_dataset
 ```
 
-Measured output: **30,077 rows** (23,964 train, 6,113 validation), 174 unique
-CAPECs, mean 4.03 steps and 5.75 techniques per flow. 25,484 rows have all three
-phases. 15,793 CVEs have no selected CAPEC and 9,010 selected CAPECs have no
+Measured output: **26,750 rows** (21,352 train, 5,398 validation), 170 unique
+CAPECs, mean 3.87 steps and 6.10 techniques per flow. 23,065 rows have all three
+phases. 21,444 CVEs have no selected CAPEC and 6,686 selected CAPECs have no
 execution flow.
 
 `flow_dataset.jsonl` stores `target` (description + techniques),
 `target_steps`, and `target_techniques`. Their word-length means/P90 are
-258.6/521, 145.3/290, and 113.9/230. Because the targets are long, the training
+284.6/521, 142.6/213, and 142.4/268. Because the targets are long, the training
 default is `target_techniques` with `max_target_length=256`; a 128-token budget
 truncates many flows. Full details are in `docs/flow-dataset-report-vi.md`.
 
@@ -217,16 +215,16 @@ python scripts/map_techniques_exploitdb.py \
   --epochs 10
 ```
 
-Measured output: 665 unique techniques, all mapped to 46,709 ExploitDB
-descriptions, mean cosine 0.8911 (median 0.8933). The stage-2 target
-`target_exploit_techniques` has mean length 37.4 words (P90 65), so 128 target
+Measured output: 656 unique techniques, all mapped to 45,538 ExploitDB
+descriptions (1999-2023), mean cosine 0.8915 (median 0.8928). The stage-2 target
+`target_exploit_techniques` has mean length 43.4 words (P90 71), so 128 target
 tokens are sufficient for this field. Full details are in
 `docs/stage2-exploit-mapping-report-vi.md`.
 
-This is a semantic, CVE-independent mapping. Only 27 ExploitDB rows share a CVE
-with the latest 55k sample, so the paper's CVE-specific exploit-code retrieval
-and SBERT threshold stage remain blocked until a hybrid or historical
-exploit-linked subset is added.
+This is a semantic, CVE-independent mapping. The paper-faithful sample has
+6,474 ExploitDB rows sharing a CVE with selected CVEs, enough for a pilot of the
+paper's CVE-specific exploit-code retrieval and SBERT threshold study, but not
+full paper coverage. The SBERT stage has not been run yet.
 
 ## Step 5: local Flask GUI
 
@@ -242,7 +240,7 @@ It accepts a CVE id from the 55k sample or a free description, shows the selecte
 CAPEC, the Explore/Experiment/Exploit flow, candidate CAPECs, and technique ->
 ExploitDB descriptions. It also exposes `GET /health` and
 `GET /api/analyze?cve_id=...`. With the real dataset, `/health` reports 55,000
-CVEs, 615 CAPECs, 39,181 predictions, and 665 technique mappings. See
+CVEs, 615 CAPECs, 33,539 predictions, and 656 technique mappings. See
 `docs/gui-report-vi.md`.
 
 The GUI currently displays the reference CAPEC flow, not a T5-generated flow;
@@ -281,9 +279,9 @@ python scripts/evaluate_t5.py \
   --target-field target_techniques --num-beams 4
 ```
 
-`scripts/train_t5.py` also accepts `--stage 2 --target-field <field>` for a
-future exploit-enriched target. The current flow dataset has no such field, and
-stage 2 is blocked by the 27-row ExploitDB overlap documented above.
+`scripts/train_t5.py` also accepts `--stage 2 --target-field <field>` for the
+exploit-enriched target. Use `flow_dataset_stage2/` and
+`target_exploit_techniques` with `max_target_length=128` for stage 2.
 
 Using multiple Kaggle accounts to bypass quota is not a design assumption and
 may violate Kaggle's terms. The training code must be able to finish under a
@@ -300,11 +298,11 @@ independent experiments, not evade limits.
    SBERT threshold study.
 5. **Resource use**: inference latency and CPU/GPU memory on the available
    hardware, clearly labelled as T4 x2 rather than A100.
-6. **Human evaluation**: 20 CVEs, correctness/completeness/clarity. Latest
-   mode uses 20 deterministic recent CVEs, not the paper's 20 CVEs (none of the
-   paper CVEs is in the latest 55k sample). The reproduction currently has one
-   advisor reviewer, not the paper's three independent experts. Report this as
-   a **single-expert advisor review**, not as a three-expert study. Optional
+6. **Human evaluation**: 20 CVEs, correctness/completeness/clarity. The
+   paper-faithful split uses 20 deterministic historical CVEs; it is still not
+   guaranteed to be the paper's exact 20 CVEs. The reproduction currently has
+   one advisor reviewer, not the paper's three independent experts. Report this
+   as a **single-expert advisor review**, not as a three-expert study. Optional
    internal sanity checks may be added, but they must not be merged into the
    advisor's scores.
 

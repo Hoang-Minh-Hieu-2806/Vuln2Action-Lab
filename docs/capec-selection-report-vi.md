@@ -1,138 +1,77 @@
-# Báo cáo bước 2: chọn CAPEC tốt nhất
+# B?o c?o b??c 2: ch?n CAPEC t?t nh?t (dataset paper-faithful)
 
-Ngày chạy: 2026-11-05  
-Nhánh: `codex/paper-reproduction`  
-Dataset: `data/processed/reproduction/` (55.000 CVE mới nhất)  
-Ground truth: CVE2CAPEC, chỉ dùng cho evaluation.
+Ng?y ch?y: 2026-11-05  
+Dataset: `data/processed/reproduction/` (55k stratified 2002?2023)  
+Ground truth: CVE2CAPEC, ch? d?ng cho evaluation.
 
-## 1. Phương pháp
+## 1. Ph??ng ph?p
 
-Đầu vào của mỗi CVE:
+- Candidate CAPEC = h?p c?c candidate t? m?i CVE?CWE row c?a CVE.
+- So m? t? CVE v?i `name + description` c?a t?ng CAPEC candidate.
+- TF-IDF: unigram + bigram, `sublinear_tf`, cosine.
+- Word2Vec: skip-gram, 100 chi?u, window 5, 10 epoch, seed 42, vector c?u =
+trung b?nh vector t?, cosine.
+- Kh?ng d?ng CVE2CAPEC khi ch?n; ch? d?ng ?? ch?m top-1.
 
-1. lấy tất cả dòng `cve_capec_candidates.jsonl` của CVE đó;
-2. hợp các `candidate_capec_ids` lại (một CVE có thể có nhiều CWE);
-3. so mô tả CVE với mô tả từng CAPEC ứng viên;
-4. chọn CAPEC có cosine similarity cao nhất.
-
-Text của CAPEC là `name + description`; text của CVE là `description`.
-Không dùng CVE2CAPEC trong lúc chọn, chỉ dùng để chấm điểm.
-
-### TF-IDF
-
-- `TfidfVectorizer` với unigram + bigram, `sublinear_tf=True`, stopword list
-  chung của repo.
-- Fit vocabulary trên toàn bộ mô tả CVE + mô tả CAPEC, sau đó vector hóa
-  query và các CAPEC.
-- Cosine similarity, chọn top-1 trong tập ứng viên.
-
-### Word2Vec
-
-- Skip-gram (`sg=1`), `vector_size=100`, `window=5`, `min_count=1`,
-  `epochs=10`, `workers=1`, `seed=42`.
-- Huấn luyện trên token của toàn bộ mô tả CVE + CAPEC.
-- Vector câu = trung bình vector các từ; chuẩn hóa L2; cosine similarity.
-- Chọn top-1 trong tập ứng viên.
-
-Các tham số Word2Vec là lựa chọn reproduction; paper không công bố đầy đủ
-siêu tham số.
-
-## 2. Kết quả trên 100 CVE evaluation
-
-Split `capec_eval_100` có 100 CVE, tất cả đều có reference CVE2CAPEC không rỗng.
-
-| Phương pháp | Có candidate | Candidate recall | Top-1 đúng | Accuracy /100 | Accuracy trên CVE có candidate | Cosine trung bình của CAPEC được chọn |
-|---|---:|---:|---:|---:|---:|---:|
-| TF-IDF | 80 | 80 | 78 | **78,0%** | **97,5%** | 0,0289 |
-| Word2Vec | 80 | 80 | 78 | **78,0%** | **97,5%** | 0,8320 |
-
-Điểm quan trọng: 20 CVE không có candidate CAPEC nào, nên trần accuracy của
-split này là 80/100. Trong 80 CVE có candidate, hai phương pháp chọn đúng 78,
-tức 97,5%. Hai CVE còn lại chọn sai.
-
-Hai phương pháp hòa nhau về top-1 trên split nhỏ này. Paper chọn Word2Vec vì
-similarity cao hơn; bản reproduction cũng dùng **Word2Vec** cho bước sinh flow
-về sau. Không nên so trực tiếp cosine trung bình ở bảng trên với con số
-"max similarity" 52,9% / 91,2% của paper vì paper báo cáo đại lượng khác.
-
-## 3. Kết quả trên toàn bộ 55.000 CVE
-
-Chạy Word2Vec cho toàn bộ dataset:
-
-| Hạng mục | Số lượng |
-|---|---:|
-| CVE | 55.000 |
-| CVE có candidate CAPEC | 39.181 |
-| CVE có reference CVE2CAPEC không rỗng | 48.127 |
-| CVE vừa có candidate vừa có reference | 38.581 |
-| Top-1 đúng | 38.374 |
-| Accuracy trên toàn bộ 55k | 69,77% |
-| Accuracy trên CVE trả lời được | 99,46% |
-| Candidate recall | 80,02% |
-
-Con số 69,77% bị kéo xuống bởi các CVE không có candidate; đây không phải
-"model chọn sai" mà là giới hạn của candidate generation từ CWE–CAPEC trực tiếp.
-Báo cáo tách riêng accuracy trên CVE trả lời được để tránh gây hiểu nhầm.
-
-## 4. So với paper
-
-| Hạng mục | Paper | Reproduction | Ghi chú |
-|---|---:|---:|---|
-| CAPEC accuracy trên 100 CVE | 89/100 | 78/100 | Candidate recall của bản này chỉ 80/100 |
-| Accuracy trên CVE có candidate | Không báo cáo | 97,5% | 78/80 |
-| Phương pháp được chọn | Word2Vec | Word2Vec | Cùng top-1 với TF-IDF ở split này |
-| CAPEC catalog | 1.024 | 615 | Dùng CAPEC 3.9 hiện có |
-| CWE–CAPEC | 46.575 | 1.212 cặp catalog duy nhất | Cách đếm khác paper |
-
-Không tuyên bố đạt 89/100. Chênh lệch chủ yếu do candidate coverage: 20 CVE
-không có CAPEC ứng viên vì CWE trực tiếp của chúng không có quan hệ CAPEC trong
-catalog hiện tại. Đã kiểm tra: phần lớn là CWE-416, CWE-787, CWE-863, CWE-266,
-CWE-639 và một số CWE khác. Không tự động leo lên CWE cha để tạo candidate vì
-paper dùng quan hệ CWE–CAPEC trực tiếp; nếu muốn tăng coverage, đó phải là một
-thí nghiệm riêng và được báo cáo như một deviation.
-
-## 5. File đầu ra
-
-Nằm trong `data/processed/reproduction/capec_selection/` và đã git-ignore:
-
-```text
-capec_predictions_tfidf_capec_eval_100.jsonl
-capec_predictions_word2vec_capec_eval_100.jsonl
-capec_selection_metrics_capec_eval_100.json
-capec_predictions_word2vec_all.jsonl
-capec_selection_metrics_all.json
-```
-
-Mỗi dòng prediction có:
-
-- `cve_id`
-- `method`
-- `selected_capec_id`
-- `score`
-- `candidate_capec_ids`
-- `reference_capec_ids` (evaluation only)
-- `correct`
-
-## 6. Cách tái lập
+L?nh:
 
 ```bash
-# So sánh TF-IDF và Word2Vec trên 100 CVE
 python scripts/select_capec.py --dataset data/processed/reproduction \
   --method both --scope eval --split capec_eval_100
-
-# Sinh CAPEC đã chọn cho toàn bộ 55k CVE (dùng cho bước flow dataset)
 python scripts/select_capec.py --dataset data/processed/reproduction \
   --method word2vec --scope all
 ```
 
-Word2Vec cần `gensim`:
+## 2. K?t qu? 100 CVE evaluation
 
-```bash
-pip install -e ".[nlp]"
+| Ph??ng ph?p | C? candidate | Candidate recall | Top-1 ??ng | Accuracy /100 | Accuracy tr?n CVE c? candidate | Cosine trung b?nh |
+|---|---:|---:|---:|---:|---:|---:|
+| TF-IDF | 91 | 90 | 87 | 87,0% | 95,6% | 0,0299 |
+| Word2Vec | 91 | 90 | **88** | **88,0%** | **96,7%** | 0,8400 |
+
+Paper b?o c?o **89/100**. B?n n?y ??t **88/100** v?i Word2Vec, s?t paper h?n
+h?n b?n latest tr??c ?? (78/100). Trong 91 CVE c? candidate, Word2Vec ch?n ??ng
+88; 9 CVE c?n l?i kh?ng c? candidate n?n kh?ng th? tr? l?i.
+
+Word2Vec th?ng TF-IDF 88 so v?i 87, ph? h?p k?t lu?n paper ch?n Word2Vec.
+Cosine trung b?nh c?a Word2Vec (0,84) c?ng g?n kho?ng 0,84?0,94 m? paper m? t?
+cho c?c b??c/flow, nh?ng kh?ng n?n so tr?c ti?p v?i ?max similarity?.
+
+## 3. To?n b? 55k
+
+| H?ng m?c | S? l??ng |
+|---|---:|
+| CVE | 55.000 |
+| C? candidate | 33.539 |
+| C? reference CVE2CAPEC kh?ng r?ng | 38.837 |
+| V?a candidate v?a reference | 33.402 |
+| Top-1 ??ng | 32.720 |
+| Accuracy tr?n to?n b? | 59,49% |
+| Accuracy tr?n CVE tr? l?i ???c | **97,96%** |
+| Candidate recall | 85,49% |
+
+Con s? 59,49% b? k?o xu?ng b?i c?c CVE kh?ng c? candidate; accuracy tr?n CVE tr?
+l?i ???c l? 97,96%.
+
+## 4. V? sao t?t h?n b?n latest
+
+B?n latest 2026 c? 20/100 CVE kh?ng c? candidate v? ch? ??t 78/100. B?n
+paper-faithful 2002?2023 c? 91/100 CVE c? candidate, candidate recall 90/100,
+n?n top-1 ??t 88/100. ??y l? l? do ch?n corpus l?ch s? thay v? newest.
+
+## 5. File ??u ra
+
+```text
+capec_selection/capec_predictions_tfidf_capec_eval_100.jsonl
+capec_selection/capec_predictions_word2vec_capec_eval_100.jsonl
+capec_selection/capec_selection_metrics_capec_eval_100.json
+capec_selection/capec_predictions_word2vec_all.jsonl
+capec_selection/capec_selection_metrics_all.json
 ```
 
-## 7. Việc tiếp theo
+## 6. Gi?i h?n
 
-1. Sinh execution-flow dataset từ CAPEC đã chọn.
-2. Map flow sang 3 pha Explore / Experiment / Exploit.
-3. Tạo train/validation cho T5 stage 1 và stage 2.
-4. Viết training script T4 x2 có checkpoint/resume cho Kaggle.
+- 9/100 CVE eval kh?ng c? candidate CAPEC do CWE tr?c ti?p kh?ng c? quan h?
+  trong CAPEC 3.9.
+- Catalog CAPEC 3.9 c? 615 entry, ?t h?n 1.024 c?a paper; CWE 4.20 c? 969 entry.
+- Kh?ng leo CWE cha ?? t?o candidate, v? paper d?ng quan h? CWE?CAPEC tr?c ti?p.

@@ -100,6 +100,19 @@ def test_parse_capec_xml_extracts_flow_and_related_cwe():
     assert record.execution_flow[0].techniques == ["Fingerprint the database."]
 
 
+def test_parse_exploitdb_csv_filters_paper_year_window():
+    csv_text = (
+        "id,file,description,date_published,author,type,platform,port,date_added,"
+        "date_updated,verified,codes,tags,aliases,screenshot_url,application_url,source_url\n"
+        "1,1.py,Old,1998-01-01,me,webapps,linux,,1998-01-01,1998-01-02,1,CVE-1999-0001,,,,,,\n"
+        "2,2.py,Start,1999-01-01,me,webapps,linux,,1999-01-01,1999-01-02,1,CVE-1999-0002,,,,,,\n"
+        "3,3.py,End,2023-12-31,me,webapps,linux,,2023-12-31,2023-12-31,1,CVE-2023-0001,,,,,,\n"
+        "4,4.py,New,2024-01-01,me,webapps,linux,,2024-01-01,2024-01-02,1,CVE-2024-0001,,,,,,\n"
+    )
+    records = parse_exploitdb_csv(csv_text, start_year=1999, end_year=2023)
+    assert [record.exploit_id for record in records] == ["EDB-2", "EDB-3"]
+
+
 def test_parse_exploitdb_csv_keeps_metadata_only():
     csv_text = (
         "id,file,description,date_published,author,type,platform,port,date_added,"

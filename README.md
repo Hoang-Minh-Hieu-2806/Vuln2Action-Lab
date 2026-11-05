@@ -74,8 +74,8 @@ Vuln2Action-Lab/
       flows, ExploitDB metadata, CVE2CAPEC references, and deterministic
       55k-CVE latest/stratified selection
 - [x] Best-CAPEC selection with TF-IDF and Word2Vec + cosine similarity
-      (78/100 top-1 on the CAPEC eval split)
-- [x] Stage-1 execution-flow dataset (30,077 train/validation rows)
+      (88/100 top-1 on the CAPEC eval split)
+- [x] Stage-1 execution-flow dataset (26,750 train/validation rows)
 - [x] Stage-1 T5 training and BLEU/ROUGE evaluation scripts for T4 x2
 - [x] Stage-2 technique -> ExploitDB description dataset
 - [x] Local Flask GUI for CVE/CAPEC/flow inspection
@@ -90,13 +90,17 @@ The reproduction track is documented in `docs/paper-reproduction.md`. It is
 offline by default; snapshots are fetched only by explicit scripts.
 
 ```bash
-# Latest 55k CVEs (current generated dataset)
-python scripts/download_reproduction_data.py --source all --start-year 2002 --end-year 2026
-python scripts/build_reproduction_dataset.py --target-cves 55000 --selection-strategy newest
+# Paper-faithful 55k CVEs (current generated dataset)
+python scripts/download_reproduction_data.py --source all --start-year 2002 --end-year 2023
+python scripts/build_reproduction_dataset.py \
+  --target-cves 55000 --seed 42 --selection-strategy stratified \
+  --start-year 2002 --end-year 2023 \
+  --exploit-start-year 1999 --exploit-end-year 2023
 python scripts/audit_reproduction_dataset.py
 
-# Paper-faithful stratified alternative
-python scripts/build_reproduction_dataset.py --target-cves 55000 --seed 42 --selection-strategy stratified
+# Latest-CVE alternative (archived snapshot)
+python scripts/download_reproduction_data.py --source all --start-year 2002 --end-year 2026
+python scripts/build_reproduction_dataset.py --target-cves 55000 --selection-strategy newest
 ```
 
 The NVD 2.0 annual feeds start at 2002. The builder writes `cves.jsonl`,
@@ -105,15 +109,16 @@ references, ExploitDB metadata, leakage-free splits, and `stats.json` under
 `data/processed/reproduction/`. Exploit source code is never downloaded or
 written.
 
-Latest snapshot: **55,000 CVEs** (54,119 with a 2026 CVE ID), 49,650 with a
-CWE, 57,023 CVE-CWE pairs, 48,127 non-empty CVE2CAPEC references, and only **27**
-ExploitDB rows. The low ExploitDB overlap is expected for the newest CVEs and
-is flagged in the report; the exploit stage needs a historical exploit-linked
-subset or a hybrid selection mode.
+Primary snapshot: **55,000 CVEs** (stratified 2002-2023), 42,897 with a CWE,
+46,265 CVE-CWE pairs, 38,837 non-empty CVE2CAPEC references, **6,474 ExploitDB
+rows** matched to selected CVEs, and 45,538 ExploitDB descriptions from the
+1999-2023 window. This follows the paper's historical cutoff and leaves the
+exploit stage with enough overlap for a pilot.
 
-The latest-mode snapshot is documented in
-`docs/reproduction-dataset-report-vi.md`; the earlier 2023 stratified snapshot
-is kept at `data/processed/reproduction_paper_2023/`.
+The paper-faithful snapshot is documented in `docs/paper-dataset-report-vi.md`.
+The previous latest-2026 snapshot is preserved at
+`data/processed/reproduction_latest/` and documented in
+`docs/reproduction-dataset-report-vi.md`.
 
 Best-CAPEC selection (step 2):
 
@@ -124,8 +129,8 @@ python scripts/select_capec.py --dataset data/processed/reproduction \
   --method word2vec --scope all
 ```
 
-Measured on `capec_eval_100`: TF-IDF and Word2Vec both reach **78/100** top-1
-(97.5% among the 80 CVEs that have candidates); candidate recall is 80/100.
+Measured on `capec_eval_100`: Word2Vec reaches **88/100** top-1 (96.7% among
+the 91 CVEs that have candidates), TF-IDF 87/100; candidate recall is 90/100.
 See `docs/capec-selection-report-vi.md`.
 
 Execution-flow dataset (step 3):
@@ -137,8 +142,8 @@ python scripts/build_flow_dataset.py \
   --out data/processed/reproduction/flow_dataset
 ```
 
-This produces 30,077 train/validation flows (23,964 train, 6,113 validation)
-from 174 CAPECs. See `docs/flow-dataset-report-vi.md`.
+This produces 26,750 train/validation flows (21,352 train, 5,398 validation)
+from 170 CAPECs. See `docs/flow-dataset-report-vi.md`.
 
 T5 stage-1 training (Kaggle T4 x2):
 
@@ -167,10 +172,10 @@ python scripts/map_techniques_exploitdb.py \
   --out data/processed/reproduction/flow_dataset_stage2 --epochs 10
 ```
 
-This maps 665 unique techniques to 46,709 ExploitDB descriptions (mean cosine
-0.8911). It uses descriptions/metadata only. See
-`docs/stage2-exploit-mapping-report-vi.md`; CVE-specific exploit-code retrieval
-remains blocked by the 27-row overlap.
+This maps 656 unique techniques to 45,538 ExploitDB descriptions (mean cosine
+0.8915). It uses descriptions/metadata only. See
+`docs/stage2-exploit-mapping-report-vi.md`; 6,474 ExploitDB rows share a CVE
+with the selected sample, enough for a CVE-specific pilot but not full coverage.
 
 Local Flask GUI:
 

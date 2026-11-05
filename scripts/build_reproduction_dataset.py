@@ -60,6 +60,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--cwe", default="data/raw/cwe/cwec_latest.xml")
     parser.add_argument("--capec", default="data/raw/capec/capec_latest.xml")
     parser.add_argument("--exploitdb", default="data/raw/exploitdb/files_exploits.csv")
+    parser.add_argument("--exploit-start-year", type=int, default=1999)
+    parser.add_argument("--exploit-end-year", type=int, default=2023)
     parser.add_argument("--cve2capec", default="data/raw/cve2capec")
     parser.add_argument("--out-dir", default="data/processed/reproduction")
     parser.add_argument("--target-cves", type=int, default=55_000)
@@ -77,6 +79,8 @@ def main(argv: list[str] | None = None) -> int:
         parser.error("--target-cves must be >= 1")
     if args.start_year > args.end_year:
         parser.error("--start-year must be <= --end-year")
+    if args.exploit_start_year > args.exploit_end_year:
+        parser.error("--exploit-start-year must be <= --exploit-end-year")
 
     feed_dir = _resolve(args.nvd_feed_dir)
     cwe_path = _resolve(args.cwe)
@@ -122,7 +126,11 @@ def main(argv: list[str] | None = None) -> int:
     reference_rows = build_reference_rows(references)
 
     print("parsing ExploitDB metadata...")
-    exploits = parse_exploitdb_csv(exploitdb_path)
+    exploits = parse_exploitdb_csv(
+        exploitdb_path,
+        start_year=args.exploit_start_year,
+        end_year=args.exploit_end_year,
+    )
     exploit_rows = exploit_rows_for_selected(exploits, selected_ids)
 
     reference_ids = [cve_id for cve_id, reference in references.items() if reference.capec_ids]

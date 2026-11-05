@@ -1,79 +1,66 @@
-# Báo cáo bước 3: execution-flow dataset
+# B?o c?o b??c 3: execution-flow dataset (paper-faithful)
 
-Ngày chạy: 2026-11-05  
-Nhánh: `codex/paper-reproduction`  
-Nguồn CAPEC đã chọn: `capec_predictions_word2vec_all.jsonl`  
+Ng?y ch?y: 2026-11-05  
+Ngu?n CAPEC: `capec_predictions_word2vec_all.jsonl`  
 Output: `data/processed/reproduction/flow_dataset/`
 
-## 1. Cách dựng
+## 1. C?ch d?ng
 
-Mỗi CVE trong train/validation được ghép với CAPEC tốt nhất do Word2Vec chọn.
-Nếu CAPEC có `Execution_Flow`, các step được nhóm theo 3 pha của paper:
+M?i CVE train/validation ???c gh?p v?i CAPEC t?t nh?t do Word2Vec ch?n. N?u
+CAPEC c? Execution Flow, c?c step ???c nh?m theo 3 pha:
 
 ```text
-Explore:  thu thập thông tin mục tiêu
-Experiment: thử kỹ thuật / kiểm tra lỗ hổng
-Exploit:  khai thác thành công
+Explore:  thu th?p th?ng tin m?c ti?u
+Experiment: th? k? thu?t / ki?m tra l? h?ng
+Exploit:  khai th?c th?nh c?ng
 ```
 
-Mỗi row có 3 biến thể target để training script chọn theo ngân sách token:
+M?i row c?:
 
-| Field | Nội dung |
+| Field | N?i dung |
 |---|---|
-| `target` | phase + mô tả step + danh sách technique |
-| `target_steps` | phase + mô tả step, bỏ technique |
-| `target_techniques` | phase + tên technique, bỏ mô tả dài |
+| `target` | phase + m? t? step + technique |
+| `target_steps` | phase + m? t? step, b? technique |
+| `target_techniques` | phase + technique, b? m? t? d?i |
 
-Ví dụ format:
+`input` l? m? t? CVE NVD; `phases` gi? c?u tr?c step/technique cho stage 2/GUI.
 
-```text
-Explore: [Survey] ... (Techniques: spidering; proxy)
-Experiment: [Test input] ... (Techniques: fuzzing)
-Exploit: [Run code] ... (Techniques: union query)
-```
+## 2. K?t qu?
 
-`input` là mô tả CVE nguyên bản từ NVD. `phases` lưu cấu trúc step/technique
-để dùng cho bước map ExploitDB và GUI.
-
-## 2. Kết quả
-
-| Hạng mục | Số lượng |
+| H?ng m?c | S? l??ng |
 |---|---:|
-| Tổng row train + validation | 30.077 |
-| Train | 23.964 |
-| Validation | 6.113 |
-| CAPEC duy nhất | 174 |
-| Row có đủ 3 pha | 25.484 (84,7%) |
-| CVE không có CAPEC prediction | 15.793 |
-| CVE có prediction nhưng CAPEC không có flow | 9.010 |
-| Step trung bình / row | 4,03 |
-| Technique trung bình / row | 5,75 |
+| T?ng row train + validation | 26.750 |
+| Train | 21.352 |
+| Validation | 5.398 |
+| CAPEC duy nh?t | 170 |
+| Row ?? 3 pha | 23.065 (86,2%) |
+| CVE kh?ng c? CAPEC prediction | 21.444 |
+| CVE c? prediction nh?ng CAPEC kh?ng c? flow | 6.686 |
+| Step trung b?nh / row | 3,87 |
+| Technique trung b?nh / row | 6,10 |
 
-Độ dài target (từ, chưa tokenize):
+?? d?i target (t?, ch?a tokenize):
 
-| Field | Trung bình | P90 |
+| Field | Trung b?nh | P90 |
 |---|---:|---:|
-| `target` | 258,6 | 521 |
-| `target_steps` | 145,3 | 290 |
-| `target_techniques` | 113,9 | 230 |
+| `target` | 284,6 | 521 |
+| `target_steps` | 142,6 | 213 |
+| `target_techniques` | 142,4 | 268 |
 
-Vì target khá dài, cấu hình T5 nên dùng `max_target_length=256` cho
-`target_techniques` hoặc `target_steps`; nếu dùng `target` đầy đủ thì nên
-tăng lên 512. Cấu hình 128 token sẽ cắt mất nhiều flow; nếu vẫn muốn 128,
-dùng `target_techniques` và chấp nhận truncation.
+V?i `max_target_length=256`, `target_techniques`/`target_steps` g?n nh? v?a;
+`target` ??y ?? n?n d?ng 512 n?u mu?n gi? to?n b? flow. N?u bu?c d?ng 128,
+ch?p nh?n truncation ho?c d?ng target stage 2 g?n h?n.
 
-## 3. File đầu ra
+## 3. File ??u ra
 
 ```text
-flow_dataset.jsonl      30.077 row đầy đủ
-flow_train.jsonl        23.964 row
-flow_validation.jsonl    6.113 row
-flow_stats.json          số liệu và độ dài target
+flow_dataset.jsonl      26.750 row
+flow_train.jsonl        21.352 row
+flow_validation.jsonl    5.398 row
+flow_stats.json
 ```
 
-Các file nằm dưới `data/processed/reproduction/flow_dataset/` và đã git-ignore.
-
-## 4. Cách tái lập
+## 4. C?ch t?i l?p
 
 ```bash
 python scripts/build_flow_dataset.py \
@@ -82,27 +69,15 @@ python scripts/build_flow_dataset.py \
   --out data/processed/reproduction/flow_dataset
 ```
 
-## 5. Sai lệch / giới hạn
+## 5. Stage 2
 
-- 15.793 CVE không có candidate CAPEC nên không có flow; nguyên nhân là
-  CWE trực tiếp không có quan hệ CAPEC trong catalog hiện tại.
-- 9.010 CVE có CAPEC nhưng CAPEC đó không có Execution Flow trong CAPEC 3.9.
-- Chỉ 174 CAPEC khác nhau được dùng, nên flow dataset tập trung vào một phần
-  catalog.
-- Chưa làm stage 2 (enrich bằng ExploitDB) vì latest 55k chỉ khớp 27 dòng
-  ExploitDB. Cần exploit-linked subset hoặc hybrid selection trước khi train
-  stage 2 nghiêm túc.
+?? map 656 technique sang 45.538 m? t? ExploitDB (1999?2023) b?ng Word2Vec +
+cosine; xem `docs/stage2-exploit-mapping-report-vi.md`. Stage 2 n?m ?
+`data/processed/reproduction/flow_dataset_stage2/`.
 
-## 6. Stage 2
+## 6. Gi?i h?n
 
-?? map 665 technique sang 46.709 m? t? ExploitDB b?ng Word2Vec + cosine; xem
-`docs/stage2-exploit-mapping-report-vi.md`. Dataset stage 2 n?m ?
-`data/processed/reproduction/flow_dataset_stage2/`, target g?n
-`target_exploit_techniques` d?i trung b?nh 37,4 t?.
-
-## 7. Vi?c ti?p theo
-
-1. Viết T5 training script stage 1 cho Kaggle T4 x2, có checkpoint/resume.
-2. Chọn `target_techniques` + `max_target_length=256` hoặc `target` + 512.
-3. Benchmark 1 epoch trên T4 trước khi chạy 50 epochs.
-4. Sau đó xử lý riêng stage 2 / ExploitDB mapping.
+- 21.444 CVE kh?ng c? candidate CAPEC n?n kh?ng c? flow.
+- 6.686 CVE c? CAPEC nh?ng CAPEC kh?ng c? Execution Flow.
+- Ch? 170 CAPEC ???c d?ng; flow t?p trung v?o m?t ph?n catalog.
+- Ch?a train T5; dataset ?? s?n cho Kaggle.
