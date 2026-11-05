@@ -1,0 +1,60 @@
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: #f4f6f8;
+  color: #1d2733;
+}
+main { max-width: 1100px; margin: 0 auto; padding: 32px 20px 64px; }
+header h1 { margin: 0 0 8px; font-size: 30px; }
+.muted, .hint { color: #617080; }
+.panel {
+  background: #fff;
+  border: 1px solid #dbe3ea;
+  border-radius: 12px;
+  padding: 22px;
+  margin: 18px 0;
+  box-shadow: 0 2px 8px rgba(20, 40, 60, .04);
+}
+.panel.error { border-color: #e2a1a1; background: #fff5f5; color: #8a1f1f; }
+label { display: block; font-weight: 650; margin: 12px 0 6px; }
+input, textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #b9c7d4;
+  border-radius: 8px;
+  font: inherit;
+}
+textarea { resize: vertical; }
+button {
+  margin-top: 12px;
+  padding: 9px 16px;
+  border: 0;
+  border-radius: 8px;
+  background: #1d5f8a;
+  color: #fff;
+  font-weight: 650;
+  cursor: pointer;
+}
+button.example {
+  margin: 2px 4px 2px 0;
+  padding: 4px 9px;
+  background: #e8eef4;
+  color: #23445d;
+  font-weight: 500;
+}
+.result-head { display: flex; justify-content: space-between; gap: 16px; align-items: start; }
+.result-head h2 { margin: 0 0 6px; }
+.badge { background: #e8f4ea; color: #246338; padding: 5px 10px; border-radius: 999px; font-size: 12px; white-space: nowrap; }
+.cap-desc { color: #3d4c5c; }
+.phases { display: grid; gap: 14px; }
+.phase { border-left: 4px solid #1d5f8a; background: #f9fbfc; padding: 12px 16px; border-radius: 8px; }
+.phase h4 { margin: 0 0 10px; color: #1d5f8a; }
+.step { margin-bottom: 12px; }
+.step-no { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: #6b7b8b; }
+.step p { margin: 4px 0; }
+.techniques { margin: 6px 0 0; padding-left: 20px; }
+.techniques li { margin: 5px 0; }
+.technique { font-weight: 550; }
+.exploit { display: block; color: #5c4b24; font-size: 13px; }
+footer { color: #738190; font-size: 13px; margin-top: 30px; }

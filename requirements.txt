@@ -28,3 +28,6 @@ uvicorn[standard]>=0.29
 
 # Testing
 pytest>=8.0
+
+# Optional local Flask GUI (pip install -e ".[gui]").
+# flask>=3.0

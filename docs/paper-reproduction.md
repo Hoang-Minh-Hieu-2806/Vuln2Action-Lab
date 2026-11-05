@@ -228,6 +228,26 @@ with the latest 55k sample, so the paper's CVE-specific exploit-code retrieval
 and SBERT threshold stage remain blocked until a hybrid or historical
 exploit-linked subset is added.
 
+## Step 5: local Flask GUI
+
+The GUI reads only the local dataset and never executes exploit code.
+
+```bash
+pip install -e ".[gui]"
+python gui/app.py
+# http://127.0.0.1:5000
+```
+
+It accepts a CVE id from the 55k sample or a free description, shows the selected
+CAPEC, the Explore/Experiment/Exploit flow, candidate CAPECs, and technique ->
+ExploitDB descriptions. It also exposes `GET /health` and
+`GET /api/analyze?cve_id=...`. With the real dataset, `/health` reports 55,000
+CVEs, 615 CAPECs, 39,181 predictions, and 665 technique mappings. See
+`docs/gui-report-vi.md`.
+
+The GUI currently displays the reference CAPEC flow, not a T5-generated flow;
+that mode waits for a trained checkpoint.
+
 ## T4 x2 training configuration
 
 Kaggle provides 2 x T4 (16 GB each). Use:

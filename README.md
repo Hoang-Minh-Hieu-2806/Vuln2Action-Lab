@@ -78,9 +78,10 @@ Vuln2Action-Lab/
 - [x] Stage-1 execution-flow dataset (30,077 train/validation rows)
 - [x] Stage-1 T5 training and BLEU/ROUGE evaluation scripts for T4 x2
 - [x] Stage-2 technique -> ExploitDB description dataset
+- [x] Local Flask GUI for CVE/CAPEC/flow inspection
 - [x] Tracked CVE→CWE retrieval benchmark with measured P@k / R@k / F1@k / MRR
 - [x] Sample end-to-end CLI pipeline over fake sample CVEs
-- [ ] T5 GPU training run, Flask GUI, and full evaluation
+- [ ] T5 GPU training run and full evaluation
 - [ ] Live labs for `cve-002`/`cve-003`; generation and reproduction benchmarks
 
 ## Paper-reproduction dataset (step 1)
@@ -170,6 +171,17 @@ This maps 665 unique techniques to 46,709 ExploitDB descriptions (mean cosine
 0.8911). It uses descriptions/metadata only. See
 `docs/stage2-exploit-mapping-report-vi.md`; CVE-specific exploit-code retrieval
 remains blocked by the 27-row overlap.
+
+Local Flask GUI:
+
+```bash
+pip install -e ".[gui]"
+python gui/app.py
+# http://127.0.0.1:5000
+```
+
+The GUI is read-only, localhost-only, and shows CAPEC flow plus ExploitDB
+descriptions. It never executes exploit code. See `docs/gui-report-vi.md`.
 
 ## Installation
 
