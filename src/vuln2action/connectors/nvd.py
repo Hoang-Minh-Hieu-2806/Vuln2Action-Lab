@@ -269,12 +269,15 @@ def parse_nvd_cve(raw: dict[str, Any]) -> CveRecord:
         cwe=_cwe_ids(inner.get("weaknesses")),
         cpe=_cpe_criteria(inner.get("configurations")),
         references=_reference_urls(inner.get("references")),
+        published=str(inner.get("published", "")).strip(),
+        vuln_status=str(inner.get("vulnStatus", "")).strip(),
     )
 
 
 def parse_nvd_records(
     payload: dict[str, Any],
     include_rejected: bool = False,
+    skip_invalid: bool = False,
 ) -> list[CveRecord]:
     if not isinstance(payload, dict):
         raise TypeError("NVD snapshot must be a JSON object")
@@ -289,5 +292,9 @@ def parse_nvd_records(
         status = str(inner.get("vulnStatus", "")).strip().lower()
         if not include_rejected and status == "rejected":
             continue
-        records.append(parse_nvd_cve(item))
+        try:
+            records.append(parse_nvd_cve(item))
+        except (TypeError, ValueError):
+            if not skip_invalid:
+                raise
     return records

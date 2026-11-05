@@ -5,7 +5,10 @@ from vuln2action.domain.evidence import EvidenceBundle, HttpEvidence
 from vuln2action.domain.execution import ExecutionPlan, ExecutionResult, PlanStep
 from vuln2action.domain.knowledge import (
     CapecRecord,
+    CapecStep,
+    CveCapecReference,
     CweRecord,
+    ExploitRecord,
     ExploitReference,
     KnowledgeDocument,
     RetrievedContext,
@@ -20,12 +23,15 @@ from vuln2action.domain.workflow import (
 
 __all__ = [
     "CapecRecord",
+    "CapecStep",
     "CpeRecord",
+    "CveCapecReference",
     "CveRecord",
     "CweRecord",
     "EvidenceBundle",
     "ExecutionPlan",
     "ExecutionResult",
+    "ExploitRecord",
     "ExploitReference",
     "HttpEvidence",
     "KnowledgeDocument",

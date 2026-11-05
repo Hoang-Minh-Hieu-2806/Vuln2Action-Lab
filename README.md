@@ -70,9 +70,35 @@ Vuln2Action-Lab/
       counterfactual and a real `PASS`/`FAIL` validator
 - [x] Opt-in NVD 2.0 ingestion, local snapshots, CWE/CPE/CAPEC parsers, and a
       dataset builder
+- [x] Paper-reproduction dataset builder: CWE–CAPEC relations, CAPEC execution
+      flows, ExploitDB metadata, CVE2CAPEC references, and a deterministic
+      55k-CVE stratified sample
 - [x] Tracked CVE→CWE retrieval benchmark with measured P@k / R@k / F1@k / MRR
 - [x] Sample end-to-end CLI pipeline over fake sample CVEs
+- [ ] CAPEC selection, T5 training, Flask GUI, and full evaluation
 - [ ] Live labs for `cve-002`/`cve-003`; generation and reproduction benchmarks
+
+## Paper-reproduction dataset (step 1)
+
+The reproduction track is documented in `docs/paper-reproduction.md`. It is
+offline by default; snapshots are fetched only by explicit scripts.
+
+```bash
+python scripts/download_reproduction_data.py --source all --start-year 2002 --end-year 2023
+python scripts/build_reproduction_dataset.py --target-cves 55000 --seed 42
+python scripts/audit_reproduction_dataset.py
+```
+
+The NVD 2.0 annual feeds start at 2002, so the sample covers 2002–2023. The
+builder writes `cves.jsonl`, catalog/relation tables, CAPEC candidates,
+evaluation-only CVE2CAPEC references, ExploitDB metadata, leakage-free splits,
+and `stats.json` under `data/processed/reproduction/`. Exploit source code is
+never downloaded or written.
+
+Generated snapshot: **55,000 CVEs**, 42,897 with at least one CWE, 46,265
+CVE–CWE pairs, 1,212 unique CWE–CAPEC pairs, and 53,962 CVE2CAPEC references.
+See `docs/reproduction-dataset-report-vi.md` for the full report and deviations
+from the paper.
 
 ## Installation
 
