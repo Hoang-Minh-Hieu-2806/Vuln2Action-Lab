@@ -72,10 +72,10 @@ Vuln2Action-Lab/
       dataset builder
 - [x] Paper-reproduction dataset builder: CWE–CAPEC relations, CAPEC execution
       flows, ExploitDB metadata, CVE2CAPEC references, and deterministic
-      55k-CVE latest/stratified selection
+      full 114,560-CVE paper-scale stratified selection
 - [x] Best-CAPEC selection with TF-IDF and Word2Vec + cosine similarity
-      (88/100 top-1 on the CAPEC eval split)
-- [x] Stage-1 execution-flow dataset (26,750 train/validation rows)
+      (87/100 top-1 on the CAPEC eval split)
+- [x] Stage-1 execution-flow dataset (55,420 train/validation rows)
 - [x] Stage-1 T5 training and BLEU/ROUGE evaluation scripts for T4 x2
 - [x] Stage-2 technique -> ExploitDB description dataset
 - [x] Local Flask GUI for CVE/CAPEC/flow inspection
@@ -90,10 +90,10 @@ The reproduction track is documented in `docs/paper-reproduction.md`. It is
 offline by default; snapshots are fetched only by explicit scripts.
 
 ```bash
-# Paper-faithful 55k CVEs (current generated dataset)
+# Paper-faithful 114,560 CVEs (current generated dataset)
 python scripts/download_reproduction_data.py --source all --start-year 2002 --end-year 2023
 python scripts/build_reproduction_dataset.py \
-  --target-cves 55000 --seed 42 --selection-strategy stratified \
+  --target-cves 114560 --seed 42 --selection-strategy stratified \
   --start-year 2002 --end-year 2023 \
   --exploit-start-year 1999 --exploit-end-year 2023
 python scripts/audit_reproduction_dataset.py
@@ -109,11 +109,11 @@ references, ExploitDB metadata, leakage-free splits, and `stats.json` under
 `data/processed/reproduction/`. Exploit source code is never downloaded or
 written.
 
-Primary snapshot: **55,000 CVEs** (stratified 2002-2023), 42,897 with a CWE,
-46,265 CVE-CWE pairs, 38,837 non-empty CVE2CAPEC references, **6,474 ExploitDB
-rows** matched to selected CVEs, and 45,538 ExploitDB descriptions from the
-1999-2023 window. This follows the paper's historical cutoff and leaves the
-exploit stage with enough overlap for a pilot.
+Primary snapshot: **114,560 CVEs** (stratified 2002-2023), 89,311 with a
+CWE, 96,368 CVE-CWE pairs, 80,807 non-empty CVE2CAPEC references, **13,161
+ExploitDB rows** matched to selected CVEs, and 45,538 ExploitDB descriptions
+from the 1999-2023 window. This matches the paper's CVE count and historical
+cutoff; the 55k snapshot is preserved at `data/processed/reproduction_55k/`.
 
 The paper-faithful snapshot is documented in `docs/paper-dataset-report-vi.md`.
 The previous latest-2026 snapshot is preserved at
@@ -129,8 +129,8 @@ python scripts/select_capec.py --dataset data/processed/reproduction \
   --method word2vec --scope all
 ```
 
-Measured on `capec_eval_100`: Word2Vec reaches **88/100** top-1 (96.7% among
-the 91 CVEs that have candidates), TF-IDF 87/100; candidate recall is 90/100.
+Measured on `capec_eval_100`: Word2Vec reaches **87/100** top-1 (100% among
+the 87 CVEs that have candidates), TF-IDF 86/100; candidate recall is 87/100.
 See `docs/capec-selection-report-vi.md`.
 
 Execution-flow dataset (step 3):
@@ -142,8 +142,8 @@ python scripts/build_flow_dataset.py \
   --out data/processed/reproduction/flow_dataset
 ```
 
-This produces 26,750 train/validation flows (21,352 train, 5,398 validation)
-from 170 CAPECs. See `docs/flow-dataset-report-vi.md`.
+This produces 55,420 train/validation flows (44,331 train, 11,089 validation)
+from 176 CAPECs. See `docs/flow-dataset-report-vi.md`.
 
 T5 stage-1 training (Kaggle T4 x2):
 
@@ -172,10 +172,10 @@ python scripts/map_techniques_exploitdb.py \
   --out data/processed/reproduction/flow_dataset_stage2 --epochs 10
 ```
 
-This maps 656 unique techniques to 45,538 ExploitDB descriptions (mean cosine
-0.8915). It uses descriptions/metadata only. See
-`docs/stage2-exploit-mapping-report-vi.md`; 6,474 ExploitDB rows share a CVE
-with the selected sample, enough for a CVE-specific pilot but not full coverage.
+This maps 665 unique techniques to 45,538 ExploitDB descriptions (mean cosine
+0.8907). It uses descriptions/metadata only. See
+`docs/stage2-exploit-mapping-report-vi.md`; 13,161 ExploitDB rows share a CVE
+with the selected sample, enough for a CVE-specific pilot.
 
 Local Flask GUI:
 

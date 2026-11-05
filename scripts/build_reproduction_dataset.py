@@ -64,7 +64,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--exploit-end-year", type=int, default=2023)
     parser.add_argument("--cve2capec", default="data/raw/cve2capec")
     parser.add_argument("--out-dir", default="data/processed/reproduction")
-    parser.add_argument("--target-cves", type=int, default=55_000)
+    parser.add_argument("--target-cves", type=int, default=114_560)
     parser.add_argument("--start-year", type=int, default=2002)
     parser.add_argument("--end-year", type=int, default=2023)
     parser.add_argument(

@@ -94,7 +94,7 @@ The NVD 2.0 annual feeds start at 2002. Two selection modes are available:
 - `newest`: the latest 55,000 CVEs by NVD `published` timestamp, using all
   downloaded feeds (including 2024-2026 when present).
 
-The target is **55,000 CVEs**, about half of the paper's 114,560.
+The target is **114,560 CVEs**, matching the paper's CVE count.
 
 Paper-faithful mode (the generated primary dataset):
 
@@ -117,10 +117,11 @@ The generated `data/processed/reproduction/` uses the paper-faithful mode:
 CVE 2002-2023, ExploitDB only 1999-2023. The previous latest-2026 snapshot is
 preserved at `data/processed/reproduction_latest/` for comparison.
 
-The current primary dataset has 55,000 CVEs (42,897 with CWE), 46,265 CVE-CWE
-pairs, 38,837 non-empty CVE2CAPEC references, 6,474 ExploitDB rows matched to
-selected CVEs, and 45,538 ExploitDB descriptions in the 1999-2023 window. It is
-still half of the paper's 114,560 CVEs, so exact paper counts are not expected.
+The current primary dataset has 114,560 CVEs (89,311 with CWE), 96,368
+CVE-CWE pairs, 80,807 non-empty CVE2CAPEC references, 13,161 ExploitDB rows
+matched to selected CVEs, and 45,538 ExploitDB descriptions in the 1999-2023
+window. The CVE count now matches the paper; exact row-level counts still differ
+because the original dataset and catalog snapshots are not public.
 
 Outputs under `data/processed/reproduction/`:
 
@@ -146,8 +147,8 @@ with `cwe_in_catalog: false`; they produce no CWE→CAPEC candidates and are
 reported in `stats.json` and by the audit script. They are not silently
 rewritten to a modern CWE because that would introduce artificial labels.
 
-The measured 55k snapshot and its deviation table are in
-`docs/reproduction-dataset-report-vi.md`.
+The measured 114,560-CVE snapshot and its deviation table are in
+`docs/paper-dataset-report-vi.md`. The 55k snapshot is kept for comparison.
 
 ## Step 2: best-CAPEC selection
 
@@ -167,15 +168,15 @@ Measured results:
 
 | Method | Candidate coverage | Candidate recall | Top-1 / 100 | Top-1 among answered |
 |---|---:|---:|---:|---:|
-| TF-IDF | 91 | 90 | 87 | 95.6% |
-| Word2Vec | 91 | 90 | **88** | **96.7%** |
+| TF-IDF | 87 | 87 | 86 | 98.85% |
+| Word2Vec | 87 | 87 | **87** | **100%** |
 
-The paper reports 89/100. This reproduction reports **88/100**, within one CVE
-of the paper. The remaining limit is candidate coverage: 9 of the 100 CVEs have
+The paper reports 89/100. This reproduction reports **87/100**, two CVEs below
+the paper. The remaining limit is candidate coverage: 13 of the 100 CVEs have
 no candidate CAPEC because their direct CWE has no relation in the current
-CAPEC catalog. On all 55,000 CVEs, Word2Vec selects a CAPEC for 33,539 CVEs,
-answers 33,402 of the 38,837 reference CVEs, and is correct on 32,720
-(97.96% conditional; 59.49% over all 55,000). Full details are in
+CAPEC catalog. On all 114,560 CVEs, Word2Vec selects a CAPEC for 69,791 CVEs,
+answers 69,504 of the 80,807 reference CVEs, and is correct on 68,052
+(97.91% conditional; 59.40% over all 114,560). Full details are in
 `docs/capec-selection-report-vi.md`.
 
 ## Step 3: execution-flow dataset
@@ -190,14 +191,14 @@ python scripts/build_flow_dataset.py \
   --out data/processed/reproduction/flow_dataset
 ```
 
-Measured output: **26,750 rows** (21,352 train, 5,398 validation), 170 unique
-CAPECs, mean 3.87 steps and 6.10 techniques per flow. 23,065 rows have all three
-phases. 21,444 CVEs have no selected CAPEC and 6,686 selected CAPECs have no
-execution flow.
+Measured output: **55,420 rows** (44,331 train, 11,089 validation), 176 unique
+CAPECs, mean 3.87 steps and 6.23 techniques per flow. 47,903 rows have all three
+phases. Among train/validation CVEs, 44,753 have no selected CAPEC and 14,267
+selected CAPECs have no execution flow.
 
 `flow_dataset.jsonl` stores `target` (description + techniques),
 `target_steps`, and `target_techniques`. Their word-length means/P90 are
-284.6/521, 142.6/213, and 142.4/268. Because the targets are long, the training
+286.6/521, 143.6/213, and 143.3/285. Because the targets are long, the training
 default is `target_techniques` with `max_target_length=256`; a 128-token budget
 truncates many flows. Full details are in `docs/flow-dataset-report-vi.md`.
 
@@ -215,16 +216,16 @@ python scripts/map_techniques_exploitdb.py \
   --epochs 10
 ```
 
-Measured output: 656 unique techniques, all mapped to 45,538 ExploitDB
-descriptions (1999-2023), mean cosine 0.8915 (median 0.8928). The stage-2 target
-`target_exploit_techniques` has mean length 43.4 words (P90 71), so 128 target
+Measured output: 665 unique techniques, all mapped to 45,538 ExploitDB
+descriptions (1999-2023), mean cosine 0.8907 (median 0.8915). The stage-2 target
+`target_exploit_techniques` has mean length 41.5 words (P90 71), so 128 target
 tokens are sufficient for this field. Full details are in
 `docs/stage2-exploit-mapping-report-vi.md`.
 
-This is a semantic, CVE-independent mapping. The paper-faithful sample has
-6,474 ExploitDB rows sharing a CVE with selected CVEs, enough for a pilot of the
-paper's CVE-specific exploit-code retrieval and SBERT threshold study, but not
-full paper coverage. The SBERT stage has not been run yet.
+This is a semantic, CVE-independent mapping. The paper-scale sample has 13,161
+ExploitDB rows sharing a CVE with selected CVEs, enough for a pilot of the
+paper's CVE-specific exploit-code retrieval and SBERT threshold study. The SBERT
+stage has not been run yet.
 
 ## Step 5: local Flask GUI
 
@@ -236,11 +237,11 @@ python gui/app.py
 # http://127.0.0.1:5000
 ```
 
-It accepts a CVE id from the 55k sample or a free description, shows the selected
+It accepts a CVE id from the 114,560-CVE dataset or a free description, shows the selected
 CAPEC, the Explore/Experiment/Exploit flow, candidate CAPECs, and technique ->
 ExploitDB descriptions. It also exposes `GET /health` and
-`GET /api/analyze?cve_id=...`. With the real dataset, `/health` reports 55,000
-CVEs, 615 CAPECs, 33,539 predictions, and 656 technique mappings. See
+`GET /api/analyze?cve_id=...`. With the real dataset, `/health` reports
+114,560 CVEs, 615 CAPECs, 69,791 predictions, and 665 technique mappings. See
 `docs/gui-report-vi.md`.
 
 The GUI currently displays the reference CAPEC flow, not a T5-generated flow;

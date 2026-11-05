@@ -171,9 +171,9 @@ python -m torch.distributed.run --nproc_per_node=2 scripts/train_t5.py \
 ```
 
 L?u ?: mapping technique -> ExploitDB description là semantic toàn cục, không
-phải CVE-specific exploit code. Bản paper-faithful 55k có 6.474 dòng ExploitDB
-khớp CVE được chọn, đủ cho pilot SBERT/exploit-code retrieval, nhưng vẫn chưa
-phải coverage đầy đủ của paper 114.560 CVE.
+phải CVE-specific exploit code. Bản paper-faithful 114.560 CVE có 13.161 dòng ExploitDB
+khớp CVE được chọn, đủ nguyên liệu cho pilot SBERT/exploit-code retrieval,
+nhưng vẫn chưa chạy SBERT và chưa phải coverage đầy đủ.
 
 ## 8. Lưu ý an toàn
 

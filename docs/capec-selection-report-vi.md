@@ -1,7 +1,7 @@
-# B?o c?o b??c 2: ch?n CAPEC t?t nh?t (dataset paper-faithful)
+# B?o c?o b??c 2: ch?n CAPEC t?t nh?t (dataset 114.560 CVE)
 
 Ng?y ch?y: 2026-11-05  
-Dataset: `data/processed/reproduction/` (55k stratified 2002?2023)  
+Dataset: `data/processed/reproduction/` (114.560 CVE stratified 2002?2023)  
 Ground truth: CVE2CAPEC, ch? d?ng cho evaluation.
 
 ## 1. Ph??ng ph?p
@@ -10,7 +10,7 @@ Ground truth: CVE2CAPEC, ch? d?ng cho evaluation.
 - So m? t? CVE v?i `name + description` c?a t?ng CAPEC candidate.
 - TF-IDF: unigram + bigram, `sublinear_tf`, cosine.
 - Word2Vec: skip-gram, 100 chi?u, window 5, 10 epoch, seed 42, vector c?u =
-trung b?nh vector t?, cosine.
+  trung b?nh vector t?, cosine.
 - Kh?ng d?ng CVE2CAPEC khi ch?n; ch? d?ng ?? ch?m top-1.
 
 L?nh:
@@ -24,40 +24,38 @@ python scripts/select_capec.py --dataset data/processed/reproduction \
 
 ## 2. K?t qu? 100 CVE evaluation
 
-| Ph??ng ph?p | C? candidate | Candidate recall | Top-1 ??ng | Accuracy /100 | Accuracy tr?n CVE c? candidate | Cosine trung b?nh |
-|---|---:|---:|---:|---:|---:|---:|
-| TF-IDF | 91 | 90 | 87 | 87,0% | 95,6% | 0,0299 |
-| Word2Vec | 91 | 90 | **88** | **88,0%** | **96,7%** | 0,8400 |
+| Ph??ng ph?p | C? candidate | Candidate recall | Top-1 ??ng | Accuracy /100 | Accuracy tr?n CVE c? candidate |
+|---|---:|---:|---:|---:|---:|
+| TF-IDF | 87 | 87 | 86 | 86,0% | 98,85% |
+| Word2Vec | 87 | 87 | **87** | **87,0%** | **100,0%** |
 
-Paper b?o c?o **89/100**. B?n n?y ??t **88/100** v?i Word2Vec, s?t paper h?n
-h?n b?n latest tr??c ?? (78/100). Trong 91 CVE c? candidate, Word2Vec ch?n ??ng
-88; 9 CVE c?n l?i kh?ng c? candidate n?n kh?ng th? tr? l?i.
+Paper b?o c?o **89/100**. B?n ??y ?? n?y ??t **87/100**, k?m paper 2 CVE.
+Trong 87 CVE c? candidate, Word2Vec ch?n ??ng c? 87. 13 CVE c?n l?i kh?ng c?
+candidate n?n kh?ng th? tr? l?i.
 
-Word2Vec th?ng TF-IDF 88 so v?i 87, ph? h?p k?t lu?n paper ch?n Word2Vec.
-Cosine trung b?nh c?a Word2Vec (0,84) c?ng g?n kho?ng 0,84?0,94 m? paper m? t?
-cho c?c b??c/flow, nh?ng kh?ng n?n so tr?c ti?p v?i ?max similarity?.
+Word2Vec th?ng TF-IDF 87 so v?i 86, ph? h?p k?t lu?n paper ch?n Word2Vec.
 
-## 3. To?n b? 55k
+## 3. To?n b? 114.560 CVE
 
 | H?ng m?c | S? l??ng |
 |---|---:|
-| CVE | 55.000 |
-| C? candidate | 33.539 |
-| C? reference CVE2CAPEC kh?ng r?ng | 38.837 |
-| V?a candidate v?a reference | 33.402 |
-| Top-1 ??ng | 32.720 |
-| Accuracy tr?n to?n b? | 59,49% |
-| Accuracy tr?n CVE tr? l?i ???c | **97,96%** |
-| Candidate recall | 85,49% |
+| CVE | 114.560 |
+| C? candidate | 69.791 |
+| C? reference CVE2CAPEC kh?ng r?ng | 80.807 |
+| V?a candidate v?a reference | 69.504 |
+| Top-1 ??ng | 68.052 |
+| Accuracy tr?n to?n b? | 59,40% |
+| Accuracy tr?n CVE tr? l?i ???c | **97,91%** |
+| Candidate recall | 85,46% |
 
-Con s? 59,49% b? k?o xu?ng b?i c?c CVE kh?ng c? candidate; accuracy tr?n CVE tr?
-l?i ???c l? 97,96%.
+Con s? 59,40% b? k?o xu?ng b?i c?c CVE kh?ng c? candidate; accuracy tr?n CVE
+tr? l?i ???c l? 97,91%.
 
-## 4. V? sao t?t h?n b?n latest
+## 4. So v?i b?n 55k
 
-B?n latest 2026 c? 20/100 CVE kh?ng c? candidate v? ch? ??t 78/100. B?n
-paper-faithful 2002?2023 c? 91/100 CVE c? candidate, candidate recall 90/100,
-n?n top-1 ??t 88/100. ??y l? l? do ch?n corpus l?ch s? thay v? newest.
+B?n 55k ??t 88/100; b?n ??y ?? 114.560 ??t 87/100. Ch?nh l?ch 1 CVE l? nhi?u
+c?a split 100 CVE, kh?ng ph?i suy gi?m ph??ng ph?p. B?n ??y ?? c? candidate
+coverage th?p h?n m?t ch?t (87/100 so v?i 91/100), n?n tr?n accuracy th?p h?n.
 
 ## 5. File ??u ra
 
@@ -71,7 +69,7 @@ capec_selection/capec_selection_metrics_all.json
 
 ## 6. Gi?i h?n
 
-- 9/100 CVE eval kh?ng c? candidate CAPEC do CWE tr?c ti?p kh?ng c? quan h?
+- 13/100 CVE eval kh?ng c? candidate CAPEC do CWE tr?c ti?p kh?ng c? quan h?
   trong CAPEC 3.9.
 - Catalog CAPEC 3.9 c? 615 entry, ?t h?n 1.024 c?a paper; CWE 4.20 c? 969 entry.
 - Kh?ng leo CWE cha ?? t?o candidate, v? paper d?ng quan h? CWE?CAPEC tr?c ti?p.
