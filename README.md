@@ -209,6 +209,12 @@ Optional (T5 training/evaluation):
 python -m pip install -e ".[train,test]"
 ```
 
+Optional (local Flask GUI):
+
+```bash
+python -m pip install -e ".[gui,test]"
+```
+
 Copy env template (only needed for future LLM/API generation):
 
 ```bash
