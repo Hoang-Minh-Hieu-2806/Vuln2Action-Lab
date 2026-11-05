@@ -95,6 +95,7 @@ Bước 2 (TF-IDF/Word2Vec + cosine similarity) mới là bước chọn CAPEC t
 | Cặp CVE–CWE | 28.831 | 46.265 | NVD hiện có nhiều CWE hơn |
 | Cặp CWE–CAPEC | 46.575 | 1.212 | Paper có thể đếm theo mapping instance; bản này đếm cặp catalog duy nhất |
 | Nguồn CVE | 1999–2023 | 2002–2023 | NVD 2.0 annual feed không có 1999–2001 |
+| Human eval | 20 CVE của paper | 5 CVE paper + 15 CVE bổ sung | 4 CVE 2024 của paper nằm ngoài cutoff 2023 |
 | CAPEC tốt nhất | Có | Chưa | Thuộc bước 2 |
 
 ### CWE cũ / deprecated
