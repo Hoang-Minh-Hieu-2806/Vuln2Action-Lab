@@ -93,7 +93,14 @@ python scripts/build_flow_dataset.py \
   ExploitDB. Cần exploit-linked subset hoặc hybrid selection trước khi train
   stage 2 nghiêm túc.
 
-## 6. Việc tiếp theo
+## 6. Stage 2
+
+?? map 665 technique sang 46.709 m? t? ExploitDB b?ng Word2Vec + cosine; xem
+`docs/stage2-exploit-mapping-report-vi.md`. Dataset stage 2 n?m ?
+`data/processed/reproduction/flow_dataset_stage2/`, target g?n
+`target_exploit_techniques` d?i trung b?nh 37,4 t?.
+
+## 7. Vi?c ti?p theo
 
 1. Viết T5 training script stage 1 cho Kaggle T4 x2, có checkpoint/resume.
 2. Chọn `target_techniques` + `max_target_length=256` hoặc `target` + 512.

@@ -15,6 +15,7 @@ from typing import Any
 
 from vuln2action.connectors.dataset import load_capec_dataset
 from vuln2action.domain import CapecRecord, CapecStep, CveRecord
+from vuln2action.mapping.exploit import ExploitMatch
 from vuln2action.utils.filesystem import read_json, read_jsonl, write_json, write_jsonl
 
 PHASES = ("Explore", "Experiment", "Exploit")
@@ -98,6 +99,62 @@ def build_flow_row(cve: CveRecord, capec: CapecRecord, split: str) -> dict[str, 
         "step_count": len(capec.execution_flow),
         "technique_count": technique_count,
     }
+
+
+def _truncate_words(text: str, max_words: int) -> str:
+    words = _clean(text).split()
+    if len(words) <= max_words:
+        return " ".join(words)
+    return " ".join(words[:max_words]) + " ..."
+
+
+def enrich_flow_row(
+    row: dict[str, Any],
+    mapping: dict[str, ExploitMatch],
+    max_exploits_per_phase: int = 3,
+    max_exploit_words: int = 40,
+) -> dict[str, Any]:
+    """Replace flow techniques with their closest ExploitDB descriptions."""
+    full_parts: list[str] = []
+    technique_parts: list[str] = []
+    exploit_rows: list[dict[str, Any]] = []
+    for phase in row["phases"]:
+        phase_name = phase["phase"]
+        step_texts: list[str] = []
+        exploit_texts: list[str] = []
+        for step in phase["steps"]:
+            step_desc = _clean(step["description"])
+            mapped_for_step: list[str] = []
+            for technique in step["techniques"]:
+                match = mapping.get(technique)
+                if match is None:
+                    mapped_for_step.append(technique)
+                    continue
+                description = _truncate_words(match.description, max_exploit_words)
+                mapped_for_step.append(description)
+                exploit_texts.append(description)
+                exploit_rows.append(
+                    {
+                        "phase": phase_name,
+                        "step": step["step"],
+                        "technique": technique,
+                        "exploit_id": match.exploit_id,
+                        "score": match.score,
+                        "description": match.description,
+                    }
+                )
+            step_text = step_desc
+            if mapped_for_step:
+                step_text = f"{step_text} (Exploits: {'; '.join(mapped_for_step)})"
+            step_texts.append(step_text)
+        full_parts.append(f"{phase_name}: {' '.join(step_texts)}".strip())
+        unique_exploits = list(dict.fromkeys(exploit_texts))[:max_exploits_per_phase]
+        technique_parts.append(f"{phase_name}: {'; '.join(unique_exploits)}".strip())
+    enriched = dict(row)
+    enriched["target_exploit"] = " ".join(full_parts)
+    enriched["target_exploit_techniques"] = " ".join(technique_parts)
+    enriched["exploits"] = exploit_rows
+    return enriched
 
 
 def _load_predictions(path: Path) -> dict[str, str]:

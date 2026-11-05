@@ -143,17 +143,37 @@ Kết quả ghi vào `outputs/t5_eval/metrics.json`:
 Paper báo cáo BLEU `0.7589`; reproduction chỉ được báo cáo số đo thực tế, không
 được chép số paper.
 
-## 7. Về stage 2
+## 7. Stage 2 v?i ExploitDB descriptions
 
-Stage 2 cần target đã enrich bằng ExploitDB description. Dataset latest 55k chỉ
-khớp **27 dòng ExploitDB**, nên chưa đủ để train stage 2 nghiêm túc. Cần một
-trong hai hướng:
+Stage 2 dataset ?? c? t?i `data/processed/reproduction/flow_dataset_stage2/`.
+Upload th?m c?c file:
 
-1. thêm exploit-linked subset lịch sử (25.106 CVE có exploit);
-2. tạo hybrid selection "newest + exploit coverage".
+```text
+flow_dataset_stage2/flow_train.jsonl
+flow_dataset_stage2/flow_validation.jsonl
+flow_dataset_stage2/flow_stats.json
+```
 
-Script `train_t5.py --stage 2 --target-field <field>` đã sẵn để dùng khi có
-target field tương ứng; hiện flow dataset chưa có field đó.
+Ch?y stage 2:
+
+```bash
+python -m torch.distributed.run --nproc_per_node=2 scripts/train_t5.py \
+  --dataset /kaggle/input/<dataset-name>/flow_dataset_stage2 \
+  --output-dir /kaggle/working/t5_stage2 \
+  --model-name t5-base \
+  --stage 2 \
+  --target-field target_exploit_techniques \
+  --max-input-length 256 \
+  --max-target-length 128 \
+  --per-device-batch-size 8 \
+  --gradient-accumulation-steps 4 \
+  --auto-resume
+```
+
+L?u ?: mapping technique -> ExploitDB description l? semantic to?n c?c, kh?ng
+ph?i CVE-specific exploit code. Latest 55k ch? kh?p 27 d?ng ExploitDB, n?n ph?n
+SBERT/exploit-code retrieval c?a paper v?n c?n hybrid ho?c exploit-linked subset
+l?ch s? tr??c khi ??nh gi? ??y ??.
 
 ## 8. Lưu ý an toàn
 

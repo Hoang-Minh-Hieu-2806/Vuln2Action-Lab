@@ -77,6 +77,7 @@ Vuln2Action-Lab/
       (78/100 top-1 on the CAPEC eval split)
 - [x] Stage-1 execution-flow dataset (30,077 train/validation rows)
 - [x] Stage-1 T5 training and BLEU/ROUGE evaluation scripts for T4 x2
+- [x] Stage-2 technique -> ExploitDB description dataset
 - [x] Tracked CVE→CWE retrieval benchmark with measured P@k / R@k / F1@k / MRR
 - [x] Sample end-to-end CLI pipeline over fake sample CVEs
 - [ ] T5 GPU training run, Flask GUI, and full evaluation
@@ -156,6 +157,20 @@ python scripts/evaluate_t5.py \
 The scripts are implemented but have not been run here (no local GPU). See
 `docs/kaggle-t5-training-vi.md` for the full Kaggle/checkpoint workflow.
 
+Stage-2 technique -> ExploitDB mapping:
+
+```bash
+python scripts/map_techniques_exploitdb.py \
+  --flow-dataset data/processed/reproduction/flow_dataset \
+  --exploitdb data/processed/reproduction/exploitdb.jsonl \
+  --out data/processed/reproduction/flow_dataset_stage2 --epochs 10
+```
+
+This maps 665 unique techniques to 46,709 ExploitDB descriptions (mean cosine
+0.8911). It uses descriptions/metadata only. See
+`docs/stage2-exploit-mapping-report-vi.md`; CVE-specific exploit-code retrieval
+remains blocked by the 27-row overlap.
+
 ## Installation
 
 Requires **Python 3.11+**.
@@ -174,6 +189,12 @@ Optional (Word2Vec CAPEC selection):
 
 ```bash
 python -m pip install -e ".[nlp,test]"
+```
+
+Optional (T5 training/evaluation):
+
+```bash
+python -m pip install -e ".[train,test]"
 ```
 
 Copy env template (only needed for future LLM/API generation):

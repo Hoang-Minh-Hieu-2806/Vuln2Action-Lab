@@ -4,7 +4,8 @@ import json
 from pathlib import Path
 
 from vuln2action.domain import CapecRecord, CapecStep, CveRecord
-from vuln2action.generation.flow_dataset import build_flow_dataset
+from vuln2action.generation.flow_dataset import build_flow_dataset, enrich_flow_row
+from vuln2action.mapping.exploit import ExploitMatch
 from vuln2action.utils.filesystem import write_json, write_jsonl
 
 
@@ -83,3 +84,37 @@ def test_build_flow_dataset_serialises_three_phases(tmp_path: Path):
     assert row["target_techniques"].startswith("Explore: Spidering")
     assert row["step_count"] == 3
     assert row["technique_count"] == 3
+
+
+def test_enrich_flow_row_replaces_techniques_with_exploit_descriptions():
+    row = {
+        "cve_id": "CVE-2024-0001",
+        "phases": [
+            {
+                "phase": "Explore",
+                "steps": [
+                    {
+                        "step": 1,
+                        "description": "Survey the target.",
+                        "techniques": ["Spidering"],
+                    }
+                ],
+            },
+            {"phase": "Experiment", "steps": []},
+            {"phase": "Exploit", "steps": []},
+        ],
+    }
+    mapping = {
+        "Spidering": ExploitMatch(
+            exploit_id="EDB-1",
+            description="Crawl every link on the target application.",
+            score=0.91,
+        )
+    }
+
+    enriched = enrich_flow_row(row, mapping)
+
+    assert "Crawl every link" in enriched["target_exploit"]
+    assert "Crawl every link" in enriched["target_exploit_techniques"]
+    assert enriched["exploits"][0]["exploit_id"] == "EDB-1"
+    assert enriched["exploits"][0]["technique"] == "Spidering"

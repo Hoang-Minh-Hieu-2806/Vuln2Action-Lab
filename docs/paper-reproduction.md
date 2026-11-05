@@ -203,6 +203,31 @@ execution flow.
 default is `target_techniques` with `max_target_length=256`; a 128-token budget
 truncates many flows. Full details are in `docs/flow-dataset-report-vi.md`.
 
+## Step 4: technique -> ExploitDB description mapping
+
+Each flow technique is matched to the closest ExploitDB description with
+Word2Vec + cosine similarity. Only descriptions and metadata are used; exploit
+source code is never downloaded or executed.
+
+```bash
+python scripts/map_techniques_exploitdb.py \
+  --flow-dataset data/processed/reproduction/flow_dataset \
+  --exploitdb data/processed/reproduction/exploitdb.jsonl \
+  --out data/processed/reproduction/flow_dataset_stage2 \
+  --epochs 10
+```
+
+Measured output: 665 unique techniques, all mapped to 46,709 ExploitDB
+descriptions, mean cosine 0.8911 (median 0.8933). The stage-2 target
+`target_exploit_techniques` has mean length 37.4 words (P90 65), so 128 target
+tokens are sufficient for this field. Full details are in
+`docs/stage2-exploit-mapping-report-vi.md`.
+
+This is a semantic, CVE-independent mapping. Only 27 ExploitDB rows share a CVE
+with the latest 55k sample, so the paper's CVE-specific exploit-code retrieval
+and SBERT threshold stage remain blocked until a hybrid or historical
+exploit-linked subset is added.
+
 ## T4 x2 training configuration
 
 Kaggle provides 2 x T4 (16 GB each). Use:
