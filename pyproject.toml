@@ -19,6 +19,14 @@ dependencies = [
 [project.optional-dependencies]
 api = ["fastapi>=0.110", "uvicorn[standard]>=0.29"]
 nlp = ["gensim>=4.3"]
+train = [
+  "torch>=2.1",
+  "transformers>=4.41",
+  "datasets>=2.18",
+  "accelerate>=0.30",
+  "sacrebleu>=2.4",
+  "rouge-score>=0.1.2",
+]
 test = ["pytest>=8.0"]
 dev = ["pytest>=8.0", "ruff>=0.6", "build>=1.2"]
 

@@ -75,9 +75,11 @@ Vuln2Action-Lab/
       55k-CVE latest/stratified selection
 - [x] Best-CAPEC selection with TF-IDF and Word2Vec + cosine similarity
       (78/100 top-1 on the CAPEC eval split)
+- [x] Stage-1 execution-flow dataset (30,077 train/validation rows)
+- [x] Stage-1 T5 training and BLEU/ROUGE evaluation scripts for T4 x2
 - [x] Tracked CVE→CWE retrieval benchmark with measured P@k / R@k / F1@k / MRR
 - [x] Sample end-to-end CLI pipeline over fake sample CVEs
-- [ ] T5 training, Flask GUI, and full evaluation
+- [ ] T5 GPU training run, Flask GUI, and full evaluation
 - [ ] Live labs for `cve-002`/`cve-003`; generation and reproduction benchmarks
 
 ## Paper-reproduction dataset (step 1)
@@ -123,6 +125,36 @@ python scripts/select_capec.py --dataset data/processed/reproduction \
 Measured on `capec_eval_100`: TF-IDF and Word2Vec both reach **78/100** top-1
 (97.5% among the 80 CVEs that have candidates); candidate recall is 80/100.
 See `docs/capec-selection-report-vi.md`.
+
+Execution-flow dataset (step 3):
+
+```bash
+python scripts/build_flow_dataset.py \
+  --dataset data/processed/reproduction \
+  --predictions data/processed/reproduction/capec_selection/capec_predictions_word2vec_all.jsonl \
+  --out data/processed/reproduction/flow_dataset
+```
+
+This produces 30,077 train/validation flows (23,964 train, 6,113 validation)
+from 174 CAPECs. See `docs/flow-dataset-report-vi.md`.
+
+T5 stage-1 training (Kaggle T4 x2):
+
+```bash
+pip install -e ".[train]"
+python -m torch.distributed.run --nproc_per_node=2 scripts/train_t5.py \
+  --dataset data/processed/reproduction/flow_dataset \
+  --output-dir outputs/t5_stage1 \
+  --model-name t5-base --target-field target_techniques \
+  --max-target-length 256 --auto-resume
+
+python scripts/evaluate_t5.py \
+  --checkpoint outputs/t5_stage1/final \
+  --dataset data/processed/reproduction/flow_dataset
+```
+
+The scripts are implemented but have not been run here (no local GPU). See
+`docs/kaggle-t5-training-vi.md` for the full Kaggle/checkpoint workflow.
 
 ## Installation
 

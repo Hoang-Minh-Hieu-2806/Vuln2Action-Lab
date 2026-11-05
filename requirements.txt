@@ -17,5 +17,14 @@ gensim>=4.3
 fastapi>=0.110
 uvicorn[standard]>=0.29
 
+# Optional T5 training/evaluation (Kaggle or a GPU machine).
+# Install with `pip install -e ".[train]"` instead of uncommenting by default.
+# torch>=2.1
+# transformers>=4.41
+# datasets>=2.18
+# accelerate>=0.30
+# sacrebleu>=2.4
+# rouge-score>=0.1.2
+
 # Testing
 pytest>=8.0

@@ -180,6 +180,29 @@ On all 55,000 CVEs, Word2Vec selects a CAPEC for 39,181 CVEs and is correct on
 38,374 of 38,581 answered CVEs (99.46% conditional; 69.77% over all 55,000).
 Full details are in `docs/capec-selection-report-vi.md`.
 
+## Step 3: execution-flow dataset
+
+The selected CAPEC is converted into the paper's Explore/Experiment/Exploit
+flow. Train/validation rows only are kept to avoid evaluation leakage.
+
+```bash
+python scripts/build_flow_dataset.py \
+  --dataset data/processed/reproduction \
+  --predictions data/processed/reproduction/capec_selection/capec_predictions_word2vec_all.jsonl \
+  --out data/processed/reproduction/flow_dataset
+```
+
+Measured output: **30,077 rows** (23,964 train, 6,113 validation), 174 unique
+CAPECs, mean 4.03 steps and 5.75 techniques per flow. 25,484 rows have all three
+phases. 15,793 CVEs have no selected CAPEC and 9,010 selected CAPECs have no
+execution flow.
+
+`flow_dataset.jsonl` stores `target` (description + techniques),
+`target_steps`, and `target_techniques`. Their word-length means/P90 are
+258.6/521, 145.3/290, and 113.9/230. Because the targets are long, the training
+default is `target_techniques` with `max_target_length=256`; a 128-token budget
+truncates many flows. Full details are in `docs/flow-dataset-report-vi.md`.
+
 ## T4 x2 training configuration
 
 Kaggle provides 2 x T4 (16 GB each). Use:
@@ -187,7 +210,9 @@ Kaggle provides 2 x T4 (16 GB each). Use:
 - `t5-base` as the primary model; `t5-small` only as a fallback/ablation.
 - DDP across 2 GPUs, `fp16`, per-device batch size 8, gradient accumulation 4
   (effective batch 32).
-- `max_input_length=256`, `max_target_length=128`.
+- `max_input_length=256`, `max_target_length=256` for the flow targets. The
+  earlier 128-token plan is kept only as a fallback and must use
+  `target_techniques`; 128 truncates a large fraction of the full targets.
 - `gradient_checkpointing=True`.
 - learning rate `5e-5`, AdamW, cross-entropy.
 - 50 epochs as the target; record the actual number if quota forces a stop.
@@ -195,6 +220,25 @@ Kaggle provides 2 x T4 (16 GB each). Use:
   `resume_from_checkpoint`.
 - benchmark one epoch before committing to 50; if an epoch is too slow, reduce
   the dataset or use `t5-small` and record the deviation.
+
+```bash
+python -m torch.distributed.run --nproc_per_node=2 scripts/train_t5.py \
+  --dataset data/processed/reproduction/flow_dataset \
+  --output-dir outputs/t5_stage1 \
+  --model-name t5-base --target-field target_techniques \
+  --max-input-length 256 --max-target-length 256 \
+  --per-device-batch-size 8 --gradient-accumulation-steps 4 \
+  --save-steps 500 --eval-steps 500 --auto-resume
+
+python scripts/evaluate_t5.py \
+  --checkpoint outputs/t5_stage1/final \
+  --dataset data/processed/reproduction/flow_dataset \
+  --target-field target_techniques --num-beams 4
+```
+
+`scripts/train_t5.py` also accepts `--stage 2 --target-field <field>` for a
+future exploit-enriched target. The current flow dataset has no such field, and
+stage 2 is blocked by the 27-row ExploitDB overlap documented above.
 
 Using multiple Kaggle accounts to bypass quota is not a design assumption and
 may violate Kaggle's terms. The training code must be able to finish under a
