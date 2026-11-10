@@ -71,6 +71,36 @@ Smoke test x?c nh?n DDP 2 GPU, fp16, ??c dataset, eval v? checkpoint ho?t ??ng.
 L?n ch?y ??u l?i v? hard-code `/kaggle/input/vuln2action-flow-114560`; ?? s?a
 b?ng t? d? `flow_train.jsonl`.
 
+## 3b. K?t qu? benchmark 1 epoch
+
+Notebook:
+
+```text
+notebooks/kaggle/stage1_benchmark/kaggle_t5_stage1_benchmark.ipynb
+```
+
+C?u h?nh:
+
+| H?ng m?c | Gi? tr? |
+|---|---:|
+| Model | `t5-base` |
+| Train / validation | 44.331 / 11.089 rows |
+| Effective batch | 64 (8/GPU ? 2 GPU ? grad accum 4) |
+| Steps / epoch | 693 |
+| Max input / target | 256 / 256 |
+| fp16 / gradient checkpointing | C? / C? |
+| Tr?ng th?i | **COMPLETE** |
+
+K?t qu?:
+
+| Step | Eval loss |
+|---:|---:|
+| 500 | 0,5180 |
+| 693 | **0,4455** |
+
+??y m?i l? loss sau 1 epoch, ch?a ph?i BLEU/ROUGE cu?i c?ng. Kh?ng n?n so
+tr?c ti?p v?i paper khi ch?a ch?y ?? epoch v? ch?a evaluate generation.
+
 ## 4. Train stage 1
 
 Benchmark 1 epoch tr??c, kh?ng ch?y 50 epoch ngay:

@@ -165,9 +165,11 @@ Kaggle datasets are uploaded privately:
 - `minhiw/vuln2action-flow-114560`
 - `minhiw/vuln2action-stage2-114560`
 
-A 20-step T5-small smoke test completed on Kaggle T4 x2 with DDP, fp16,
-evaluation, and checkpoints (`notebooks/kaggle/`). Full T5-base training has
-not been run yet. See `docs/kaggle-t5-training-vi.md` for the full workflow.
+A 20-step T5-small smoke test and a 1-epoch T5-base benchmark completed on
+Kaggle T4 x2 with DDP, fp16, evaluation, and checkpoints (`notebooks/kaggle/`).
+The 1-epoch benchmark finished 693 steps with validation loss 0.4455. Full
+50-epoch training has not been run yet. See `docs/kaggle-t5-training-vi.md` for
+the full workflow.
 
 Stage-2 technique -> ExploitDB mapping:
 
