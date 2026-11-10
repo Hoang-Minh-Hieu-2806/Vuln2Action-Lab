@@ -1,0 +1,15 @@
+{
+  "id": "minhiw/vuln2action-t5-smoke-test",
+  "title": "Vuln2Action T5 smoke test",
+  "code_file": "kaggle_t5_smoke.ipynb",
+  "language": "python",
+  "kernel_type": "notebook",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_internet": true,
+  "dataset_sources": [
+    "minhiw/vuln2action-flow-114560"
+  ],
+  "competition_sources": [],
+  "kernel_sources": []
+}

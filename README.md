@@ -160,8 +160,14 @@ python scripts/evaluate_t5.py \
   --dataset data/processed/reproduction/flow_dataset
 ```
 
-The scripts are implemented but have not been run here (no local GPU). See
-`docs/kaggle-t5-training-vi.md` for the full Kaggle/checkpoint workflow.
+Kaggle datasets are uploaded privately:
+
+- `minhiw/vuln2action-flow-114560`
+- `minhiw/vuln2action-stage2-114560`
+
+A 20-step T5-small smoke test completed on Kaggle T4 x2 with DDP, fp16,
+evaluation, and checkpoints (`notebooks/kaggle/`). Full T5-base training has
+not been run yet. See `docs/kaggle-t5-training-vi.md` for the full workflow.
 
 Stage-2 technique -> ExploitDB mapping:
 
