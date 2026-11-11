@@ -167,9 +167,13 @@ Kaggle datasets are uploaded privately:
 
 A 20-step T5-small smoke test and a 1-epoch T5-base benchmark completed on
 Kaggle T4 x2 with DDP, fp16, evaluation, and checkpoints (`notebooks/kaggle/`).
-The 1-epoch benchmark finished 693 steps with validation loss 0.4455. Full
-50-epoch training has not been run yet. See `docs/kaggle-t5-training-vi.md` for
-the full workflow.
+The 1-epoch benchmark finished 693 steps with validation loss 0.4455. Its
+checkpoint scored BLEU 37.55, ROUGE-1 44.43%, ROUGE-2 31.70%, and ROUGE-L
+38.53% on 11,089 validation rows. However, 11,083/11,089 validation targets
+also occur in train and the model emitted only 19 unique flows, so these scores
+are target-overlap-inflated rather than a generalization result. Full 50-epoch
+training has not been run yet. See `docs/t5-stage1-eval-vi.md` and
+`docs/kaggle-t5-training-vi.md`.
 
 Stage-2 technique -> ExploitDB mapping:
 

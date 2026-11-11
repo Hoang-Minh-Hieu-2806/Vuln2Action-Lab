@@ -101,6 +101,29 @@ K?t qu?:
 ??y m?i l? loss sau 1 epoch, ch?a ph?i BLEU/ROUGE cu?i c?ng. Kh?ng n?n so
 tr?c ti?p v?i paper khi ch?a ch?y ?? epoch v? ch?a evaluate generation.
 
+## 3c. K?t qu? evaluate checkpoint-693
+
+Notebook:
+
+```text
+notebooks/kaggle/stage1_eval/kaggle_t5_stage1_eval.ipynb
+```
+
+K?t qu? tr?n 11.089 validation rows:
+
+| Metric | Gi? tr? |
+|---|---:|
+| BLEU (sacreBLEU 0-100) | 37,55 |
+| ROUGE-1 | 44,43% |
+| ROUGE-2 | 31,70% |
+| ROUGE-L | 38,53% |
+
+Tuy nhi?n, **11.083 / 11.089** validation rows c? target flow ?? xu?t hi?n
+nguy?n v?n trong train. Model ch? sinh **19 flow kh?c nhau**, top 8 flow chi?m
+96,01%. V? v?y ?i?m s? n?y b? l?c quan do tr?ng target, ch?a ph?i kh? n?ng t?ng
+qu?t h?a. Chi ti?t v? khuy?n ngh? s?a split theo `capec_id` n?m trong
+`docs/t5-stage1-eval-vi.md`.
+
 ## 4. Train stage 1
 
 Benchmark 1 epoch tr??c, kh?ng ch?y 50 epoch ngay:
