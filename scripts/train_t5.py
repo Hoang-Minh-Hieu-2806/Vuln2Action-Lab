@@ -116,6 +116,15 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument("--auto-resume", action="store_true")
     parser.add_argument("--resume-from-checkpoint", default="")
+    parser.add_argument(
+        "--load-best-model-at-end",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+        help=(
+            "Reload the checkpoint with the lowest eval loss. Paper-style runs "
+            "should keep the final epoch, so this defaults to false."
+        ),
+    )
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args(argv)
 
@@ -207,7 +216,7 @@ def main(argv: list[str] | None = None) -> int:
         "logging_steps": args.logging_steps,
         "save_total_limit": args.save_total_limit,
         "save_strategy": "steps",
-        "load_best_model_at_end": True,
+        "load_best_model_at_end": args.load_best_model_at_end,
         "metric_for_best_model": "eval_loss",
         "greater_is_better": False,
         "predict_with_generate": False,
