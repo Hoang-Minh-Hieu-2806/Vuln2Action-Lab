@@ -100,6 +100,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--per-device-batch-size", type=int, default=8)
     parser.add_argument("--gradient-accumulation-steps", type=int, default=4)
     parser.add_argument("--learning-rate", type=float, default=5e-5)
+    parser.add_argument(
+        "--warmup-ratio",
+        type=float,
+        default=0.1,
+        help="Fraction of steps used for linear warmup (default: 0.1).",
+    )
     parser.add_argument("--num-train-epochs", type=float, default=50.0)
     parser.add_argument("--max-steps", type=int, default=-1)
     parser.add_argument("--save-steps", type=int, default=500)
@@ -209,6 +215,7 @@ def main(argv: list[str] | None = None) -> int:
         "per_device_eval_batch_size": args.per_device_batch_size,
         "gradient_accumulation_steps": args.gradient_accumulation_steps,
         "learning_rate": args.learning_rate,
+        "warmup_ratio": args.warmup_ratio,
         "num_train_epochs": args.num_train_epochs,
         "max_steps": args.max_steps,
         "save_steps": args.save_steps,
