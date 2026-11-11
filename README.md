@@ -170,11 +170,14 @@ Kaggle T4 x2 with DDP, fp16, evaluation, and checkpoints (`notebooks/kaggle/`).
 The 1-epoch benchmark finished 693 steps. Paper-style evaluation of the
 10-epoch checkpoint produced BLEU 0.1640, ROUGE-1 F1 0.3553, ROUGE-2 F1
 0.1982, and ROUGE-L F1 0.2831 on all 11,089 validation rows. This is far below
-the paper (BLEU 0.7589) and worse than the 1-epoch checkpoint, because
-`target_techniques` contains 14.2% empty flows and only 139 unique targets. A
-full-flow target pilot is running; 50-epoch training is intentionally deferred
-until that is fixed. See `docs/t5-stage1-paper10-eval-vi.md`,
-`docs/t5-stage1-eval-vi.md`, and `docs/kaggle-t5-training-vi.md`.
+the paper (BLEU 0.7589) and worse than the 1-epoch checkpoint. A 1-epoch
+full-flow `target` pilot also failed (BLEU 0.0665 on 1,000 rows, repetitive
+output), so the issue is not merely the number of epochs. The current
+`target_techniques` field has 14.2% empty flows and only 139 unique targets, and
+the dataset covers 176 CAPECs versus roughly 1,024 in the paper. Further
+training is deferred until the target/data coverage is fixed. See
+`docs/t5-stage1-paper10-eval-vi.md`, `docs/t5-stage1-eval-vi.md`, and
+`docs/kaggle-t5-training-vi.md`.
 
 Stage-2 technique -> ExploitDB mapping:
 

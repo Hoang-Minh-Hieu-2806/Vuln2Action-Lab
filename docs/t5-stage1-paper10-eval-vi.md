@@ -1,6 +1,6 @@
-# T5 stage 1 - ??nh gi? checkpoint epoch 10
+# T5 stage 1 - đánh giá checkpoint epoch 10 và pilot full-flow
 
-## 1. K?t qu?
+## 1. Kết quả 10 epoch
 
 Notebook:
 
@@ -8,77 +8,167 @@ Notebook:
 minhiw/vuln2action-t5-stage1-paper-eval10
 ```
 
-Checkpoint:
+Checkpoint được đánh giá:
 
 ```text
 checkpoint-6930 (epoch 10)
 ```
 
-| Metric | Gi? tr? |
+| Metric | Giá trị |
 |---|---:|
 | Rows | 11.089 |
-| BLEU trung b?nh t?ng c?u (0-1) | **0,1640** |
+| BLEU trung bình từng câu (0-1) | **0,1640** |
 | Corpus BLEU (0-1) | 0,2799 |
 | ROUGE-1 Precision / Recall / F1 | 0,3899 / 0,5064 / 0,3553 |
 | ROUGE-2 Precision / Recall / F1 | 0,2365 / 0,1845 / 0,1982 |
 | ROUGE-L Precision / Recall / F1 | 0,3160 / 0,4235 / 0,2831 |
 
-So v?i paper:
+So với paper:
 
-| Metric | Paper T5 | Hi?n t?i |
+| Metric | Paper T5 | Hiện tại |
 |---|---:|---:|
 | BLEU | 0,7589 | 0,1640 |
 | ROUGE-1 F1 | 0,8126 | 0,3553 |
 | ROUGE-L F1 | 0,7950 | 0,2831 |
 
-## 2. So v?i checkpoint 1 epoch
-
-Checkpoint 1 epoch tr??c ??:
+## 2. So với checkpoint 1 epoch
 
 | Metric | 1 epoch | 10 epoch |
 |---|---:|---:|
-| BLEU trung b?nh t?ng c?u | 0,2792 | 0,1640 |
+| BLEU trung bình từng câu | 0,2792 | 0,1640 |
 | Corpus BLEU | 0,4071 | 0,2799 |
 | ROUGE-1 F1 | 0,4493 | 0,3553 |
 | ROUGE-L F1 | 0,3950 | 0,2831 |
 | Exact match | 847 / 11.089 (7,64%) | 209 / 11.089 (1,88%) |
 
-**Train th?m epoch l?m k?t qu? x?u ?i**, n?n v?n ?? kh?ng ph?i ch? l? "ch?a ?? 50 epoch".
+Train thêm epoch làm kết quả xấu đi. Vì vậy vấn đề không phải chỉ là
+"chưa đủ 50 epoch".
 
-## 3. Model collapse
+## 3. Model collapse ở 10 epoch
 
-- 11.089 rows nh?ng ch? c? **25 prediction kh?c nhau**.
-- Top 8 prediction chi?m **94,34%**.
-- Prediction ph? bi?n nh?t chi?m **4.879 / 11.089 = 44,0%**.
-- 14,25% reference l? flow r?ng `Explore: Experiment: Exploit:`, nh?ng model
-  kh?ng sinh flow r?ng l?n n?o.
-- Nhi?u CVE kh?c nhau nh?n c?ng flow spidering / web application.
+- 11.089 rows nhưng chỉ có **25 prediction khác nhau**.
+- Top 8 prediction chiếm **94,34%**.
+- Prediction phổ biến nhất chiếm **4.879 / 11.089 = 44,0%**.
+- 14,25% reference là flow rỗng `Explore: Experiment: Exploit:`, nhưng model
+  không sinh flow rỗng lần nào.
+- Nhiều CVE khác nhau nhận cùng một flow spidering / web application.
 
-## 4. Nguy?n nh?n ch?nh
+## 4. Pilot full execution flow
 
-L?n train n?y d?ng `target_techniques` - ch? g?m t?n technique, kh?ng g?m step
-description. H? qu?:
+Pilot dùng `target` (step description + technique) thay vì
+`target_techniques`, train 1 epoch, evaluate trên 1.000 validation rows đầu.
 
-- `target_techniques` r?ng ? **6.277 / 44.331** train rows (14,2%).
-- Ch? c? **139** target kh?c nhau trong train.
-- Model h?c ph?n ph?i target chung, kh?ng h?c ???c ?nh x? CVE -> flow.
+```text
+minhiw/vuln2action-t5-stage1-target-pilot
+checkpoint: final (epoch 1)
+```
 
-Paper m? t? execution flow g?m c?c step v?i description v? technique. V? v?y
-c?n train tr?n `target` (full execution flow), kh?ng ph?i `target_techniques`.
+| Metric | 1 epoch, `target` | 1 epoch, `target_techniques` (cùng 1.000 rows) | 10 epoch, `target_techniques` (cùng 1.000 rows) |
+|---|---:|---:|---:|
+| BLEU | **0,0665** | 0,3982 | 0,1947 |
+| Corpus BLEU | 0,1001 | 0,4898 | 0,3184 |
+| ROUGE-1 F1 | 0,1954 | 0,5787 | 0,4028 |
+| ROUGE-2 F1 | 0,0760 | 0,4732 | 0,2406 |
+| ROUGE-L F1 | 0,1456 | 0,5231 | 0,3243 |
+| Exact match | 0,00% | 13,40% | 3,60% |
 
-## 5. ?? s?a th?m
+Pilot không sửa được lỗi. Model sinh 733 output khác nhau nhưng nội dung bị
+lặp cụm, ví dụ:
 
-- `scripts/train_t5.py`: m?c ??nh **kh?ng** reload checkpoint c? eval loss th?p
-  nh?t; gi? epoch cu?i gi?ng paper. Tr??c ?? `final/` b? quay v? epoch 1 d?
-  train 10 epoch.
-- ?ang ch?y pilot 1 epoch v?i `target` full flow, `max_target_length=512`,
-  batch 4/GPU, gradient accumulation 8.
-- N?u pilot cho BLEU/ROUGE t?t h?n r? r?t, m?i ch?y 10/50 epoch tr?n target
-  ??ng.
+```text
+Explore: [Survey the application for stored user-controllable inputs]
+Exploit: [Survey the application for stored user-controllable inputs]
+Exploit: [Survey the application for stored user-controllable inputs]
+Exploit: [Survey the application for stored user-controllable inputs]
+...
+```
 
-## 6. K?t lu?n
+Các số liệu cấu trúc:
 
-- **K? thu?t:** eval full ch?y xong, metric paper-style ??y ??.
-- **Ch?t l??ng:** ch?a ?n; k?m xa paper v? k?m h?n checkpoint 1 epoch.
-- **Kh?ng n?n ch?y 50 epoch ngay** v?i `target_techniques`.
-- Ph?i s?a target sang full execution flow tr??c; sau ?? m?i ??nh gi? l?i.
+- 1.000/1.000 output có `Explore:`.
+- 765/1.000 có `Experiment:`.
+- 613/1.000 có `Exploit:`.
+- Chỉ 406/1.000 có đủ cả ba phase.
+- Chỉ 46/1.000 kết thúc bằng dấu chấm.
+- Độ dài trung bình: reference 311,8 từ, prediction 310,6 từ. Model không bị
+  ngắn output; nó sinh đủ dài nhưng sai nội dung và lặp.
+
+Eval loss của pilot là **2,876**, so với **0,258** của 1 epoch
+`target_techniques`. Full target khó hơn rất nhiều.
+
+Lưu ý: loss train hiển thị 23-32 trong log là do gradient accumulation
+(`gradient_accumulation_steps=8`), không phải loss thật tăng 8 lần. Không nên
+đọc các con số đó như bằng chứng model diverged.
+
+## 5. Nguyên nhân
+
+### 5.1. `target_techniques` có nhiều nhãn rỗng
+
+- **6.277 / 44.331** train rows có target rỗng (14,2%).
+- Chỉ có **139 target khác nhau** trong train, **125** trong validation.
+- Top 5 target chiếm 42,1%; top 10 chiếm 61,4%; top 20 chiếm 81,3%.
+
+Với phân phối này, model dễ học flow phổ biến thay vì ánh xạ CVE -> flow.
+Đây là lỗi chất lượng dữ liệu, không chỉ là lỗi chọn epoch.
+
+### 5.2. Full target quá dài so với ngân sách 512 token
+
+- `target`: mean 286,6 từ, P90 521 từ, 12,3% rows dài hơn 512 từ.
+- `target_steps`: mean 143,6 từ, P90 213 từ.
+- `target_techniques`: mean 143,3 từ, P90 285 từ.
+
+Với `max_target_length=512`, một phần đáng kể full target bị cắt. Pilot 1 epoch
+chưa đủ để học cấu trúc full flow, nên model rơi vào vòng lặp cụm từ.
+
+### 5.3. 10 epoch không phải là 10 epoch đầu của 50 epoch
+
+Learning-rate schedule được tính theo tổng số epoch. Chạy `num_train_epochs=10`
+làm LR giảm về 0 ở epoch 10; chạy 50 epoch thì ở epoch 10 LR vẫn còn khoảng
+4e-5. Vì vậy kết quả 10 epoch không chứng minh trực tiếp rằng 50 epoch cũng sẽ
+tệ như vậy. Tuy nhiên, nó đủ để thấy cấu hình hiện tại chưa ổn.
+
+### 5.4. Độ phủ dữ liệu thấp hơn paper
+
+Theo báo cáo dataset hiện tại:
+
+- 55.420 flow rows trên 114.560 CVE.
+- 176 CAPEC có execution flow.
+- 44.753 CVE không có selected CAPEC.
+- 14.267 selected CAPEC không có execution flow.
+- Paper dùng khoảng 1.024 CAPEC.
+
+Đây là khoảng cách lớn về số lượng nhãn và độ đa dạng flow. Với 139 nhãn khác
+nhau, BLEU 0,7589 khó đạt được, đặc biệt khi input chỉ là CVE description.
+
+### 5.5. Overlap validation
+
+11.083/11.089 validation target đã xuất hiện nguyên văn trong train. Metric hiện
+tại đo mức độ khớp template/overlap nhiều hơn là khả năng tổng quát hóa. Kể cả
+với overlap này, BLEU vẫn chỉ 0,164, nên chất lượng model thực sự thấp.
+
+## 6. Kết luận
+
+- Eval full đã chạy xong; metric paper-style đầy đủ.
+- Kết quả 10 epoch rất thấp: BLEU 0,1640 so với paper 0,7589.
+- 10 epoch còn tệ hơn 1 epoch; model bị collapse về một vài flow phổ biến.
+- Pilot full target 1 epoch cũng thất bại: BLEU 0,0665, output lặp cụm.
+- Không nên chạy 50 epoch một cách mù quáng với cấu hình hiện tại.
+
+## 7. Hướng tiếp theo
+
+Thứ tự hợp lý:
+
+1. Thử `target_steps` (ngắn hơn, không rỗng) với warmup 0,1 và 5-10 epoch.
+   Đây là biến thể sát paper hơn `target_techniques` nhưng vẫn vừa ngân sách
+   512 token.
+2. Nếu `target_steps` tốt hơn, chạy 10 epoch rồi đánh giá full validation.
+3. Nếu vẫn thấp, phải mở rộng độ phủ CAPEC/execution flow về gần 1.024 CAPEC
+   như paper; tăng epoch không giải quyết được thiếu đa dạng nhãn.
+4. Chỉ chạy 50 epoch khi target và dataset đã ổn định; ghi rõ nếu phải dùng
+   `target_steps` thay cho full flow.
+
+Các thay đổi code đã có:
+
+- `scripts/train_t5.py` mặc định không reload checkpoint có eval loss thấp nhất;
+  giữ epoch cuối giống paper.
+- Có thể chọn `--target-field target_steps` hoặc `target` mà không cần sửa code.
