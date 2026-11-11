@@ -85,7 +85,13 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--stage", type=int, choices=[1, 2], default=1)
     parser.add_argument(
         "--target-field",
-        choices=["target", "target_steps", "target_techniques"],
+        choices=[
+            "target",
+            "target_steps",
+            "target_techniques",
+            "target_exploit",
+            "target_exploit_techniques",
+        ],
         default="target_techniques",
     )
     parser.add_argument("--source-prefix", default="")

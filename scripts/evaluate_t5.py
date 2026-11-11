@@ -27,7 +27,7 @@ def _require_eval_deps() -> tuple[Any, ...]:
         import torch
         from datasets import load_dataset
         from rouge_score import rouge_scorer
-        from sacrebleu import corpus_bleu
+        from sacrebleu import corpus_bleu, sentence_bleu
         from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
     except ImportError as exc:
         raise SystemExit(
@@ -40,6 +40,7 @@ def _require_eval_deps() -> tuple[Any, ...]:
         AutoModelForSeq2SeqLM,
         AutoTokenizer,
         corpus_bleu,
+        sentence_bleu,
         rouge_scorer,
     )
 
@@ -51,7 +52,13 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--split", choices=["validation", "train"], default="validation")
     parser.add_argument(
         "--target-field",
-        choices=["target", "target_steps", "target_techniques"],
+        choices=[
+            "target",
+            "target_steps",
+            "target_techniques",
+            "target_exploit",
+            "target_exploit_techniques",
+        ],
         default="target_techniques",
     )
     parser.add_argument("--output-dir", default="outputs/t5_eval")
@@ -64,7 +71,15 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     deps = _require_eval_deps()
-    torch, load_dataset, auto_model, auto_tokenizer, corpus_bleu, rouge_scorer = deps
+    (
+        torch,
+        load_dataset,
+        auto_model,
+        auto_tokenizer,
+        corpus_bleu,
+        sentence_bleu,
+        rouge_scorer,
+    ) = deps
 
     dataset_dir = _resolve(args.dataset)
     split_file = dataset_dir / f"flow_{args.split}.jsonl"
@@ -126,16 +141,32 @@ def main(argv: list[str] | None = None) -> int:
             )
         )
 
-    bleu = corpus_bleu(predictions, [references]).score
+    # The paper reports BLEU on a 0-1 scale and Algorithm 2 averages the
+    # per-sample BLEU.  Keep corpus BLEU as a secondary, stricter metric.
+    sentence_bleu_scores = [
+        sentence_bleu(prediction, [reference]).score / 100.0
+        for reference, prediction in zip(references, predictions, strict=True)
+    ]
+    bleu = sum(sentence_bleu_scores) / len(sentence_bleu_scores)
+    bleu_corpus = corpus_bleu(predictions, [references]).score / 100.0
+
     scorer = rouge_scorer.RougeScorer(["rouge1", "rouge2", "rougeL"], use_stemmer=True)
     rouge_scores = [
         scorer.score(reference, prediction)
         for reference, prediction in zip(references, predictions, strict=True)
     ]
-    rouge = {
-        name: sum(score[name].fmeasure for score in rouge_scores) / len(rouge_scores)
-        for name in ("rouge1", "rouge2", "rougeL")
-    }
+    rouge = {}
+    for name in ("rouge1", "rouge2", "rougeL"):
+        rouge[f"{name}_precision"] = (
+            sum(score[name].precision for score in rouge_scores) / len(rouge_scores)
+        )
+        rouge[f"{name}_recall"] = (
+            sum(score[name].recall for score in rouge_scores) / len(rouge_scores)
+        )
+        rouge[f"{name}_f1"] = (
+            sum(score[name].fmeasure for score in rouge_scores) / len(rouge_scores)
+        )
+        rouge[name] = rouge[f"{name}_f1"]
 
     output_dir = _resolve(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -148,6 +179,18 @@ def main(argv: list[str] | None = None) -> int:
         "target_field": args.target_field,
         "rows": len(rows),
         "bleu": bleu,
+        "bleu_sentence": bleu,
+        "bleu_corpus": bleu_corpus,
+        "bleu_corpus_100": bleu_corpus * 100.0,
+        "rouge1_precision": rouge["rouge1_precision"],
+        "rouge1_recall": rouge["rouge1_recall"],
+        "rouge1_f1": rouge["rouge1_f1"],
+        "rouge2_precision": rouge["rouge2_precision"],
+        "rouge2_recall": rouge["rouge2_recall"],
+        "rouge2_f1": rouge["rouge2_f1"],
+        "rougeL_precision": rouge["rougeL_precision"],
+        "rougeL_recall": rouge["rougeL_recall"],
+        "rougeL_f1": rouge["rougeL_f1"],
         "rouge1": rouge["rouge1"],
         "rouge2": rouge["rouge2"],
         "rougeL": rouge["rougeL"],
