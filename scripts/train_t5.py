@@ -17,6 +17,7 @@ from __future__ import annotations
 import argparse
 import inspect
 import json
+import math
 import os
 import sys
 from pathlib import Path
@@ -105,6 +106,12 @@ def main(argv: list[str] | None = None) -> int:
         type=float,
         default=0.1,
         help="Fraction of steps used for linear warmup (default: 0.1).",
+    )
+    parser.add_argument(
+        "--warmup-steps",
+        type=int,
+        default=-1,
+        help="Override warmup steps; -1 computes it from --warmup-ratio.",
     )
     parser.add_argument("--num-train-epochs", type=float, default=50.0)
     parser.add_argument("--max-steps", type=int, default=-1)
@@ -207,6 +214,21 @@ def main(argv: list[str] | None = None) -> int:
             )
         return 0
 
+    world_size = int(os.environ.get("WORLD_SIZE", "1") or "1")
+    steps_per_epoch = math.ceil(
+        len(tokenized["train"])
+        / max(1, args.per_device_batch_size * world_size * args.gradient_accumulation_steps)
+    )
+    if args.max_steps > 0:
+        total_steps = args.max_steps
+    else:
+        total_steps = max(1, math.ceil(steps_per_epoch * args.num_train_epochs))
+    warmup_steps = (
+        args.warmup_steps
+        if args.warmup_steps >= 0
+        else int(total_steps * args.warmup_ratio)
+    )
+
     output_dir = _resolve(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
     training_kwargs: dict[str, Any] = {
@@ -215,7 +237,6 @@ def main(argv: list[str] | None = None) -> int:
         "per_device_eval_batch_size": args.per_device_batch_size,
         "gradient_accumulation_steps": args.gradient_accumulation_steps,
         "learning_rate": args.learning_rate,
-        "warmup_ratio": args.warmup_ratio,
         "num_train_epochs": args.num_train_epochs,
         "max_steps": args.max_steps,
         "save_steps": args.save_steps,
@@ -236,6 +257,11 @@ def main(argv: list[str] | None = None) -> int:
         "dataloader_num_workers": 2,
         "remove_unused_columns": False,
     }
+    training_params = inspect.signature(training_arguments_cls.__init__).parameters
+    if "warmup_steps" in training_params:
+        training_kwargs["warmup_steps"] = warmup_steps
+    elif "warmup_ratio" in training_params:
+        training_kwargs["warmup_ratio"] = args.warmup_ratio
     training_args = _training_arguments(training_arguments_cls, training_kwargs)
 
     trainer = trainer_cls(
@@ -257,6 +283,8 @@ def main(argv: list[str] | None = None) -> int:
         **vars(args),
         "train_rows": len(tokenized["train"]),
         "validation_rows": len(tokenized["validation"]),
+        "total_steps": total_steps,
+        "warmup_steps": warmup_steps,
     }
     (output_dir / "training_config.json").write_text(
         json.dumps(config, indent=2, ensure_ascii=False),
