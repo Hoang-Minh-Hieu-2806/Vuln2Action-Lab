@@ -111,6 +111,7 @@ def test_build_hybrid_eval_keeps_predicted_and_reference_views_separate(tmp_path
     assert stats["views"]["reference_predicted"] == 2
     assert stats["views"]["reference_predicted_correct"] == 1
     assert stats["predicted_in_independent_reference"] == 1
+    assert stats["predicted_in_independent_reference_with_flow"] == 1
 
     common = [
         json.loads(line)

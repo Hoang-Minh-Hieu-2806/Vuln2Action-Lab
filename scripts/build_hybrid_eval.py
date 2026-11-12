@@ -193,6 +193,7 @@ def main(argv: list[str] | None = None) -> int:
     common_matches_gold = 0
     predicted_matches_reference = 0
     predicted_in_reference = 0
+    predicted_in_reference_with_flow = 0
 
     for base in base_rows:
         cve_id = str(base["cve_id"])
@@ -253,14 +254,22 @@ def main(argv: list[str] | None = None) -> int:
             selection_correct = predicted_id in cve_references
             if selection_correct:
                 predicted_in_reference += 1
+            predicted_has_flow = bool(
+                predicted_id
+                and predicted_id in capecs
+                and capecs[predicted_id].execution_flow
+            )
+            if selection_correct and predicted_has_flow:
+                predicted_in_reference_with_flow += 1
             if predicted_id == reference_id:
                 predicted_matches_reference += 1
 
-            # If the selector chose a valid reference CAPEC, evaluate generation
-            # against that CAPEC's flow.  Otherwise fall back to the first valid
-            # reference flow; the row is then a combined selection+generation
-            # failure, which is what an end-to-end system would experience.
-            target_capec = predicted if selection_correct else reference_capec
+            # If the selector chose a valid reference CAPEC with a flow, evaluate
+            # generation against that CAPEC.  Otherwise fall back to the first
+            # valid reference flow; the row is then a combined selection or
+            # coverage failure, which is what an end-to-end system would see.
+            use_predicted = selection_correct and predicted_has_flow
+            target_capec = capecs[predicted_id] if use_predicted else reference_capec
             target_id = target_capec.capec_id
             reference_predicted.append(
                 _row_for_input(
@@ -277,7 +286,7 @@ def main(argv: list[str] | None = None) -> int:
                     selection_correct=selection_correct,
                 )
             )
-            if selection_correct:
+            if use_predicted:
                 reference_predicted_correct.append(
                     _row_for_input(
                         base,
@@ -351,6 +360,7 @@ def main(argv: list[str] | None = None) -> int:
         "skipped_no_reference": skipped_no_reference,
         "common_predicted_equals_dataset_gold": common_matches_gold,
         "predicted_in_independent_reference": predicted_in_reference,
+        "predicted_in_independent_reference_with_flow": predicted_in_reference_with_flow,
         "reference_predicted_equals_reference_target": predicted_matches_reference,
         "notes": [
             (

@@ -98,6 +98,26 @@ python scripts/evaluate_t5.py \
   --output-dir outputs/hybrid/reference_cve_only
 ```
 
+## Độ phủ end-to-end
+
+Các view `reference_*` chỉ đánh giá được trên CVE có CAPEC reference và CAPEC
+đó có execution flow. Đây là **flow-eligible subset**, không phải toàn bộ
+114.560 CVE:
+
+| Hạng mục | Số lượng |
+|---|---:|
+| Tổng CVE | 114.560 |
+| Có candidate CAPEC | 69.791 |
+| Chọn được CAPEC | 69.504 (trong 80.807 CVE có reference) |
+| CVE reference được chọn đúng | 68.052 |
+| Selected CAPEC không có execution flow | 14.267 |
+| Flow rows dùng được | 55.420 |
+| Train / validation flow rows | 44.331 / 11.089 |
+
+Vì vậy BLEU/ROUGE của hybrid phải được đọc cùng coverage. Với CVE không có
+candidate hoặc CAPEC không có flow, hệ thống phải fallback CVE-only; điểm
+hybrid không đại diện cho 100% CVE.
+
 ## Kết quả
 
 Kernel evaluation:
