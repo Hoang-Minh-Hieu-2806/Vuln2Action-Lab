@@ -1,0 +1,15 @@
+{
+  "id": "hoangdang1711/vuln2action-paper-stage1-target",
+  "title": "Vuln2Action paper stage1 CVE-only target",
+  "code_file": "kaggle_t5_paper_stage1_target.ipynb",
+  "language": "python",
+  "kernel_type": "notebook",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_internet": true,
+  "dataset_sources": [
+    "hoangdang1711/vuln2action-p0-stage1"
+  ],
+  "competition_sources": [],
+  "kernel_sources": []
+}
