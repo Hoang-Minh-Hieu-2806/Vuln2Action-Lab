@@ -232,9 +232,17 @@ evaluate từng checkpoint trên cùng 1.000 validation rows. Kết quả:
 | 2079 (epoch 3) | 0,1538 | 0,2299 | 0,3911 | 0,1898 | 0,2932 | 0/1.000 |
 
 Ba checkpoint cho ra `predictions.jsonl` giống nhau từng byte và eval loss
-trùng khớp `2,360677`; vì vậy chỉ nên coi đây là một kết quả, không phải ba
-điểm dữ liệu độc lập. Nguyên nhân kỹ thuật của việc checkpoint giống nhau
-chưa được xác minh đầy đủ.
+trùng khớp `2,360677`. Kiểm tra thêm file `model.safetensors` cho thấy
+`checkpoint-693`, `checkpoint-1386`, `checkpoint-2079` và `final/` đều có
+cùng SHA-256:
+
+```text
+7F5754879CBADA36215DAD2B4BBC70ABE413B51518BD0488ED6B9E2481C4E694
+```
+
+Vì vậy đây chỉ là **một** kết quả model, không phải ba điểm dữ liệu độc lập.
+Cần kiểm tra lại cơ chế save/checkpoint nếu muốn dùng LR này; không dùng nó
+cho stage 2.
 
 Kết luận: LR `2e-5` **không cải thiện** CVE-only. BLEU 0,1538 thấp hơn mức
 0,2567 của LR `5e-5` epoch 1. Không dùng LR này cho stage 2.
