@@ -98,8 +98,9 @@ def _row_for_input(
     input_source: str,
     target_source: str,
     selection_correct: bool | None = None,
+    targets_override: dict[str, str] | None = None,
 ) -> dict[str, Any]:
-    targets = flow_targets(target_capec)
+    targets = targets_override or flow_targets(target_capec)
     return {
         "cve_id": cve_id,
         "capec_id": input_capec.capec_id,
@@ -200,6 +201,10 @@ def main(argv: list[str] | None = None) -> int:
         predicted_score = float(prediction.get("score") or 0.0)
         base_gold_id = base.get("capec_id")
         base_gold = capecs.get(base_gold_id) if base_gold_id else None
+        base_targets = {
+            field: str(base.get(field) or "")
+            for field in ("target", "target_steps", "target_techniques")
+        }
 
         if base_gold is not None:
             common_gold.append(
@@ -214,6 +219,7 @@ def main(argv: list[str] | None = None) -> int:
                     reference_ids=references.get(cve_id, []),
                     input_source="dataset_gold",
                     target_source="dataset_gold",
+                    targets_override=base_targets,
                 )
             )
 
@@ -234,6 +240,7 @@ def main(argv: list[str] | None = None) -> int:
                         reference_ids=references.get(cve_id, []),
                         input_source="predicted",
                         target_source="dataset_gold",
+                        targets_override=base_targets,
                     )
                 )
 
