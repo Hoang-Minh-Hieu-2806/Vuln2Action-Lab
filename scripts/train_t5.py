@@ -54,6 +54,7 @@ def _require_training_deps() -> tuple[Any, ...]:
             DataCollatorForSeq2Seq,
             Seq2SeqTrainer,
             Seq2SeqTrainingArguments,
+            TrainerCallback,
         )
     except ImportError as exc:
         raise SystemExit(
@@ -68,6 +69,7 @@ def _require_training_deps() -> tuple[Any, ...]:
         DataCollatorForSeq2Seq,
         Seq2SeqTrainer,
         Seq2SeqTrainingArguments,
+        TrainerCallback,
     )
 
 
@@ -123,6 +125,16 @@ def main(argv: list[str] | None = None) -> int:
         help="Override warmup steps; -1 computes it from --warmup-ratio.",
     )
     parser.add_argument("--num-train-epochs", type=float, default=50.0)
+    parser.add_argument(
+        "--stop-after-epoch",
+        type=float,
+        default=None,
+        help=(
+            "Stop training after this epoch while keeping the LR schedule length "
+            "defined by --num-train-epochs. Useful for evaluating an early epoch "
+            "of a longer paper-style schedule."
+        ),
+    )
     parser.add_argument("--max-steps", type=int, default=-1)
     parser.add_argument("--save-steps", type=int, default=500)
     parser.add_argument("--eval-steps", type=int, default=500)
@@ -160,6 +172,7 @@ def main(argv: list[str] | None = None) -> int:
         data_collator_cls,
         trainer_cls,
         training_arguments_cls,
+        trainer_callback_cls,
     ) = deps
 
     dataset_dir = _resolve(args.dataset)
@@ -282,12 +295,24 @@ def main(argv: list[str] | None = None) -> int:
         training_kwargs["warmup_ratio"] = args.warmup_ratio
     training_args = _training_arguments(training_arguments_cls, training_kwargs)
 
+    callbacks = None
+    if args.stop_after_epoch is not None:
+        stop_after_epoch = args.stop_after_epoch
+
+        class _StopAfterEpoch(trainer_callback_cls):
+            def on_epoch_end(self, args, state, control, **kwargs):
+                if state.epoch is not None and state.epoch >= stop_after_epoch:
+                    control.should_training_stop = True
+
+        callbacks = [_StopAfterEpoch()]
+
     trainer = trainer_cls(
         model=model,
         args=training_args,
         train_dataset=tokenized["train"],
         eval_dataset=tokenized["validation"],
         data_collator=data_collator_cls(tokenizer, model=model, padding="longest"),
+        callbacks=callbacks,
     )
 
     if torch.cuda.is_available():

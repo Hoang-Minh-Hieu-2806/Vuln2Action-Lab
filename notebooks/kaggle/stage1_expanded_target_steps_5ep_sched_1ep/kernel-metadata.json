@@ -1,0 +1,16 @@
+{
+  "id": "hoangdang1711/vuln2action-t5-expanded-5ep-sched-1ep",
+  "title": "Vuln2Action T5 expanded 5ep sched",
+  "code_file": "kaggle_t5_stage1_expanded_target_steps_5ep_sched_1ep.ipynb",
+  "language": "python",
+  "kernel_type": "notebook",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_internet": true,
+  "dataset_sources": [
+    "hoangdang1711/vuln2action-flow-expanded-80k",
+    "hoangdang1711/vuln2action-eval-common-1000"
+  ],
+  "competition_sources": [],
+  "kernel_sources": []
+}
