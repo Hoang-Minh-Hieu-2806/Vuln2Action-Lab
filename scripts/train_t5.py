@@ -96,6 +96,15 @@ def main(argv: list[str] | None = None) -> int:
         default="target_techniques",
     )
     parser.add_argument("--source-prefix", default="")
+    parser.add_argument(
+        "--include-capec",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+        help=(
+            "Condition the input on the selected CAPEC name/id. This is an "
+            "operational variant, not the paper's CVE-only input."
+        ),
+    )
     parser.add_argument("--max-input-length", type=int, default=256)
     parser.add_argument("--max-target-length", type=int, default=256)
     parser.add_argument("--per-device-batch-size", type=int, default=8)
@@ -180,9 +189,18 @@ def main(argv: list[str] | None = None) -> int:
     model.config.use_cache = False
 
     def preprocess(batch: dict[str, list[Any]]) -> dict[str, Any]:
-        inputs = [
-            f"{args.source_prefix}{text}" if args.source_prefix else text for text in batch["input"]
-        ]
+        if args.include_capec:
+            inputs = [
+                f"{args.source_prefix}CAPEC {capec_id}: {capec_name}\nCVE: {text}"
+                for text, capec_id, capec_name in zip(
+                    batch["input"], batch["capec_id"], batch["capec_name"], strict=True
+                )
+            ]
+        else:
+            inputs = [
+                f"{args.source_prefix}{text}" if args.source_prefix else text
+                for text in batch["input"]
+            ]
         model_inputs = tokenizer(
             inputs,
             max_length=args.max_input_length,

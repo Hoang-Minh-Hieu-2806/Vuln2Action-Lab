@@ -61,6 +61,15 @@ def main(argv: list[str] | None = None) -> int:
         ],
         default="target_techniques",
     )
+    parser.add_argument(
+        "--include-capec",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+        help=(
+            "Condition the input on the selected CAPEC name/id. This is an "
+            "operational variant, not the paper's CVE-only input."
+        ),
+    )
     parser.add_argument("--output-dir", default="outputs/t5_eval")
     parser.add_argument("--max-input-length", type=int, default=256)
     parser.add_argument("--max-target-length", type=int, default=256)
@@ -104,8 +113,17 @@ def main(argv: list[str] | None = None) -> int:
     rows: list[dict[str, str]] = []
     for start in range(0, len(raw), args.batch_size):
         batch = raw[start : start + args.batch_size]
+        if args.include_capec:
+            input_texts = [
+                f"CAPEC {capec_id}: {capec_name}\nCVE: {text}"
+                for text, capec_id, capec_name in zip(
+                    batch["input"], batch["capec_id"], batch["capec_name"], strict=True
+                )
+            ]
+        else:
+            input_texts = batch["input"]
         inputs = tokenizer(
-            batch["input"],
+            input_texts,
             max_length=args.max_input_length,
             truncation=True,
             padding=True,
@@ -134,7 +152,7 @@ def main(argv: list[str] | None = None) -> int:
             }
             for cve_id, input_text, reference, prediction in zip(
                 batch["cve_id"],
-                batch["input"],
+                input_texts,
                 batch[args.target_field],
                 decoded,
                 strict=True,
@@ -177,6 +195,7 @@ def main(argv: list[str] | None = None) -> int:
         "checkpoint": str(checkpoint),
         "split": args.split,
         "target_field": args.target_field,
+        "include_capec": args.include_capec,
         "rows": len(rows),
         "bleu": bleu,
         "bleu_sentence": bleu,
