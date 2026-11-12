@@ -217,3 +217,54 @@ trực tiếp "CVE -> flow". Vì vậy không được so trực tiếp 0,8594 v
 paper như cùng một thiết lập. Đây là biến thể operational có thể dùng khi
 pipeline đã có CAPEC selection (97,91% accuracy trên CVE có candidate), nhưng
 chất lượng end-to-end vẫn phụ thuộc vào bước chọn CAPEC và coverage CVE.
+
+## 9. LR 2e-5 và dataset mở rộng
+
+### 9.1. LR 2e-5, 3 epoch
+
+Đã chạy lại CVE-only `target_steps` với LR `2e-5`, warmup `0,06`, 3 epoch và
+evaluate từng checkpoint trên cùng 1.000 validation rows. Kết quả:
+
+| Checkpoint | BLEU | Corpus BLEU | ROUGE-1 F1 | ROUGE-2 F1 | ROUGE-L F1 | Exact |
+|---|---:|---:|---:|---:|---:|---:|
+| 693 (epoch 1) | 0,1538 | 0,2299 | 0,3911 | 0,1898 | 0,2932 | 0/1.000 |
+| 1386 (epoch 2) | 0,1538 | 0,2299 | 0,3911 | 0,1898 | 0,2932 | 0/1.000 |
+| 2079 (epoch 3) | 0,1538 | 0,2299 | 0,3911 | 0,1898 | 0,2932 | 0/1.000 |
+
+Ba checkpoint cho ra `predictions.jsonl` giống nhau từng byte và eval loss
+trùng khớp `2,360677`; vì vậy chỉ nên coi đây là một kết quả, không phải ba
+điểm dữ liệu độc lập. Nguyên nhân kỹ thuật của việc checkpoint giống nhau
+chưa được xác minh đầy đủ.
+
+Kết luận: LR `2e-5` **không cải thiện** CVE-only. BLEU 0,1538 thấp hơn mức
+0,2567 của LR `5e-5` epoch 1. Không dùng LR này cho stage 2.
+
+### 9.2. Dataset mở rộng 80.477 rows
+
+Để tăng coverage thay vì tăng epoch, đã dùng dataset mở rộng:
+
+```text
+data/processed/reproduction/flow_dataset_expanded/
+```
+
+Thống kê: 80.477 rows, 64.388 train / 16.089 validation, 187 CAPEC có flow.
+Dataset và notebook được đưa sang tài khoản Kaggle thứ hai để tránh phụ thuộc
+quota của `minhiw`:
+
+```text
+hoangdang1711/vuln2action-flow-expanded-80k
+hoangdang1711/vuln2action-eval-common-1000
+hoangdang1711/vuln2action-t5-expanded-1ep
+```
+
+Thiết lập:
+
+- CVE-only, `target_steps`, không đưa CAPEC vào input.
+- `t5-base`, LR `5e-5`, warmup `0,1`, 1 epoch.
+- batch 8/GPU, gradient accumulation 4, 2x T4, fp16.
+- Evaluate trên đúng 1.000 validation rows đầu của baseline cũ, lưu thành
+  `vuln2action-eval-common-1000`, để so sánh trực tiếp với BLEU 0,2567.
+- Chỉ upload CVE description, CAPEC flow và metadata; không có exploit source.
+
+Trạng thái tại thời điểm ghi báo cáo: kernel đang chạy. Kết quả sẽ được cập
+nhật sau khi có `metrics.json` và `predictions.jsonl`.
