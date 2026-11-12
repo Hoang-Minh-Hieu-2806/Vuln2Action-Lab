@@ -1,0 +1,84 @@
+{
+  "kernel": "hoangdang1711/vuln2action-hybrid-eval",
+  "dataset": "hoangdang1711/vuln2action-hybrid-capec-model",
+  "cve_model_dataset": "hoangdang1711/vuln2action-hybrid-cve-model",
+  "git_branch": "feature/paper-reproduction",
+  "git_commit_at_run": "9ccfff8",
+  "sample": {
+    "base_rows": 1000,
+    "reference_rows": 997,
+    "no_reference_rows": 3,
+    "predicted_in_reference": 977,
+    "selection_error_rows": 20,
+    "selection_accuracy_on_reference_rows": 0.9799398194583752
+  },
+  "views": {
+    "common_predicted": {
+      "rows": 1000,
+      "bleu": 0.8593914137114652,
+      "rouge1_f1": 0.9058302075535988,
+      "rouge2_f1": 0.8644735381298088,
+      "rougeL_f1": 0.8840361244720367,
+      "exact": 801,
+      "phase_complete": 1000,
+      "unique_predictions": 64
+    },
+    "random_reference_predicted": {
+      "rows": 997,
+      "bleu": 0.7507662674042694,
+      "rouge1_f1": 0.8258152558862377,
+      "rouge2_f1": 0.7585861515092004,
+      "rougeL_f1": 0.7918506985498456,
+      "exact": 628,
+      "phase_complete": 991,
+      "unique_predictions": 133
+    },
+    "random_reference_predicted_correct": {
+      "rows": 977,
+      "bleu": 0.7639063010649058,
+      "rouge1_f1": 0.8351871678692957,
+      "rouge2_f1": 0.7715648781944976,
+      "rougeL_f1": 0.80298590689059,
+      "exact": 628,
+      "phase_complete": 971,
+      "unique_predictions": 129
+    },
+    "random_reference_gold": {
+      "rows": 997,
+      "bleu": 0.48312766600630136,
+      "rouge1_f1": 0.6600941496585258,
+      "rouge2_f1": 0.498516854058482,
+      "rougeL_f1": 0.5874126564294143,
+      "exact": 165,
+      "phase_complete": 996,
+      "unique_predictions": 28,
+      "note": "Not an upper bound: 112/997 target CAPEC flows are absent from train."
+    },
+    "random_reference_cve_only": {
+      "rows": 997,
+      "bleu": 0.019013661491021273,
+      "rouge1_f1": 0.13579813481432226,
+      "rouge2_f1": 0.01877647178324394,
+      "rougeL_f1": 0.1262234977483523,
+      "exact": 0,
+      "phase_complete": 26,
+      "unique_predictions": 437
+    }
+  },
+  "coverage": {
+    "total_cves": 114560,
+    "flow_eligible_rows": 55420,
+    "flow_eligible_fraction": 0.48376335362856284,
+    "cves_with_candidates": 69791,
+    "cves_with_selected_capec": 69504,
+    "selected_capec_without_flow": 14267,
+    "capecs_with_flow": 239,
+    "capecs_used_in_flow_dataset": 182
+  },
+  "caveats": [
+    "The hybrid is evaluated only on the flow-eligible subset; 51.6% of CVEs require CVE-only fallback.",
+    "common_predicted is in-distribution because its labels were produced by the same Word2Vec selector.",
+    "reference_gold is a reference-flow generalization score, not an upper bound.",
+    "The 0.7508 hybrid score is not directly comparable to the paper's 0.7589 CVE-only score."
+  ]
+}
