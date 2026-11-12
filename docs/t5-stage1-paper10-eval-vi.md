@@ -318,4 +318,51 @@ Thiết lập giống baseline epoch 1:
 - LR `5e-5`, warmup `0,1`
 - 1.007 steps/epoch, evaluate trên cùng common 1.000 rows
 
-Kernel đang chạy; kết quả sẽ được cập nhật sau khi monitor tải xong.
+Kết quả:
+
+| Metric | Baseline epoch 1 | Expanded 1 epoch | Expanded 5-epoch schedule, dừng epoch 1 |
+|---|---:|---:|---:|
+| BLEU | **0,2567** | 0,1722 | 0,0158 |
+| Corpus BLEU | 0,2944 | 0,2299 | 0,0170 |
+| ROUGE-1 F1 | **0,4887** | 0,4136 | 0,0695 |
+| ROUGE-2 F1 | **0,2748** | 0,1993 | 0,0129 |
+| ROUGE-L F1 | **0,3686** | 0,3124 | 0,0565 |
+| Exact match | **100/1.000** | 0/1.000 | 0/1.000 |
+
+Run này **không dùng được**: model bị suy giảm thành vòng lặp lặp lại.
+
+- 733 prediction khác nhau trên 1.000 rows.
+- 932/1.000 prediction có một cụm từ lặp ít nhất 5 lần; 916/1.000 lặp ít
+  nhất 10 lần; mức lặp cao nhất là 370 lần.
+- Chỉ 48/1.000 output giữ đúng thứ tự `Explore → Experiment → Exploit`.
+- 66/1.000 output thiếu hẳn phase `Experiment:`.
+- Độ dài trung bình 195 từ, dài hơn reference 149 từ, nhưng phần lớn là lặp.
+
+Training loss cho thấy model phân kỳ:
+
+| Step | Train loss | LR |
+|---:|---:|---:|
+| 100 | 83,52 | 9,34e-6 |
+| 400 | 10,22 | 3,81e-5 |
+| 600 | 5,31 | 4,92e-5 |
+| 800 | 9,62 | 4,69e-5 |
+| 1.000 | 22,99 | 4,48e-5 |
+| 1.007 | eval loss 4,85 | — |
+
+Loss giảm đến khoảng step 600 rồi tăng mạnh. Vì vậy nguyên nhân không chỉ là
+“thiếu epoch”; lịch LR 5 epoch giữ LR khoảng `5e-5` quá lâu trên dataset mở
+rộng, khiến model rơi vào degenerate repetition.
+
+Kết luận tạm thời:
+
+- CVE-only tốt nhất vẫn là baseline epoch 1: BLEU `0,2567`, ROUGE-L F1
+  `0,3686`.
+- Dataset mở rộng 1 epoch: BLEU `0,1722`, thấp hơn baseline.
+- Dataset mở rộng với lịch 5 epoch: BLEU `0,0158`, hỏng hoàn toàn.
+- Không nên chạy thêm 5 epoch đầy đủ với cùng LR.
+
+Hướng tiếp theo hợp lý là một run kiểm soát với LR thấp hơn (`2e-5` hoặc
+`3e-5`), lưu/evaluate nhiều checkpoint và chọn checkpoint có eval loss tốt
+nhất trước khi phân kỳ. Nếu vẫn không vượt baseline, nên chốt CVE-only với
+baseline hiện tại và ghi rõ giới hạn dataset/checkpoint; hoặc chuyển sang
+pipeline CAPEC-conditioned cho mục đích vận hành.
