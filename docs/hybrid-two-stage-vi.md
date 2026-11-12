@@ -113,6 +113,7 @@ Các view `reference_*` chỉ đánh giá được trên CVE có CAPEC reference
 | Selected CAPEC không có execution flow | 14.267 |
 | Flow rows dùng được | 55.420 |
 | Train / validation flow rows | 44.331 / 11.089 |
+| Coverage flow-eligible | 48,4% (55.420 / 114.560) |
 
 Vì vậy BLEU/ROUGE của hybrid phải được đọc cùng coverage. Với CVE không có
 candidate hoặc CAPEC không có flow, hệ thống phải fallback CVE-only; điểm
@@ -126,7 +127,37 @@ Kernel evaluation:
 minhiw/vuln2action-hybrid-eval
 ```
 
-Kết quả sẽ được cập nhật sau khi kernel hoàn tất.
+Kernel dùng ba nguồn:
+
+```text
+dataset: minhiw/vuln2action-hybrid-eval-bundle
+model:   minhiw/vuln2action-t5-stage1-capec-conditioned
+model:   minhiw/vuln2action-t5-stage1-target-steps-pilot
+```
+
+Các view được evaluate:
+
+```text
+common_predicted
+random_reference_gold
+random_reference_predicted
+random_reference_predicted_correct
+random_reference_cve_only
+```
+
+Các mốc đã biết:
+
+| Thiết lập | Input lúc inference | Rows | BLEU | ROUGE-L F1 |
+|---|---|---:|---:|---:|
+| CVE-only baseline, common 1.000 | CVE description | 1.000 | 0,2567 | 0,3686 |
+| Gold CAPEC upper bound, common 1.000 | gold CAPEC + CVE | 1.000 | 0,8594 | 0,8840 |
+| Hybrid end-to-end, random reference | predicted CAPEC + CVE | 997 | đang chạy | đang chạy |
+| Hybrid, selection đúng (stage-2 conditional) | predicted CAPEC + CVE | 977 | đang chạy | đang chạy |
+| Gold-reference upper bound, random reference | reference CAPEC + CVE | 997 | đang chạy | đang chạy |
+| CVE-only, cùng target reference | CVE description | 997 | đang chạy | đang chạy |
+
+`0,8594` **không phải** kết quả CVE-only và không so trực tiếp với BLEU
+`0,7589` của paper. Nó chỉ là upper bound khi đã biết CAPEC.
 
 ## Giới hạn
 

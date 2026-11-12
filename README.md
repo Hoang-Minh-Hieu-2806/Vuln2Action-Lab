@@ -179,6 +179,13 @@ training is deferred until the target/data coverage is fixed. See
 `docs/t5-stage1-paper10-eval-vi.md`, `docs/t5-stage1-eval-vi.md`, and
 `docs/kaggle-t5-training-vi.md`.
 
+The operational two-stage pipeline uses the Word2Vec/TF-IDF CAPEC selector and
+the CAPEC-conditioned T5 checkpoint, so inference never receives a gold CAPEC.
+Evaluation is split into an in-distribution `common_predicted` view and
+independent `reference_*` views; the latter are the honest end-to-end test. See
+`docs/hybrid-two-stage-vi.md`, `scripts/build_hybrid_eval.py`, and
+`scripts/summarize_hybrid_eval.py`.
+
 Stage-2 technique -> ExploitDB mapping:
 
 ```bash
