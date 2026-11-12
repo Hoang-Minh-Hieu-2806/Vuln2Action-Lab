@@ -1,0 +1,17 @@
+{
+  "id": "minhiw/vuln2action-t5-stage1-lr2e5-3ep-eval",
+  "title": "Vuln2Action T5 stage1 lr2e5 3ep eval",
+  "code_file": "kaggle_t5_stage1_lr2e5_3ep_eval.ipynb",
+  "language": "python",
+  "kernel_type": "notebook",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_internet": true,
+  "dataset_sources": [
+    "minhiw/vuln2action-flow-114560"
+  ],
+  "competition_sources": [],
+  "kernel_sources": [
+    "minhiw/vuln2action-t5-stage1-lr2e5-3ep"
+  ]
+}
