@@ -1,0 +1,16 @@
+{
+  "id": "hoangdang1711/vuln2action-hybrid-eval",
+  "title": "Vuln2Action hybrid eval",
+  "code_file": "kaggle_t5_hybrid_eval.ipynb",
+  "language": "python",
+  "kernel_type": "notebook",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_internet": true,
+  "dataset_sources": [
+    "hoangdang1711/vuln2action-hybrid-capec-model",
+    "hoangdang1711/vuln2action-hybrid-cve-model"
+  ],
+  "competition_sources": [],
+  "kernel_sources": []
+}
