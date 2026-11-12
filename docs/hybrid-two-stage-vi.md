@@ -205,6 +205,21 @@ CVE-only trên target reference bị degenerate: 437 output khác nhau nhưng ch
 việc thiếu CAPEC conditioning lẫn lỗi repetition; không nên dùng nó làm đại
 diện cho CVE-only paper-faithful (baseline đó là `0,2567` trên common set).
 
+### Lỗi selection
+
+20 rows selection sai; ví dụ:
+
+- `CVE-2023-27915`: dự đoán `CAPEC-540`, reference có `CAPEC-8` và nhiều
+  CAPEC web; target fallback là `CAPEC-8`.
+- `CVE-2023-45197`: dự đoán `CAPEC-126`, reference có `CAPEC-1`, `CAPEC-21`,
+  `CAPEC-60`; target fallback là `CAPEC-1`.
+- `CVE-2017-5189`: dự đoán `CAPEC-509`, reference là nhóm CAPEC injection /
+  file manipulation; target fallback là `CAPEC-19`.
+
+Các CVE này vẫn được tính vào `reference_predicted`; vì vậy `0,7508` là điểm
+strict end-to-end, không phải điểm chỉ khi selection đúng. `reference_predicted_correct`
+loại 20 rows này và đạt `0,7639`.
+
 ## Giới hạn
 
 - CAPEC 3.9 công khai chỉ có 239 entry có execution flow; không thể tái tạo

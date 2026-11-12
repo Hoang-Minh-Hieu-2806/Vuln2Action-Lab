@@ -331,6 +331,14 @@ independent experiments, not evade limits.
 | 13 | Buffer and fixes |
 | 14 | Freeze, demo, final report |
 
+## Hybrid operational extension
+
+The paper-faithful CVE-only T5 remains the ablation. A separate two-stage
+pipeline uses the Word2Vec/TF-IDF selector at inference and conditions T5 on
+the **predicted** CAPEC. It is evaluated only on the flow-eligible subset and
+must not be merged with the paper-faithful CVE-only score. See
+`docs/hybrid-two-stage-vi.md` and `docs/hybrid-eval-results.json`.
+
 ## Reporting rules
 
 Every report must distinguish:
@@ -341,6 +349,8 @@ Every report must distinguish:
 - `t5-base` vs `t5-small`;
 - paper's three independent experts vs this reproduction's single advisor
   reviewer;
+- CVE-only vs gold-CAPEC-conditioned vs hybrid predicted-CAPEC results;
+- flow-eligible hybrid coverage vs the full 114,560-CVE population;
 - public metadata vs local-only exploit code.
 
 The final report must not claim exact reproduction of the paper.
