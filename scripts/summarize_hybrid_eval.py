@@ -28,7 +28,7 @@ def _load_metrics(run_dir: Path) -> dict[str, object] | None:
     path = run_dir / "metrics.json"
     if not path.is_file():
         return None
-    return json.loads(path.read_text(encoding="utf-8"))
+    return json.loads(path.read_text(encoding="utf-8-sig"))
 
 
 def main(argv: list[str] | None = None) -> int:

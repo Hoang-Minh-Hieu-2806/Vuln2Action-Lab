@@ -138,6 +138,18 @@ model:   minhiw/vuln2action-t5-stage1-capec-conditioned
 model:   minhiw/vuln2action-t5-stage1-target-steps-pilot
 ```
 
+Do quota GPU của `minhiw` gần hết, lần chạy hoàn chỉnh được chuyển sang tài
+khoản `hoangdang1711`:
+
+```text
+kernel:  hoangdang1711/vuln2action-hybrid-eval
+dataset: hoangdang1711/vuln2action-hybrid-capec-model   # CAPEC model + eval views
+dataset: hoangdang1711/vuln2action-hybrid-cve-model     # CVE-only model
+```
+
+Cả hai dataset đều private; chỉ chứa model weights và mô tả/flow, không có
+exploit source.
+
 Các view được evaluate:
 
 ```text
