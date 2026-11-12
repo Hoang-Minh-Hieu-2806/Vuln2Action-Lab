@@ -172,3 +172,48 @@ Các thay đổi code đã có:
 - `scripts/train_t5.py` mặc định không reload checkpoint có eval loss thấp nhất;
   giữ epoch cuối giống paper.
 - Có thể chọn `--target-field target_steps` hoặc `target` mà không cần sửa code.
+
+## 8. Pilot CAPEC-conditioned (biến thể operational)
+
+Để kiểm tra nút thắt nằm ở T5 hay ở bước chọn CAPEC, đã chạy một pilot đưa
+CAPEC đã chọn vào input:
+
+```text
+CAPEC CAPEC-540: Overread Buffers
+CVE: <CVE description>
+```
+
+Cấu hình: `target_steps`, 1 epoch, batch 8/GPU, gradient accumulation 4,
+warmup 0,1, `max_target_length=384`, evaluate 1.000 validation rows.
+
+Notebook:
+
+```text
+minhiw/vuln2action-t5-stage1-capec-conditioned
+```
+
+| Metric | CVE-only, `target_steps` epoch 1 | CAPEC-conditioned, epoch 1 | Paper |
+|---|---:|---:|---:|
+| BLEU | 0,2567 | **0,8594** | 0,7589 |
+| Corpus BLEU | 0,2944 | **0,8858** | — |
+| ROUGE-1 F1 | 0,4887 | **0,9058** | 0,8126 |
+| ROUGE-2 F1 | 0,2748 | **0,8645** | — |
+| ROUGE-L F1 | 0,3686 | **0,8840** | 0,7950 |
+| Exact match | 100/1.000 (10%) | **801/1.000 (80,1%)** | — |
+
+Các quan sát:
+
+- 1.000/1.000 prediction có đủ `Explore:`, `Experiment:`, `Exploit:`.
+- 64 prediction khác nhau; 56 reference khác nhau.
+- Top 1 prediction chiếm 14,1%; top 8 chiếm 70,6%.
+- Các CAPEC phổ biến đạt exact 100% (ví dụ CAPEC-63, CAPEC-110,
+  CAPEC-126, CAPEC-14, CAPEC-592).
+- 199 lỗi chủ yếu rơi vào CAPEC hiếm, chỉ có 1-2 validation row.
+
+**Cảnh báo quan trọng:** đây không phải input CVE-only của paper. Target flow
+được sinh từ chính CAPEC đã chọn, nên khi đưa CAPEC vào input, model chỉ cần
+render flow cho CAPEC đó; metric này đo chất lượng "CAPEC -> flow", không đo
+trực tiếp "CVE -> flow". Vì vậy không được so trực tiếp 0,8594 với 0,7589 của
+paper như cùng một thiết lập. Đây là biến thể operational có thể dùng khi
+pipeline đã có CAPEC selection (97,91% accuracy trên CVE có candidate), nhưng
+chất lượng end-to-end vẫn phụ thuộc vào bước chọn CAPEC và coverage CVE.
