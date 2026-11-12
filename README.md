@@ -189,8 +189,8 @@ selection-correct stage-2 score was BLEU 0.7639 / ROUGE-L F1 0.8030. CVE-only on
 the same reference targets was BLEU 0.0190, while the in-distribution
 CAPEC-conditioned score remained 0.8594. Hybrid coverage is 55,420/114,560
 flow-eligible rows (48.4%), so CVE-only fallback is required.
-See `docs/hybrid-two-stage-vi.md`, `scripts/build_hybrid_eval.py`, and
-`scripts/summarize_hybrid_eval.py`.
+See `docs/hybrid-two-stage-vi.md`, `docs/hybrid-eval-results.json`,
+`scripts/build_hybrid_eval.py`, and `scripts/summarize_hybrid_eval.py`.
 
 Stage-2 technique -> ExploitDB mapping:
 
