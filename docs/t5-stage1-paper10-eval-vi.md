@@ -274,5 +274,48 @@ Thiết lập:
   `vuln2action-eval-common-1000`, để so sánh trực tiếp với BLEU 0,2567.
 - Chỉ upload CVE description, CAPEC flow và metadata; không có exploit source.
 
-Trạng thái tại thời điểm ghi báo cáo: kernel đang chạy. Kết quả sẽ được cập
-nhật sau khi có `metrics.json` và `predictions.jsonl`.
+Kết quả 1 epoch:
+
+| Metric | Baseline 1 epoch | Expanded 1 epoch | Paper |
+|---|---:|---:|---:|
+| BLEU | **0,2567** | 0,1722 | 0,7589 |
+| Corpus BLEU | 0,2944 | 0,2299 | — |
+| ROUGE-1 F1 | **0,4887** | 0,4136 | 0,8126 |
+| ROUGE-2 F1 | **0,2748** | 0,1993 | — |
+| ROUGE-L F1 | **0,3686** | 0,3124 | 0,7950 |
+| Exact match | **100/1.000** | 0/1.000 | — |
+
+Các quan sát:
+
+- Expanded model sinh 218 prediction khác nhau; top 1 chiếm 15,9%, top 8
+  chiếm 57,8%.
+- 1.000/1.000 có `Explore:`, 1.000/1.000 có `Experiment:`, 982/1.000 có
+  `Exploit:`.
+- Độ dài trung bình: reference 148,8 từ, prediction 115,1 từ. Model sinh
+  ngắn hơn reference; baseline sinh 186,1 từ.
+- 1.000/1.000 target của common set vẫn xuất hiện trong train của cả baseline
+  và expanded, nên chênh lệch không phải do thay đổi leakage.
+- Eval loss: baseline epoch 1 khoảng 0,996; expanded 1 epoch 1,889.
+
+**Chưa thể kết luận dataset mở rộng thất bại**, vì baseline epoch 1 được lấy
+từ lịch 5 epoch: tại bước 693, LR vẫn khoảng 4e-5. Run expanded ở trên dùng
+`num_train_epochs=1`, nên LR giảm về 0 ngay trong epoch đầu; model có thể chỉ
+đang undertrained.
+
+### 9.3. Chạy lại với lịch 5 epoch, dừng sau epoch 1
+
+Để so sánh công bằng, đã thêm `--stop-after-epoch` vào `scripts/train_t5.py`:
+lịch LR vẫn được tính theo `--num-train-epochs=5`, nhưng dừng sau epoch 1.
+Notebook:
+
+```text
+hoangdang1711/vuln2action-t5-expanded-5ep-sched
+```
+
+Thiết lập giống baseline epoch 1:
+
+- `num_train_epochs=5`, `stop_after_epoch=1`
+- LR `5e-5`, warmup `0,1`
+- 1.007 steps/epoch, evaluate trên cùng common 1.000 rows
+
+Kernel đang chạy; kết quả sẽ được cập nhật sau khi monitor tải xong.

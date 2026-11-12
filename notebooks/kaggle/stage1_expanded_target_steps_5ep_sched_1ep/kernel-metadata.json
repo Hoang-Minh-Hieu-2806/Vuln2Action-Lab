@@ -1,5 +1,5 @@
 {
-  "id": "hoangdang1711/vuln2action-t5-expanded-5ep-sched-1ep",
+  "id": "hoangdang1711/vuln2action-t5-expanded-5ep-sched",
   "title": "Vuln2Action T5 expanded 5ep sched",
   "code_file": "kaggle_t5_stage1_expanded_target_steps_5ep_sched_1ep.ipynb",
   "language": "python",
