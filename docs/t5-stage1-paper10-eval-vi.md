@@ -366,3 +366,21 @@ Hướng tiếp theo hợp lý là một run kiểm soát với LR thấp hơn (
 nhất trước khi phân kỳ. Nếu vẫn không vượt baseline, nên chốt CVE-only với
 baseline hiện tại và ghi rõ giới hạn dataset/checkpoint; hoặc chuyển sang
 pipeline CAPEC-conditioned cho mục đích vận hành.
+
+## 10. Hybrid end-to-end (operational extension)
+
+Kết quả chi tiết ở `docs/hybrid-two-stage-vi.md`. Tóm tắt trên 1.000 CVE
+validation random, 997 rows có reference flow:
+
+| Thiết lập | Rows | BLEU | ROUGE-L F1 |
+|---|---:|---:|---:|
+| Hybrid: predicted CAPEC -> T5 | 997 | 0,7508 | 0,7919 |
+| Hybrid, chỉ rows selection đúng | 977 | 0,7639 | 0,8030 |
+| Reference-flow input | 997 | 0,4831 | 0,5874 |
+| CVE-only trên cùng target | 997 | 0,0190 | 0,1262 |
+| Common predicted (in-distribution) | 1.000 | 0,8594 | 0,8840 |
+
+Selector khớp independent reference **977/997** rows. Điểm hybrid `0,7508`
+không so trực tiếp với paper `0,7589`: paper là CVE-only với khoảng 1.024
+CAPEC, còn đây là CAPEC dự đoán + T5 trên 182 CAPEC có flow. Coverage thực tế
+chỉ 55.420/114.560 CVE (48,4%); phần còn lại phải fallback CVE-only.

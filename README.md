@@ -182,8 +182,14 @@ training is deferred until the target/data coverage is fixed. See
 The operational two-stage pipeline uses the Word2Vec/TF-IDF CAPEC selector and
 the CAPEC-conditioned T5 checkpoint, so inference never receives a gold CAPEC.
 Evaluation is split into an in-distribution `common_predicted` view and
-independent `reference_*` views; the latter are the honest end-to-end test. See
-`docs/hybrid-two-stage-vi.md`, `scripts/build_hybrid_eval.py`, and
+independent `reference_*` views; the latter are the honest end-to-end test. On
+1,000 random validation CVEs (997 with a reference flow), the hybrid achieved
+BLEU 0.7508 and ROUGE-L F1 0.7919; selection was correct on 977/997 rows, and the
+selection-correct stage-2 score was BLEU 0.7639 / ROUGE-L F1 0.8030. CVE-only on
+the same reference targets was BLEU 0.0190, while the in-distribution
+CAPEC-conditioned score remained 0.8594. Hybrid coverage is 55,420/114,560
+flow-eligible rows (48.4%), so CVE-only fallback is required.
+See `docs/hybrid-two-stage-vi.md`, `scripts/build_hybrid_eval.py`, and
 `scripts/summarize_hybrid_eval.py`.
 
 Stage-2 technique -> ExploitDB mapping:

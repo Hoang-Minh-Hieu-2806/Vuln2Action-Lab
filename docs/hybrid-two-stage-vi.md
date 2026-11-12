@@ -160,19 +160,50 @@ random_reference_predicted_correct
 random_reference_cve_only
 ```
 
-Các mốc đã biết:
+Kết quả:
 
-| Thiết lập | Input lúc inference | Rows | BLEU | ROUGE-L F1 |
-|---|---|---:|---:|---:|
-| CVE-only baseline, common 1.000 | CVE description | 1.000 | 0,2567 | 0,3686 |
-| Gold CAPEC upper bound, common 1.000 | gold CAPEC + CVE | 1.000 | 0,8594 | 0,8840 |
-| Hybrid end-to-end, random reference | predicted CAPEC + CVE | 997 | đang chạy | đang chạy |
-| Hybrid, selection đúng (stage-2 conditional) | predicted CAPEC + CVE | 977 | đang chạy | đang chạy |
-| Gold-reference upper bound, random reference | reference CAPEC + CVE | 997 | đang chạy | đang chạy |
-| CVE-only, cùng target reference | CVE description | 997 | đang chạy | đang chạy |
+| Thiết lập | Input lúc inference | Rows | BLEU | ROUGE-1 F1 | ROUGE-L F1 | Exact |
+|---|---|---:|---:|---:|---:|---:|
+| Hybrid end-to-end, random reference | predicted CAPEC + CVE | 997 | **0,7508** | 0,8258 | **0,7919** | 628 |
+| Hybrid, selection đúng (stage-2 conditional) | predicted CAPEC + CVE | 977 | 0,7639 | 0,8352 | 0,8030 | 628 |
+| Reference-flow input, random reference | reference CAPEC + CVE | 997 | 0,4831 | 0,6601 | 0,5874 | 165 |
+| CVE-only, cùng target reference | CVE description | 997 | 0,0190 | 0,1358 | 0,1262 | 0 |
+| Common predicted (in-distribution) | predicted CAPEC + CVE | 1.000 | 0,8594 | 0,9058 | 0,8840 | 801 |
+| CVE-only baseline, common 1.000 | CVE description | 1.000 | 0,2567 | 0,4887 | 0,3686 | 100 |
+
+Đọc bảng này phải tách ba thiết lập:
+
+- **Hybrid end-to-end** `0,7508` là kết quả thật với CAPEC do selector dự đoán.
+  Trên 997 rows, selector khớp independent reference ở **977/997 = 97,99%**;
+  20 rows còn lại bị phạt bởi target reference fallback.
+- **Stage-2 conditional** `0,7639` chỉ tính 977 rows selection đúng; đây là
+  mức trần thực tế của tầng sinh flow khi CAPEC đã đúng.
+- **Reference-flow input** `0,4831` **không phải upper bound**. Nó thấp hơn
+  hybrid vì 112/997 target CAPEC reference không có trong train; model không
+  học được flow của các CAPEC hiếm. Chỉ `common` có CAPEC đã thấy mới đạt
+  `0,8594`; con số này là in-distribution, không phải kết quả độc lập.
+- **CVE-only** trên cùng target reference chỉ `0,0190`; model suy giảm mạnh,
+  chỉ 26/997 output có đủ ba phase. Đây là lower bound, không phải baseline
+  paper-faithful.
 
 `0,8594` **không phải** kết quả CVE-only và không so trực tiếp với BLEU
-`0,7589` của paper. Nó chỉ là upper bound khi đã biết CAPEC.
+`0,7589` của paper. Paper dùng CVE-only với khoảng 1.024 CAPEC; kết quả hybrid
+này dùng predicted CAPEC và chỉ 182 CAPEC có flow trong dataset hiện tại.
+
+Các chỉ số cấu trúc:
+
+| View | Có đủ 3 phase | Exact | Unique prediction |
+|---|---:|---:|---:|
+| `common_predicted` | 1.000/1.000 | 801/1.000 | 64 |
+| `random_reference_predicted` | 991/997 | 628/997 | 133 |
+| `random_reference_gold` | 996/997 | 165/997 | 28 |
+| `random_reference_cve_only` | 26/997 | 0/997 | 437 |
+
+CVE-only trên target reference bị degenerate: 437 output khác nhau nhưng chỉ
+26 output có đủ `Explore/Experiment/Exploit`, và mẫu đầu tiên lặp
+`Exploit: [Survey the vulnerability]` nhiều lần. Vì vậy `0,0190` phản ánh cả
+việc thiếu CAPEC conditioning lẫn lỗi repetition; không nên dùng nó làm đại
+diện cho CVE-only paper-faithful (baseline đó là `0,2567` trên common set).
 
 ## Giới hạn
 
