@@ -50,7 +50,10 @@ Hai nhóm view:
 
 Với `reference_predicted`, nếu CAPEC dự đoán nằm trong tập reference thì target
 là flow của CAPEC dự đoán; nếu không, target là một flow reference hợp lệ. Như
-vậy điểm end-to-end phản ánh cả lỗi chọn CAPEC và lỗi sinh flow.
+vậy điểm end-to-end phản ánh cả lỗi chọn CAPEC và lỗi sinh flow. Đây là phép đo
+**strict**: nếu selector chọn một CAPEC hợp lệ khác với CAPEC reference được
+chọn làm target, flow đúng cho CAPEC đó vẫn bị phạt. Vì vậy cần đọc kèm
+`reference_predicted_correct` và selection accuracy.
 
 ## Tạo dataset evaluation
 
