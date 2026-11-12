@@ -40,10 +40,10 @@ Do GPU quota còn khoảng 13 giờ, lần chạy đầu là **10 epoch đầu c
 cho 50 epoch, nên đây không phải một run 10-epoch độc lập.
 
 - Stage 1: `notebooks/kaggle/paper_stage1_target/`
-  - Kaggle id: `hoangdang1711/vuln2action-paper-stage1-target`
+  - Kaggle id: `hoangdang1711/vuln2action-paper-stage1-cve-only-target`
   - Output: `t5_stage1_paper_target/`
 - Stage 2: `notebooks/kaggle/paper_stage2_target_exploit/`
-  - Kaggle id: `hoangdang1711/vuln2action-paper-stage2-target-exploit`
+  - Kaggle id: `hoangdang1711/vuln2action-paper-stage2-cve-only-target-exploit`
   - Output: `t5_stage2_paper_target_exploit/`
 
 Mỗi notebook:

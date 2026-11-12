@@ -1,5 +1,5 @@
 {
-  "id": "hoangdang1711/vuln2action-paper-stage1-target",
+  "id": "hoangdang1711/vuln2action-paper-stage1-cve-only-target",
   "title": "Vuln2Action paper stage1 CVE-only target",
   "code_file": "kaggle_t5_paper_stage1_target.ipynb",
   "language": "python",
