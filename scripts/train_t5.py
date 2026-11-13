@@ -144,6 +144,15 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--limit", type=int, default=None, help="Smoke-test cap on rows.")
     parser.add_argument("--fp16", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument(
+        "--abort-on-nan",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help=(
+            "Stop training when loss, grad_norm, or eval_loss becomes non-finite. "
+            "This prevents wasting GPU quota after a numerical collapse."
+        ),
+    )
+    parser.add_argument(
         "--gradient-checkpointing",
         action=argparse.BooleanOptionalAction,
         default=True,
@@ -295,7 +304,7 @@ def main(argv: list[str] | None = None) -> int:
         training_kwargs["warmup_ratio"] = args.warmup_ratio
     training_args = _training_arguments(training_arguments_cls, training_kwargs)
 
-    callbacks = None
+    callbacks = []
     if args.stop_after_epoch is not None:
         stop_after_epoch = args.stop_after_epoch
 
@@ -304,7 +313,34 @@ def main(argv: list[str] | None = None) -> int:
                 if state.epoch is not None and state.epoch >= stop_after_epoch:
                     control.should_training_stop = True
 
-        callbacks = [_StopAfterEpoch()]
+        callbacks.append(_StopAfterEpoch())
+
+    if args.abort_on_nan:
+
+        class _AbortOnNonFinite(trainer_callback_cls):
+            def on_log(self, args, state, control, logs=None, **kwargs):
+                if not logs:
+                    return
+                for key in ("loss", "grad_norm", "eval_loss"):
+                    value = logs.get(key)
+                    if value is None:
+                        continue
+                    try:
+                        finite = math.isfinite(float(value))
+                    except (TypeError, ValueError):
+                        continue
+                    if not finite:
+                        print(
+                            f"Non-finite {key}={value} at step {state.global_step}; "
+                            "stopping training.",
+                            flush=True,
+                        )
+                        control.should_training_stop = True
+                        return
+
+        callbacks.append(_AbortOnNonFinite())
+
+    callbacks = callbacks or None
 
     trainer = trainer_cls(
         model=model,

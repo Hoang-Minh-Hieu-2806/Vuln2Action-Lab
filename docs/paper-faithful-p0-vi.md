@@ -64,6 +64,17 @@ xấp xỉ 0. Chi tiết, log và hướng sửa nằm trong
 [`paper-p0-results-vi.md`](paper-p0-results-vi.md). Không dùng các checkpoint
 này cho stage 2, GUI hay báo cáo paper.
 
+Sau đó đã chạy diagnostic **FP32** trên 16.000 train/1.000 validation, cùng
+`target` và max length 512. Kết quả: eval loss `2,414`, BLEU `0,1468`,
+ROUGE-L F1 `0,2630`, **0/1.000 prediction rỗng**, không có NaN. Đây là bằng
+chứng FP16 là nguyên nhân collapse, nhưng vẫn là diagnostic trên subset/1 epoch,
+không phải kết quả paper. Xem
+[`paper-p0-diagnostic-vi.md`](paper-p0-diagnostic-vi.md).
+
+Quota GPU đã dùng hết (`30,12h/30h`), làm mới ngày 2026-11-14. Việc tiếp theo
+là chạy full 44.331 train bằng FP32, 1 epoch trước, rồi resume lên 10 epoch nếu
+ổn định.
+
 ## 5. Cách đọc kết quả
 
 - Chỉ số headline phải lấy từ thư mục `*_eval_full/metrics.json`.
@@ -78,6 +89,10 @@ này cho stage 2, GUI hay báo cáo paper.
 ## 6. Sai lệch đã biết
 
 - Chưa chạy đủ 50 epoch trong một session do giới hạn GPU.
+- FP16 ban đầu gây NaN; từ nay dùng FP32. Paper không bắt buộc mixed precision,
+  nên đây là lựa chọn triển khai, không phải thay đổi protocol khoa học.
+- Kết quả FP32 hiện chỉ là diagnostic 16.000 train/1 epoch; full 44.331 và
+  10-epoch probe vẫn chưa chạy lại.
 - Chưa chạy FLAN-T5-base, TF-IDF variant, SBERT retrieval, GUI và human eval
   trong P0 này.
 - CAPEC snapshot hiện tại không khớp số 1.024 trong paper; cần audit riêng.
