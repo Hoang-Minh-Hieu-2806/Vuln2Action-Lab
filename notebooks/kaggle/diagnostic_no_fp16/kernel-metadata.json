@@ -1,0 +1,15 @@
+{
+  "id": "hoangdang1711/vuln2action-p0-diagnostic-no-fp16",
+  "title": "Vuln2Action P0 diagnostic no-fp16",
+  "code_file": "kaggle_p0_diagnostic_no_fp16.ipynb",
+  "language": "python",
+  "kernel_type": "notebook",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_internet": true,
+  "dataset_sources": [
+    "hoangdang1711/vuln2action-p0-stage1"
+  ],
+  "competition_sources": [],
+  "kernel_sources": []
+}
