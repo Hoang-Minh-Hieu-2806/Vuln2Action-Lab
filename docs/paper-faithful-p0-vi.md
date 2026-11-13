@@ -52,7 +52,19 @@ Mỗi notebook:
 2. Probe checkpoint 5/10 trên 1.000 dòng validation.
 3. Evaluate **toàn bộ 11.089 dòng** bằng checkpoint cuối (epoch 10).
 
-## 4. Cách đọc kết quả
+## 4. Trạng thái chạy
+
+Cả hai kernel đã chạy xong nhưng **thất bại về mặt mô hình**:
+
+- Stage 1: https://www.kaggle.com/code/hoangdang1711/vuln2action-paper-stage1-cve-only-target
+- Stage 2: https://www.kaggle.com/code/hoangdang1711/vuln2action-paper-stage2-cve-only-target-exploit
+
+Cả hai bị NaN từ sau epoch 1–2 và sinh prediction rỗng; full-validation BLEU
+xấp xỉ 0. Chi tiết, log và hướng sửa nằm trong
+[`paper-p0-results-vi.md`](paper-p0-results-vi.md). Không dùng các checkpoint
+này cho stage 2, GUI hay báo cáo paper.
+
+## 5. Cách đọc kết quả
 
 - Chỉ số headline phải lấy từ thư mục `*_eval_full/metrics.json`.
 - `bleu` là BLEU trung bình từng câu, thang 0–1.
@@ -63,7 +75,7 @@ Mỗi notebook:
 - Stage 2 CVE-only không dùng CAPEC dự đoán. Kết quả hybrid vẫn chỉ nằm ở
   appendix và không được so trực tiếp với stage 2 CVE-only.
 
-## 5. Sai lệch đã biết
+## 6. Sai lệch đã biết
 
 - Chưa chạy đủ 50 epoch trong một session do giới hạn GPU.
 - Chưa chạy FLAN-T5-base, TF-IDF variant, SBERT retrieval, GUI và human eval
