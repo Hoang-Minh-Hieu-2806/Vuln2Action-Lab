@@ -175,14 +175,14 @@ def main(argv: list[str] | None = None) -> int:
     ]
     rouge = {}
     for name in ("rouge1", "rouge2", "rougeL"):
-        rouge[f"{name}_precision"] = (
-            sum(score[name].precision for score in rouge_scores) / len(rouge_scores)
+        rouge[f"{name}_precision"] = sum(score[name].precision for score in rouge_scores) / len(
+            rouge_scores
         )
-        rouge[f"{name}_recall"] = (
-            sum(score[name].recall for score in rouge_scores) / len(rouge_scores)
+        rouge[f"{name}_recall"] = sum(score[name].recall for score in rouge_scores) / len(
+            rouge_scores
         )
-        rouge[f"{name}_f1"] = (
-            sum(score[name].fmeasure for score in rouge_scores) / len(rouge_scores)
+        rouge[f"{name}_f1"] = sum(score[name].fmeasure for score in rouge_scores) / len(
+            rouge_scores
         )
         rouge[name] = rouge[f"{name}_f1"]
 

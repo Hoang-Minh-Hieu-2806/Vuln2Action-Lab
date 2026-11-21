@@ -45,9 +45,7 @@ def _load_references(path: Path, flow_ids: set[str]) -> dict[str, tuple[str, ...
             row = json.loads(line)
             ids = tuple(
                 dict.fromkeys(
-                    capec_id
-                    for capec_id in row.get("capec_ids", [])
-                    if capec_id in flow_ids
+                    capec_id for capec_id in row.get("capec_ids", []) if capec_id in flow_ids
                 )
             )
             if ids:
@@ -100,8 +98,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--predictions",
         default=(
-            "data/processed/reproduction/capec_selection/"
-            "capec_predictions_word2vec_all.jsonl"
+            "data/processed/reproduction/capec_selection/capec_predictions_word2vec_all.jsonl"
         ),
     )
     parser.add_argument("--out", default="data/processed/reproduction/flow_dataset_expanded")
@@ -123,9 +120,7 @@ def main(argv: list[str] | None = None) -> int:
     capecs: dict[str, CapecRecord] = {
         record.capec_id: record for record in load_capec_dataset(root / "capec.json")
     }
-    flow_capecs = {
-        capec_id: capec for capec_id, capec in capecs.items() if capec.execution_flow
-    }
+    flow_capecs = {capec_id: capec for capec_id, capec in capecs.items() if capec.execution_flow}
     if not flow_capecs:
         raise SystemExit("no CAPEC with execution flow found")
 
@@ -195,9 +190,7 @@ def main(argv: list[str] | None = None) -> int:
     )
     output.mkdir(parents=True, exist_ok=True)
     write_jsonl(output / "flow_dataset.jsonl", rows)
-    write_jsonl(
-        output / "flow_train.jsonl", [row for row in rows if row["split"] == "train"]
-    )
+    write_jsonl(output / "flow_train.jsonl", [row for row in rows if row["split"] == "train"])
     write_jsonl(
         output / "flow_validation.jsonl",
         [row for row in rows if row["split"] == "validation"],

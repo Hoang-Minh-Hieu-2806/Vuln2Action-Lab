@@ -1,4 +1,4 @@
-﻿"""Fine-tune T5 on the stage-1 (or future stage-2) execution-flow dataset.
+"""Fine-tune T5 on the stage-1 (or future stage-2) execution-flow dataset.
 
 Kaggle T4 x2 example:
 
@@ -264,9 +264,7 @@ def main(argv: list[str] | None = None) -> int:
     else:
         total_steps = max(1, math.ceil(steps_per_epoch * args.num_train_epochs))
     warmup_steps = (
-        args.warmup_steps
-        if args.warmup_steps >= 0
-        else int(total_steps * args.warmup_ratio)
+        args.warmup_steps if args.warmup_steps >= 0 else int(total_steps * args.warmup_ratio)
     )
 
     output_dir = _resolve(args.output_dir)

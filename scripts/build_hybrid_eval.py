@@ -75,9 +75,7 @@ def _reference_with_flow(
 ) -> tuple[str, CapecRecord] | None:
     """Pick one independent reference CAPEC that has a usable flow."""
     candidates = [
-        capec_id
-        for capec_id in capec_ids
-        if capec_id in capecs and capecs[capec_id].execution_flow
+        capec_id for capec_id in capec_ids if capec_id in capecs and capecs[capec_id].execution_flow
     ]
     if not candidates:
         return None
@@ -110,9 +108,7 @@ def _row_for_input(
         **targets,
         "phases": [],
         "step_count": len(target_capec.execution_flow),
-        "technique_count": sum(
-            len(step.techniques) for step in target_capec.execution_flow
-        ),
+        "technique_count": sum(len(step.techniques) for step in target_capec.execution_flow),
         # Provenance fields are retained for auditing; evaluate_t5.py ignores them.
         "input_capec_id": input_capec.capec_id,
         "target_capec_id": target_capec.capec_id,
@@ -141,8 +137,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--predictions",
         default=(
-            "data/processed/reproduction/capec_selection/"
-            "capec_predictions_word2vec_all.jsonl"
+            "data/processed/reproduction/capec_selection/capec_predictions_word2vec_all.jsonl"
         ),
     )
     parser.add_argument(
@@ -255,9 +250,7 @@ def main(argv: list[str] | None = None) -> int:
             if selection_correct:
                 predicted_in_reference += 1
             predicted_has_flow = bool(
-                predicted_id
-                and predicted_id in capecs
-                and capecs[predicted_id].execution_flow
+                predicted_id and predicted_id in capecs and capecs[predicted_id].execution_flow
             )
             if selection_correct and predicted_has_flow:
                 predicted_in_reference_with_flow += 1

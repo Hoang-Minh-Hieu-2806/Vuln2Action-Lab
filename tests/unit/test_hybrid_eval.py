@@ -115,15 +115,15 @@ def test_build_hybrid_eval_keeps_predicted_and_reference_views_separate(tmp_path
 
     common = [
         json.loads(line)
-        for line in (out / "common_predicted" / "flow_validation.jsonl").read_text(
-            encoding="utf-8"
-        ).splitlines()
+        for line in (out / "common_predicted" / "flow_validation.jsonl")
+        .read_text(encoding="utf-8")
+        .splitlines()
     ]
     reference = [
         json.loads(line)
-        for line in (out / "reference_predicted" / "flow_validation.jsonl").read_text(
-            encoding="utf-8"
-        ).splitlines()
+        for line in (out / "reference_predicted" / "flow_validation.jsonl")
+        .read_text(encoding="utf-8")
+        .splitlines()
     ]
     assert common[0]["capec_id"] == "CAPEC-66"
     assert common[0]["target_steps"] == "dataset target"

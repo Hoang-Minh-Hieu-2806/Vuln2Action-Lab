@@ -64,10 +64,7 @@ def main(argv: list[str] | None = None) -> int:
     if not summary:
         parser.error(f"no metrics.json found under {root}")
 
-    print(
-        f"{'view':42s} {'rows':>6s} {'BLEU':>8s} {'R1-F1':>8s} "
-        f"{'R2-F1':>8s} {'RL-F1':>8s}"
-    )
+    print(f"{'view':42s} {'rows':>6s} {'BLEU':>8s} {'R1-F1':>8s} {'R2-F1':>8s} {'RL-F1':>8s}")
     for name, values in summary.items():
         print(
             f"{name:42s} {int(values['rows']):6d} "
