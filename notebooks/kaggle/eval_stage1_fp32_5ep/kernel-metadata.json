@@ -1,0 +1,16 @@
+{
+  "id": "dangthiet/vuln2action-eval-stage1-fp32-5ep",
+  "title": "Vuln2Action eval stage1 FP32 5ep",
+  "code_file": "kaggle_eval_stage1_fp32_5ep.ipynb",
+  "language": "python",
+  "kernel_type": "notebook",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_internet": true,
+  "dataset_sources": [
+    "dangthiet/vuln2action-p0-stage1",
+    "dangthiet/vuln2action-p0-stage1-fp32-5ep"
+  ],
+  "competition_sources": [],
+  "kernel_sources": []
+}
