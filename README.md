@@ -71,11 +71,154 @@ Vuln2Action-Lab/
       counterfactual and a real `PASS`/`FAIL` validator
 - [x] Opt-in NVD 2.0 ingestion, local snapshots, CWE/CPE/CAPEC parsers, and a
       dataset builder
+- [x] Paper-reproduction dataset builder: CWE–CAPEC relations, CAPEC execution
+      flows, ExploitDB metadata, CVE2CAPEC references, and deterministic
+      full 114,560-CVE paper-scale stratified selection
+- [x] Best-CAPEC selection with TF-IDF and Word2Vec + cosine similarity
+      (87/100 top-1 on the CAPEC eval split)
+- [x] Stage-1 execution-flow dataset (55,420 train/validation rows)
+- [x] Stage-1 T5 training and BLEU/ROUGE evaluation scripts for T4 x2
+- [x] Stage-2 technique -> ExploitDB description dataset
+- [x] Local Flask GUI for CVE/CAPEC/flow inspection
 - [x] Tracked CVE→CWE retrieval benchmark with measured P@k / R@k / F1@k / MRR
 - [x] CVE→CWE→CAPEC mapping (TF-IDF vs Word2Vec + cosine) with a tracked
       120-CVE benchmark and a measured, caveated comparison
 - [x] Sample end-to-end CLI pipeline over fake sample CVEs
+- [ ] T5 GPU training run and full evaluation
 - [ ] Live labs for `cve-002`/`cve-003`; generation and reproduction benchmarks
+
+## Paper-reproduction dataset (step 1)
+
+The reproduction track is documented in `docs/paper-reproduction.md`. It is
+offline by default; snapshots are fetched only by explicit scripts.
+
+```bash
+# Paper-faithful 114,560 CVEs (current generated dataset)
+python scripts/download_reproduction_data.py --source all --start-year 2002 --end-year 2023
+python scripts/build_reproduction_dataset.py \
+  --target-cves 114560 --seed 42 --selection-strategy stratified \
+  --start-year 2002 --end-year 2023 \
+  --exploit-start-year 1999 --exploit-end-year 2023
+python scripts/audit_reproduction_dataset.py
+
+# Latest-CVE alternative (archived snapshot)
+python scripts/download_reproduction_data.py --source all --start-year 2002 --end-year 2026
+python scripts/build_reproduction_dataset.py --target-cves 55000 --selection-strategy newest
+```
+
+The NVD 2.0 annual feeds start at 2002. The builder writes `cves.jsonl`,
+catalog/relation tables, CAPEC candidates, evaluation-only CVE2CAPEC
+references, ExploitDB metadata, leakage-free splits, and `stats.json` under
+`data/processed/reproduction/`. Exploit source code is never downloaded or
+written.
+
+Primary snapshot: **114,560 CVEs** (stratified 2002-2023), 89,311 with a
+CWE, 96,368 CVE-CWE pairs, 80,807 non-empty CVE2CAPEC references, **13,161
+ExploitDB rows** matched to selected CVEs, and 45,538 ExploitDB descriptions
+from the 1999-2023 window. This matches the paper's CVE count and historical
+cutoff; the 55k snapshot is preserved at `data/processed/reproduction_55k/`.
+
+The paper-faithful snapshot is documented in `docs/paper-dataset-report-vi.md`.
+The previous latest-2026 snapshot is preserved at
+`data/processed/reproduction_latest/` and documented in
+`docs/reproduction-dataset-report-vi.md`.
+
+Best-CAPEC selection (step 2):
+
+```bash
+python scripts/select_capec.py --dataset data/processed/reproduction \
+  --method both --scope eval --split capec_eval_100
+python scripts/select_capec.py --dataset data/processed/reproduction \
+  --method word2vec --scope all
+```
+
+Measured on `capec_eval_100`: Word2Vec reaches **87/100** top-1 (100% among
+the 87 CVEs that have candidates), TF-IDF 86/100; candidate recall is 87/100.
+See `docs/capec-selection-report-vi.md`.
+
+Execution-flow dataset (step 3):
+
+```bash
+python scripts/build_flow_dataset.py \
+  --dataset data/processed/reproduction \
+  --predictions data/processed/reproduction/capec_selection/capec_predictions_word2vec_all.jsonl \
+  --out data/processed/reproduction/flow_dataset
+```
+
+This produces 55,420 train/validation flows (44,331 train, 11,089 validation)
+from 176 CAPECs. See `docs/flow-dataset-report-vi.md`.
+
+T5 stage-1 training (Kaggle T4 x2):
+
+```bash
+pip install -e ".[train]"
+python -m torch.distributed.run --nproc_per_node=2 scripts/train_t5.py \
+  --dataset data/processed/reproduction/flow_dataset \
+  --output-dir outputs/t5_stage1 \
+  --model-name t5-base --target-field target_techniques \
+  --max-target-length 256 --auto-resume
+
+python scripts/evaluate_t5.py \
+  --checkpoint outputs/t5_stage1/final \
+  --dataset data/processed/reproduction/flow_dataset
+```
+
+Kaggle datasets are uploaded privately:
+
+- `minhiw/vuln2action-flow-114560`
+- `minhiw/vuln2action-stage2-114560`
+
+A 20-step T5-small smoke test and a 1-epoch T5-base benchmark completed on
+Kaggle T4 x2 with DDP, fp16, evaluation, and checkpoints (`notebooks/kaggle/`).
+The 1-epoch benchmark finished 693 steps. Paper-style evaluation of the
+10-epoch checkpoint produced BLEU 0.1640, ROUGE-1 F1 0.3553, ROUGE-2 F1
+0.1982, and ROUGE-L F1 0.2831 on all 11,089 validation rows. This is far below
+the paper (BLEU 0.7589) and worse than the 1-epoch checkpoint. A 1-epoch
+full-flow `target` pilot also failed (BLEU 0.0665 on 1,000 rows, repetitive
+output), so the issue is not merely the number of epochs. The current
+`target_techniques` field has 14.2% empty flows and only 139 unique targets, and
+the dataset covers 176 CAPECs versus roughly 1,024 in the paper. Further
+training is deferred until the target/data coverage is fixed. See
+`docs/t5-stage1-paper10-eval-vi.md`, `docs/t5-stage1-eval-vi.md`, and
+`docs/kaggle-t5-training-vi.md`.
+
+The operational two-stage pipeline uses the Word2Vec/TF-IDF CAPEC selector and
+the CAPEC-conditioned T5 checkpoint, so inference never receives a gold CAPEC.
+Evaluation is split into an in-distribution `common_predicted` view and
+independent `reference_*` views; the latter are the honest end-to-end test. On
+1,000 random validation CVEs (997 with a reference flow), the hybrid achieved
+BLEU 0.7508 and ROUGE-L F1 0.7919; selection was correct on 977/997 rows, and the
+selection-correct stage-2 score was BLEU 0.7639 / ROUGE-L F1 0.8030. CVE-only on
+the same reference targets was BLEU 0.0190, while the in-distribution
+CAPEC-conditioned score remained 0.8594. Hybrid coverage is 55,420/114,560
+flow-eligible rows (48.4%), so CVE-only fallback is required.
+See `docs/hybrid-two-stage-vi.md`, `docs/hybrid-eval-results.json`,
+`scripts/build_hybrid_eval.py`, and `scripts/summarize_hybrid_eval.py`.
+
+Stage-2 technique -> ExploitDB mapping:
+
+```bash
+python scripts/map_techniques_exploitdb.py \
+  --flow-dataset data/processed/reproduction/flow_dataset \
+  --exploitdb data/processed/reproduction/exploitdb.jsonl \
+  --out data/processed/reproduction/flow_dataset_stage2 --epochs 10
+```
+
+This maps 665 unique techniques to 45,538 ExploitDB descriptions (mean cosine
+0.8907). It uses descriptions/metadata only. See
+`docs/stage2-exploit-mapping-report-vi.md`; 13,161 ExploitDB rows share a CVE
+with the selected sample, enough for a CVE-specific pilot.
+
+Local Flask GUI:
+
+```bash
+pip install -e ".[gui]"
+python gui/app.py
+# http://127.0.0.1:5000
+```
+
+The GUI is read-only, localhost-only, and shows CAPEC flow plus ExploitDB
+descriptions. It never executes exploit code. See `docs/gui-report-vi.md`.
 
 ## Installation
 
@@ -89,6 +232,24 @@ Optional (API server):
 
 ```bash
 python -m pip install -e ".[api,test]"
+```
+
+Optional (Word2Vec CAPEC selection):
+
+```bash
+python -m pip install -e ".[nlp,test]"
+```
+
+Optional (T5 training/evaluation):
+
+```bash
+python -m pip install -e ".[train,test]"
+```
+
+Optional (local Flask GUI):
+
+```bash
+python -m pip install -e ".[gui,test]"
 ```
 
 Copy env template (only needed for future LLM/API generation):

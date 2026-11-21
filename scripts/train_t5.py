@@ -1,28 +1,24 @@
-"""CPU-friendly fine-tuning of t5-small on CAPEC execution flows (P1.1).
+﻿"""Fine-tune T5 on the stage-1 (or future stage-2) execution-flow dataset.
 
-The dataset is built by ``scripts/build_t5_dataset.py`` from MITRE CAPEC
-``Execution_Flow`` phases; see ``docs/t5-training.md`` for provenance.
+Kaggle T4 x2 example:
 
-Downloads are explicit
---------------------
-``--allow-download`` is required to fetch the base checkpoint. Without it the
-script only uses a model already present in the local Hugging Face cache, so an
-offline or CI machine fails with a clear message instead of silently downloading
-hundreds of MB.
+    python -m torch.distributed.run --nproc_per_node=2 scripts/train_t5.py \
+        --dataset data/processed/reproduction/flow_dataset \
+        --output-dir /kaggle/working/t5_stage1 \
+        --model-name t5-base --target-field target_techniques \
+        --max-target-length 256 --auto-resume
 
-Determinism
------------
-``--seed`` seeds Python, NumPy and torch, and training uses a fixed
-``torch.Generator`` for batch shuffling. CPU float ops are not bitwise identical
-across machines/blas builds, so runs are *repeatable in procedure*, not promised
-to be bit-identical everywhere.
+The script uses Hugging Face Trainer, so DDP, fp16, gradient accumulation, and
+checkpoint resume are handled by the trainer. It does not execute exploit code.
 """
 
 from __future__ import annotations
 
 import argparse
+import inspect
 import json
-import random
+import math
+import os
 import sys
 from pathlib import Path
 from typing import Any
@@ -33,25 +29,6 @@ for _entry in (_ROOT, _ROOT / "src"):
         sys.path.insert(0, str(_entry))
 
 from vuln2action.config import project_root
-from vuln2action.utils.filesystem import ensure_dir, read_json, write_json
-
-DATASET = ("data", "processed", "t5_flows.json")
-OUTPUT_DIR = ("models", "t5-capec-flows")
-BASE_CHECKPOINT = "t5-small"
-
-
-class TrainingError(RuntimeError):
-    """Raised for unusable data or a missing optional dependency."""
-
-
-def _safe_stdout() -> None:
-    for stream in (sys.stdout, sys.stderr):
-        reconfigure = getattr(stream, "reconfigure", None)
-        if reconfigure is not None:
-            try:
-                reconfigure(errors="backslashreplace")
-            except (OSError, ValueError):  # pragma: no cover - exotic consoles
-                pass
 
 
 def _resolve(path: str | Path) -> Path:
@@ -59,269 +36,355 @@ def _resolve(path: str | Path) -> Path:
     return resolved if resolved.is_absolute() else project_root() / resolved
 
 
-def seed_everything(seed: int) -> None:
-    """Seed every RNG we can reach; called before model construction."""
-    random.seed(seed)
-    try:
-        import numpy as np
-
-        np.random.seed(seed)
-    except ImportError:  # pragma: no cover - numpy ships with torch
-        pass
-    try:
-        import torch
-
-        torch.manual_seed(seed)
-        torch.use_deterministic_algorithms(False)
-    except ImportError as exc:  # pragma: no cover - optional dependency path
-        raise TrainingError(
-            "Fine-tuning needs torch and transformers. "
-            'Install them with: python -m pip install -e ".[t5]"'
-        ) from exc
-
-
-def load_dataset(path: Path) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
-    if not path.is_file():
-        raise TrainingError(f"Dataset not found: {path}. Run: python scripts/build_t5_dataset.py")
-    payload = read_json(path)
-    train = payload.get("train") or []
-    validation = payload.get("validation") or []
-    if not train:
-        raise TrainingError("Dataset has no training records")
-    return train, validation
-
-
-class FlowDataset:
-    """Minimal tokenised dataset (no ``datasets`` dependency needed)."""
-
-    def __init__(
-        self,
-        records: list[dict[str, Any]],
-        tokenizer: Any,
-        *,
-        max_input_length: int,
-        max_target_length: int,
-    ) -> None:
-        import torch
-
-        self.encodings: list[dict[str, Any]] = []
-        for record in records:
-            model_input = tokenizer(
-                record["input_text"],
-                truncation=True,
-                max_length=max_input_length,
-                padding="max_length",
-            )
-            labels = tokenizer(
-                record["target_flow"],
-                truncation=True,
-                max_length=max_target_length,
-                padding="max_length",
-            )
-            label_ids = [
-                token if token != tokenizer.pad_token_id else -100 for token in labels["input_ids"]
-            ]
-            self.encodings.append(
-                {
-                    "input_ids": torch.tensor(model_input["input_ids"]),
-                    "attention_mask": torch.tensor(model_input["attention_mask"]),
-                    "labels": torch.tensor(label_ids),
-                }
-            )
-
-    def __len__(self) -> int:
-        return len(self.encodings)
-
-    def __getitem__(self, index: int) -> dict[str, Any]:
-        return self.encodings[index]
-
-
-def _batches(indices: list[int], batch_size: int):
-    for start in range(0, len(indices), batch_size):
-        yield indices[start : start + batch_size]
-
-
-def train(
-    train_records: list[dict[str, Any]],
-    validation_records: list[dict[str, Any]],
-    *,
-    base_checkpoint: str,
-    output_dir: Path,
-    epochs: int,
-    batch_size: int,
-    learning_rate: float,
-    max_input_length: int,
-    max_target_length: int,
-    seed: int,
-    allow_download: bool,
-    max_steps: int = 0,
-    log_every: int = 10,
-) -> dict[str, Any]:
-    """Fine-tune and persist the checkpoint; returns a run summary."""
-    seed_everything(seed)
-    import torch
-    from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
-
-    local_only = not allow_download
-    try:
-        tokenizer = AutoTokenizer.from_pretrained(base_checkpoint, local_files_only=local_only)
-        model = AutoModelForSeq2SeqLM.from_pretrained(base_checkpoint, local_files_only=local_only)
-    except (OSError, ValueError) as exc:
-        raise TrainingError(
-            f"Could not load {base_checkpoint!r}: {exc}. "
-            "Re-run with --allow-download to fetch it explicitly."
-        ) from exc
-
-    train_dataset = FlowDataset(
-        train_records,
-        tokenizer,
-        max_input_length=max_input_length,
-        max_target_length=max_target_length,
+def _latest_checkpoint(output_dir: Path) -> str | None:
+    checkpoints = sorted(
+        output_dir.glob("checkpoint-*"),
+        key=lambda path: int(path.name.rsplit("-", 1)[-1]),
     )
-    val_dataset = (
-        FlowDataset(
-            validation_records,
-            tokenizer,
-            max_input_length=max_input_length,
-            max_target_length=max_target_length,
+    return str(checkpoints[-1]) if checkpoints else None
+
+
+def _require_training_deps() -> tuple[Any, ...]:
+    try:
+        import torch
+        from datasets import load_dataset
+        from transformers import (
+            AutoModelForSeq2SeqLM,
+            AutoTokenizer,
+            DataCollatorForSeq2Seq,
+            Seq2SeqTrainer,
+            Seq2SeqTrainingArguments,
+            TrainerCallback,
         )
-        if validation_records
-        else None
+    except ImportError as exc:
+        raise SystemExit(
+            "T5 training requires torch, transformers, datasets, and accelerate. "
+            'Install them with `pip install -e ".[train]"`.'
+        ) from exc
+    return (
+        torch,
+        load_dataset,
+        AutoModelForSeq2SeqLM,
+        AutoTokenizer,
+        DataCollatorForSeq2Seq,
+        Seq2SeqTrainer,
+        Seq2SeqTrainingArguments,
+        TrainerCallback,
     )
-    if len(train_dataset) == 0:
-        raise TrainingError("Training split is empty after tokenisation")
 
-    device = torch.device("cpu")
-    model.to(device)
-    model.train()
-    optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate)
-    generator = torch.Generator().manual_seed(seed)
 
-    history: list[dict[str, Any]] = []
-    step = 0
-    stop = False
-    for epoch in range(1, epochs + 1):
-        order = torch.randperm(len(train_dataset), generator=generator).tolist()
-        epoch_losses: list[float] = []
-        for batch_indices in _batches(order, batch_size):
-            batch = [train_dataset[index] for index in batch_indices]
-            input_ids = torch.stack([item["input_ids"] for item in batch]).to(device)
-            attention_mask = torch.stack([item["attention_mask"] for item in batch]).to(device)
-            labels = torch.stack([item["labels"] for item in batch]).to(device)
-
-            outputs = model(input_ids=input_ids, attention_mask=attention_mask, labels=labels)
-            loss = outputs.loss
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
-
-            step += 1
-            epoch_losses.append(float(loss.item()))
-            if log_every and step % log_every == 0:
-                print(f"epoch={epoch} step={step} loss={loss.item():.4f}", flush=True)
-            if max_steps and step >= max_steps:
-                stop = True
-                break
-        epoch_loss = sum(epoch_losses) / len(epoch_losses) if epoch_losses else float("nan")
-        history.append({"epoch": epoch, "train_loss": epoch_loss, "steps": step})
-        print(f"epoch={epoch} mean_train_loss={epoch_loss:.4f}", flush=True)
-        if stop:
-            break
-
-    val_loss = None
-    if val_dataset is not None and len(val_dataset):
-        model.eval()
-        losses: list[float] = []
-        with torch.no_grad():
-            for batch_indices in _batches(list(range(len(val_dataset))), batch_size):
-                batch = [val_dataset[index] for index in batch_indices]
-                outputs = model(
-                    input_ids=torch.stack([item["input_ids"] for item in batch]),
-                    attention_mask=torch.stack([item["attention_mask"] for item in batch]),
-                    labels=torch.stack([item["labels"] for item in batch]),
-                )
-                losses.append(float(outputs.loss.item()))
-        val_loss = sum(losses) / len(losses) if losses else None
-
-    ensure_dir(output_dir)
-    model.save_pretrained(output_dir)
-    tokenizer.save_pretrained(output_dir)
-
-    summary = {
-        "base_checkpoint": base_checkpoint,
-        "output_dir": str(output_dir),
-        "seed": seed,
-        "epochs_requested": epochs,
-        "epochs_run": len(history),
-        "batch_size": batch_size,
-        "learning_rate": learning_rate,
-        "max_input_length": max_input_length,
-        "max_target_length": max_target_length,
-        "max_steps": max_steps,
-        "train_records": len(train_records),
-        "validation_records": len(validation_records),
-        "final_train_loss": history[-1]["train_loss"] if history else None,
-        "validation_loss": val_loss,
-        "history": history,
-        "device": "cpu",
-    }
-    write_json(output_dir / "training_summary.json", summary)
-    return summary
+def _training_arguments(training_arguments_cls: Any, kwargs: dict[str, Any]) -> Any:
+    """Support both transformers' old and new evaluation-strategy argument."""
+    parameters = inspect.signature(training_arguments_cls.__init__).parameters
+    strategy_key = "eval_strategy" if "eval_strategy" in parameters else "evaluation_strategy"
+    return training_arguments_cls(**{**kwargs, strategy_key: "steps"})
 
 
 def main(argv: list[str] | None = None) -> int:
-    _safe_stdout()
-    parser = argparse.ArgumentParser(description="Fine-tune t5-small on CAPEC flows (CPU).")
-    parser.add_argument("--dataset", default=str(Path(*DATASET)), help="Dataset JSON.")
-    parser.add_argument("--output", default=str(Path(*OUTPUT_DIR)), help="Checkpoint directory.")
-    parser.add_argument("--base-checkpoint", default=BASE_CHECKPOINT, help="Base T5 checkpoint.")
-    parser.add_argument("--epochs", type=int, default=3, help="Epochs (default: 3).")
-    parser.add_argument("--batch-size", type=int, default=4, help="Batch size (default: 4).")
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--dataset", default="data/processed/reproduction/flow_dataset")
+    parser.add_argument("--output-dir", default="outputs/t5_stage1")
+    parser.add_argument("--model-name", default="t5-base")
+    parser.add_argument("--stage", type=int, choices=[1, 2], default=1)
     parser.add_argument(
-        "--learning-rate", type=float, default=5e-4, help="AdamW LR (default: 5e-4)."
+        "--target-field",
+        choices=[
+            "target",
+            "target_steps",
+            "target_techniques",
+            "target_exploit",
+            "target_exploit_techniques",
+        ],
+        default="target_techniques",
     )
-    parser.add_argument("--max-input-length", type=int, default=512)
-    parser.add_argument("--max-target-length", type=int, default=512)
-    parser.add_argument("--seed", type=int, default=13, help="Random seed (default: 13).")
-    parser.add_argument("--max-steps", type=int, default=0, help="Stop after N steps (0 = all).")
-    parser.add_argument("--log-every", type=int, default=10, help="Log every N steps.")
+    parser.add_argument("--source-prefix", default="")
     parser.add_argument(
-        "--allow-download",
-        action="store_true",
-        help="Explicitly permit fetching the base checkpoint from the Hub.",
+        "--include-capec",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+        help=(
+            "Condition the input on the selected CAPEC name/id. This is an "
+            "operational variant, not the paper's CVE-only input."
+        ),
     )
-    parser.add_argument("--json-only", action="store_true", help="Print the summary as JSON.")
+    parser.add_argument("--max-input-length", type=int, default=256)
+    parser.add_argument("--max-target-length", type=int, default=256)
+    parser.add_argument("--per-device-batch-size", type=int, default=8)
+    parser.add_argument("--gradient-accumulation-steps", type=int, default=4)
+    parser.add_argument("--learning-rate", type=float, default=5e-5)
+    parser.add_argument(
+        "--warmup-ratio",
+        type=float,
+        default=0.1,
+        help="Fraction of steps used for linear warmup (default: 0.1).",
+    )
+    parser.add_argument(
+        "--warmup-steps",
+        type=int,
+        default=-1,
+        help="Override warmup steps; -1 computes it from --warmup-ratio.",
+    )
+    parser.add_argument("--num-train-epochs", type=float, default=50.0)
+    parser.add_argument(
+        "--stop-after-epoch",
+        type=float,
+        default=None,
+        help=(
+            "Stop training after this epoch while keeping the LR schedule length "
+            "defined by --num-train-epochs. Useful for evaluating an early epoch "
+            "of a longer paper-style schedule."
+        ),
+    )
+    parser.add_argument("--max-steps", type=int, default=-1)
+    parser.add_argument("--save-steps", type=int, default=500)
+    parser.add_argument("--eval-steps", type=int, default=500)
+    parser.add_argument("--logging-steps", type=int, default=50)
+    parser.add_argument("--save-total-limit", type=int, default=2)
+    parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--limit", type=int, default=None, help="Smoke-test cap on rows.")
+    parser.add_argument("--fp16", action=argparse.BooleanOptionalAction, default=True)
+    parser.add_argument(
+        "--abort-on-nan",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help=(
+            "Stop training when loss, grad_norm, or eval_loss becomes non-finite. "
+            "This prevents wasting GPU quota after a numerical collapse."
+        ),
+    )
+    parser.add_argument(
+        "--gradient-checkpointing",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+    )
+    parser.add_argument("--auto-resume", action="store_true")
+    parser.add_argument("--resume-from-checkpoint", default="")
+    parser.add_argument(
+        "--load-best-model-at-end",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+        help=(
+            "Reload the checkpoint with the lowest eval loss. Paper-style runs "
+            "should keep the final epoch, so this defaults to false."
+        ),
+    )
+    parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args(argv)
 
-    try:
-        train_records, validation_records = load_dataset(_resolve(args.dataset))
-        summary = train(
-            train_records,
-            validation_records,
-            base_checkpoint=args.base_checkpoint,
-            output_dir=_resolve(args.output),
-            epochs=args.epochs,
-            batch_size=args.batch_size,
-            learning_rate=args.learning_rate,
-            max_input_length=args.max_input_length,
-            max_target_length=args.max_target_length,
-            seed=args.seed,
-            allow_download=args.allow_download,
-            max_steps=args.max_steps,
-            log_every=args.log_every,
-        )
-    except TrainingError as exc:
-        parser.error(str(exc))
-        return 2  # pragma: no cover - argparse exits
+    os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
+    deps = _require_training_deps()
+    (
+        torch,
+        load_dataset,
+        auto_model,
+        auto_tokenizer,
+        data_collator_cls,
+        trainer_cls,
+        training_arguments_cls,
+        trainer_callback_cls,
+    ) = deps
 
-    if args.json_only:
-        print(json.dumps(summary, indent=2))
-    else:
-        print(f"checkpoint saved to {summary['output_dir']}")
-        print(
-            f"train_loss={summary['final_train_loss']} "
-            f"val_loss={summary['validation_loss']} epochs={summary['epochs_run']}"
+    dataset_dir = _resolve(args.dataset)
+    train_file = dataset_dir / "flow_train.jsonl"
+    validation_file = dataset_dir / "flow_validation.jsonl"
+    if not train_file.is_file() or not validation_file.is_file():
+        parser.error(
+            f"missing {train_file.name}/{validation_file.name} under {dataset_dir}; "
+            "run scripts/build_flow_dataset.py first"
         )
+
+    raw = load_dataset(
+        "json",
+        data_files={"train": str(train_file), "validation": str(validation_file)},
+    )
+    if args.limit is not None:
+        raw["train"] = raw["train"].select(range(min(args.limit, len(raw["train"]))))
+        raw["validation"] = raw["validation"].select(range(min(args.limit, len(raw["validation"]))))
+    if args.target_field not in raw["train"].column_names:
+        parser.error(
+            f"target field {args.target_field!r} is not in the flow dataset; "
+            "stage 2 needs an enriched target field"
+        )
+
+    tokenizer = auto_tokenizer.from_pretrained(args.model_name)
+    model = auto_model.from_pretrained(args.model_name)
+    model.config.use_cache = False
+
+    def preprocess(batch: dict[str, list[Any]]) -> dict[str, Any]:
+        if args.include_capec:
+            inputs = [
+                f"{args.source_prefix}CAPEC {capec_id}: {capec_name}\nCVE: {text}"
+                for text, capec_id, capec_name in zip(
+                    batch["input"], batch["capec_id"], batch["capec_name"], strict=True
+                )
+            ]
+        else:
+            inputs = [
+                f"{args.source_prefix}{text}" if args.source_prefix else text
+                for text in batch["input"]
+            ]
+        model_inputs = tokenizer(
+            inputs,
+            max_length=args.max_input_length,
+            truncation=True,
+        )
+        labels = tokenizer(
+            text_target=batch[args.target_field],
+            max_length=args.max_target_length,
+            truncation=True,
+        )
+        model_inputs["labels"] = labels["input_ids"]
+        return model_inputs
+
+    tokenized = raw.map(
+        preprocess,
+        batched=True,
+        remove_columns=raw["train"].column_names,
+        desc="tokenizing execution flows",
+    )
+
+    if args.dry_run:
+        print(f"stage={args.stage} train={len(tokenized['train'])}")
+        print(f"validation={len(tokenized['validation'])}")
+        for index in range(min(2, len(tokenized["train"]))):
+            row = tokenized["train"][index]
+            print(
+                f"row={index} input_tokens={len(row['input_ids'])} "
+                f"target_tokens={len(row['labels'])}"
+            )
+        return 0
+
+    world_size = int(os.environ.get("WORLD_SIZE", "1") or "1")
+    steps_per_epoch = math.ceil(
+        len(tokenized["train"])
+        / max(1, args.per_device_batch_size * world_size * args.gradient_accumulation_steps)
+    )
+    if args.max_steps > 0:
+        total_steps = args.max_steps
+    else:
+        total_steps = max(1, math.ceil(steps_per_epoch * args.num_train_epochs))
+    warmup_steps = (
+        args.warmup_steps
+        if args.warmup_steps >= 0
+        else int(total_steps * args.warmup_ratio)
+    )
+
+    output_dir = _resolve(args.output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    training_kwargs: dict[str, Any] = {
+        "output_dir": str(output_dir),
+        "per_device_train_batch_size": args.per_device_batch_size,
+        "per_device_eval_batch_size": args.per_device_batch_size,
+        "gradient_accumulation_steps": args.gradient_accumulation_steps,
+        "learning_rate": args.learning_rate,
+        "num_train_epochs": args.num_train_epochs,
+        "max_steps": args.max_steps,
+        "save_steps": args.save_steps,
+        "eval_steps": args.eval_steps,
+        "logging_steps": args.logging_steps,
+        "save_total_limit": args.save_total_limit,
+        "save_strategy": "steps",
+        "load_best_model_at_end": args.load_best_model_at_end,
+        "metric_for_best_model": "eval_loss",
+        "greater_is_better": False,
+        "predict_with_generate": False,
+        "fp16": bool(args.fp16 and torch.cuda.is_available()),
+        "gradient_checkpointing": args.gradient_checkpointing,
+        "optim": "adamw_torch",
+        "report_to": "none",
+        "seed": args.seed,
+        "data_seed": args.seed,
+        "dataloader_num_workers": 2,
+        "remove_unused_columns": False,
+    }
+    training_params = inspect.signature(training_arguments_cls.__init__).parameters
+    if "warmup_steps" in training_params:
+        training_kwargs["warmup_steps"] = warmup_steps
+    elif "warmup_ratio" in training_params:
+        training_kwargs["warmup_ratio"] = args.warmup_ratio
+    training_args = _training_arguments(training_arguments_cls, training_kwargs)
+
+    callbacks = []
+    if args.stop_after_epoch is not None:
+        stop_after_epoch = args.stop_after_epoch
+
+        class _StopAfterEpoch(trainer_callback_cls):
+            def on_epoch_end(self, args, state, control, **kwargs):
+                if state.epoch is not None and state.epoch >= stop_after_epoch:
+                    control.should_training_stop = True
+
+        callbacks.append(_StopAfterEpoch())
+
+    if args.abort_on_nan:
+
+        class _AbortOnNonFinite(trainer_callback_cls):
+            def on_log(self, args, state, control, logs=None, **kwargs):
+                if not logs:
+                    return
+                for key in ("loss", "grad_norm", "eval_loss"):
+                    value = logs.get(key)
+                    if value is None:
+                        continue
+                    try:
+                        finite = math.isfinite(float(value))
+                    except (TypeError, ValueError):
+                        continue
+                    if not finite:
+                        print(
+                            f"Non-finite {key}={value} at step {state.global_step}; "
+                            "stopping training.",
+                            flush=True,
+                        )
+                        control.should_training_stop = True
+                        return
+
+        callbacks.append(_AbortOnNonFinite())
+
+    callbacks = callbacks or None
+
+    trainer = trainer_cls(
+        model=model,
+        args=training_args,
+        train_dataset=tokenized["train"],
+        eval_dataset=tokenized["validation"],
+        data_collator=data_collator_cls(tokenizer, model=model, padding="longest"),
+        callbacks=callbacks,
+    )
+
+    if torch.cuda.is_available():
+        print(
+            f"CUDA devices={torch.cuda.device_count()} fp16={training_args.fp16} stage={args.stage}"
+        )
+    else:
+        print("CUDA is unavailable; running on CPU (fp16 disabled)")
+
+    config = {
+        **vars(args),
+        "train_rows": len(tokenized["train"]),
+        "validation_rows": len(tokenized["validation"]),
+        "total_steps": total_steps,
+        "warmup_steps": warmup_steps,
+    }
+    (output_dir / "training_config.json").write_text(
+        json.dumps(config, indent=2, ensure_ascii=False),
+        encoding="utf-8",
+    )
+
+    resume: str | None = None
+    if args.resume_from_checkpoint:
+        resume = str(_resolve(args.resume_from_checkpoint))
+    elif args.auto_resume:
+        resume = _latest_checkpoint(output_dir)
+        if resume:
+            print(f"auto-resuming from {resume}")
+        else:
+            print("auto-resume requested but no checkpoint found; starting fresh")
+    trainer.train(resume_from_checkpoint=resume)
+
+    if trainer.is_world_process_zero():
+        trainer.save_model(str(output_dir / "final"))
+        tokenizer.save_pretrained(str(output_dir / "final"))
+        print(f"saved final model to {output_dir / 'final'}")
     return 0
 
 

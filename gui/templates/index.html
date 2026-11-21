@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vuln2Action local reproduction GUI</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<main>
+  <header>
+    <h1>Vuln2Action local reproduction GUI</h1>
+    <p class="muted">CVE ? CWE ? CAPEC ? execution flow. Local dataset only. No exploit code is executed.</p>
+  </header>
+
+  <section class="panel">
+    <form method="post" action="{{ url_for('analyze_form') }}">
+      <label for="cve_id">CVE id from the local 55k dataset</label>
+      <input id="cve_id" name="cve_id" placeholder="CVE-2026-..." autocomplete="off">
+      <p class="hint">Examples:
+        {% for example in examples %}
+          <button type="button" class="example" onclick="document.getElementById('cve_id').value='{{ example }}'">{{ example }}</button>
+        {% endfor %}
+      </p>
+      <label for="description">Or paste a vulnerability description</label>
+      <textarea id="description" name="description" rows="5" placeholder="A vulnerability description..."></textarea>
+      <button type="submit">Analyze</button>
+    </form>
+  </section>
+
+  {% if error %}
+  <section class="panel error">{{ error }}</section>
+  {% endif %}
+
+  {% if result and not error %}
+  <section class="panel result">
+    <div class="result-head">
+      <div>
+        <h2>{{ result.selected_capec_id }} ? {{ result.selected_capec_name }}</h2>
+        <p class="muted">{{ result.cve_id }} ? {{ result.method }} ? cosine {{ "%.4f"|format(result.score) }}</p>
+      </div>
+      <span class="badge">descriptions only</span>
+    </div>
+
+    <p>{{ result.description }}</p>
+    <p class="cap-desc">{{ result.selected_capec_description }}</p>
+
+    <h3>Execution flow</h3>
+    <div class="phases">
+      {% for phase in result.flow %}
+      <article class="phase">
+        <h4>{{ phase.phase }}</h4>
+        {% if phase.steps %}
+          {% for step in phase.steps %}
+          <div class="step">
+            <div class="step-no">Step {{ step.step }}</div>
+            <p>{{ step.description }}</p>
+            {% if step.techniques %}
+            <ul class="techniques">
+              {% for technique in step.techniques %}
+              <li>
+                <span class="technique">{{ technique.text }}</span>
+                {% if technique.exploit_id %}
+                <span class="exploit">? {{ technique.exploit_id }}: {{ technique.exploit_description }} ({{ "%.3f"|format(technique.score) }})</span>
+                {% endif %}
+              </li>
+              {% endfor %}
+            </ul>
+            {% endif %}
+          </div>
+          {% endfor %}
+        {% else %}
+          <p class="muted">No step in this phase for the selected CAPEC.</p>
+        {% endif %}
+      </article>
+      {% endfor %}
+    </div>
+
+    {% if result.candidates %}
+    <details>
+      <summary>Candidate CAPECs (first 12)</summary>
+      <ul>
+        {% for candidate in result.candidates %}
+        <li><strong>{{ candidate.capec_id }}</strong> ? {{ candidate.name }}</li>
+        {% endfor %}
+      </ul>
+    </details>
+    {% endif %}
+    {% if not result.has_technique_mapping %}
+    <p class="muted">Technique ? ExploitDB mapping is not available in this local dataset yet.</p>
+    {% endif %}
+  </section>
+  {% endif %}
+
+  <footer>
+    <p>Localhost only. Dataset: CVE/CWE/CAPEC/ExploitDB metadata and descriptions; no exploit source code.</p>
+  </footer>
+</main>
+</body>
+</html>

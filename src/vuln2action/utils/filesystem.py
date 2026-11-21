@@ -28,5 +28,19 @@ def write_json(path: str | Path, data: Any, indent: int = 2) -> Path:
     return resolved
 
 
+def write_jsonl(path: str | Path, rows: list[dict[str, Any]]) -> Path:
+    resolved = Path(path)
+    resolved.parent.mkdir(parents=True, exist_ok=True)
+    with resolved.open("w", encoding="utf-8") as handle:
+        for row in rows:
+            handle.write(json.dumps(row, ensure_ascii=False) + "\n")
+    return resolved
+
+
+def read_jsonl(path: str | Path) -> list[dict[str, Any]]:
+    with Path(path).open(encoding="utf-8") as handle:
+        return [json.loads(line) for line in handle if line.strip()]
+
+
 def repo_path(*parts: str) -> Path:
     return project_root().joinpath(*parts)

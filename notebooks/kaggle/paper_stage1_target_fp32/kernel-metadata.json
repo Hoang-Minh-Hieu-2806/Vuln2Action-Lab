@@ -1,0 +1,15 @@
+{
+  "id": "dangthiet/vuln2action-paper-stage1-cve-only-target-fp32",
+  "title": "Vuln2Action paper stage1 CVE-only target FP32",
+  "code_file": "kaggle_t5_paper_stage1_target_fp32.ipynb",
+  "language": "python",
+  "kernel_type": "notebook",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_internet": true,
+  "dataset_sources": [
+    "dangthiet/vuln2action-p0-stage1"
+  ],
+  "competition_sources": [],
+  "kernel_sources": []
+}

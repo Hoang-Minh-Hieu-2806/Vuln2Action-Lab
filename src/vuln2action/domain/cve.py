@@ -29,6 +29,8 @@ class CveRecord(BaseModel):
     cwe: list[str] = Field(default_factory=list)
     cpe: list[str] = Field(default_factory=list)
     references: list[str] = Field(default_factory=list)
+    published: str = ""
+    vuln_status: str = ""
     lab_id: str = ""
 
     @field_validator("cve_id", "description")

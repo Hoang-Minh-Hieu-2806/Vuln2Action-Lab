@@ -128,6 +128,12 @@ def test_parse_nvd_records_skips_rejected_by_default():
     assert len(parse_nvd_records(_payload(), include_rejected=True)) == 2
 
 
+def test_parse_nvd_records_can_skip_invalid_bulk_rows():
+    payload = _payload()
+    payload["vulnerabilities"].append({"cve": {"id": "CVE-2019-9999", "descriptions": []}})
+    assert [r.cve_id for r in parse_nvd_records(payload, skip_invalid=True)] == ["CVE-2021-44228"]
+
+
 def test_parse_nvd_records_requires_vulnerabilities_list():
     with pytest.raises(TypeError, match="vulnerabilities"):
         parse_nvd_records({"resultsPerPage": 0})

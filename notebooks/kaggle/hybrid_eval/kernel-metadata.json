@@ -1,0 +1,18 @@
+{
+  "id": "minhiw/vuln2action-hybrid-eval",
+  "title": "Vuln2Action hybrid eval",
+  "code_file": "kaggle_t5_hybrid_eval.ipynb",
+  "language": "python",
+  "kernel_type": "notebook",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_internet": true,
+  "dataset_sources": [
+    "minhiw/vuln2action-hybrid-eval-bundle"
+  ],
+  "competition_sources": [],
+  "kernel_sources": [
+    "minhiw/vuln2action-t5-stage1-capec-conditioned",
+    "minhiw/vuln2action-t5-stage1-target-steps-pilot"
+  ]
+}
