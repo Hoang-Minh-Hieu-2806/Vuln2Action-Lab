@@ -1,4 +1,4 @@
-# ---- Python ----
+﻿# ---- Python ----
 __pycache__/
 *.py[cod]
 *$py.class
@@ -52,11 +52,17 @@ data/external/*
 results/*
 !results/.gitkeep
 
+<<<<<<< Updated upstream
 # ---- Local model checkpoints (hundreds of MB; never commit) ----
 models/*
 !models/.gitkeep
+=======
+# ---- Graphify output ----
+graphify-out/
+>>>>>>> Stashed changes
 
 # ---- Docker ----
 .docker/
 docker-compose.override.yml
 *.log
+
