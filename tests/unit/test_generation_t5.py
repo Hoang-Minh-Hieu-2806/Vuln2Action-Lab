@@ -119,9 +119,7 @@ class _FakeModel:
         return self
 
     def generate(self, **kwargs):
-        import torch
-
-        return torch.tensor([[5, 6, 7]])
+        return [[5, 6, 7]]
 
 
 def test_generator_uses_injected_model_without_download():

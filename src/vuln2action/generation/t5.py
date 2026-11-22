@@ -273,7 +273,15 @@ class T5Generator(GenerationProvider):
 
     def generate_flow(self, cve: CveRecord, contexts: list[RetrievedContext]) -> GeneratedFlow:
         self._ensure_loaded()
-        import torch
+        try:
+            import torch
+
+            context = torch.no_grad()
+        except ImportError:
+            # Injected fake models do not need torch, which is an optional extra.
+            from contextlib import nullcontext
+
+            context = nullcontext()
 
         prompt = build_model_input(cve, contexts)
         inputs = self._tokenizer(
@@ -282,7 +290,7 @@ class T5Generator(GenerationProvider):
             truncation=True,
             max_length=self.settings.max_input_length,
         )
-        with torch.no_grad():
+        with context:
             output = self._model.generate(**inputs, **self._generation_kwargs())
         text = self._tokenizer.decode(output[0], skip_special_tokens=True)
         return GeneratedFlow(text=text, checkpoint=self.checkpoint, steps=parse_flow(text))
