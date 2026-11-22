@@ -4,6 +4,7 @@ from vuln2action.reproduction.executor import (
     ReproductionExecutor,
     is_allowed_target,
     parse_validation_output,
+    select_validation_command,
 )
 from vuln2action.reproduction.planner import ReproductionPlanner
 from vuln2action.reproduction.validator import Validator
@@ -14,4 +15,5 @@ __all__ = [
     "Validator",
     "is_allowed_target",
     "parse_validation_output",
+    "select_validation_command",
 ]

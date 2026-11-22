@@ -15,4 +15,6 @@ class LabManifest(BaseModel):
     setup_command: list[str] = Field(default_factory=list)
     validation_command: list[str] = Field(default_factory=list)
     teardown_command: list[str] = Field(default_factory=list)
+    # Named, checked-in commands only; workflow text selects a key, never builds argv.
+    actions: dict[str, list[str]] = Field(default_factory=dict)
     has_patched_counterfactual: bool = False

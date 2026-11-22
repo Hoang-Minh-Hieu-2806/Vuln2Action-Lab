@@ -67,6 +67,21 @@ def run_pipeline(
     result = Validator().validate(cve.cve_id, lab_id, execution)
     collector = EvidenceCollector()
     collector.add_log(f"Pipeline run for {cve.cve_id} with provider {outcome.provider}")
+    collector.add_generation(
+        {
+            "provider": outcome.provider,
+            "input": {
+                "cve_id": cve.cve_id,
+                "description": cve.description,
+                "context_sources": [context.source for context in outcome.contexts],
+            },
+            "capec": outcome.capec.model_dump(mode="json") if outcome.capec else None,
+            "capec_note": outcome.capec_note,
+            "output": outcome.workflow.model_dump(mode="json"),
+        }
+    )
+    collector.add_workflow(outcome.workflow)
+    collector.add_plan(plan)
     for line in execution.log:
         collector.add_log(line)
     collector.add_result(result)

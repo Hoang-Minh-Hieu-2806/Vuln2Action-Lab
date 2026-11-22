@@ -13,6 +13,7 @@ from vuln2action.reproduction import (
     ReproductionExecutor,
     Validator,
     parse_validation_output,
+    select_validation_command,
 )
 
 
@@ -91,3 +92,63 @@ def test_validator_skips_when_no_verdict_is_present():
     execution = ExecutionResult(simulated=False, completed=False, steps_executed=1)
     result = Validator().validate("DEMO-1", "demo", execution)
     assert result.status is ReproductionStatus.SKIPPED
+
+
+def _allowlist_manifest() -> LabManifest:
+    return LabManifest(
+        lab_id="demo",
+        vulnerability_id="DEMO-1",
+        status="ready",
+        validation_command=["python", "fallback.py"],
+        has_patched_counterfactual=True,
+        actions={
+            "probe": ["python", "probe.py"],
+            "validate": ["python", "validate.py"],
+        },
+    )
+
+
+def test_workflow_step_selects_allowlisted_command():
+    plan = ExecutionPlan(
+        cve_id="DEMO-1",
+        lab_id="demo",
+        steps=[
+            PlanStep(id="s1", action="Start isolated lab", detail="demo", lab_id="demo"),
+            PlanStep(
+                id="s2", action="Inspect target service", detail="localhost only", lab_id="demo"
+            ),
+            PlanStep(id="s3", action="Run lab validator", detail="demo", lab_id="demo"),
+        ],
+    )
+    selected = select_validation_command(plan, _allowlist_manifest())
+    assert selected == ("s2", "probe", ["python", "probe.py"])
+
+
+def test_unmatched_workflow_falls_back_to_manifest_validation():
+    plan = ExecutionPlan(
+        cve_id="DEMO-1",
+        lab_id="demo",
+        steps=[PlanStep(id="s1", action="Start isolated lab", detail="demo", lab_id="demo")],
+    )
+    assert select_validation_command(plan, _allowlist_manifest()) == (
+        "",
+        "validation_command",
+        ["python", "fallback.py"],
+    )
+
+
+def test_generated_text_never_becomes_a_command():
+    plan = ExecutionPlan(
+        cve_id="DEMO-1",
+        lab_id="demo",
+        steps=[
+            PlanStep(
+                id="s1",
+                action="Probe",
+                detail="rm -rf /; python -c 'import os'",
+                lab_id="demo",
+            )
+        ],
+    )
+    _, _, command = select_validation_command(plan, _allowlist_manifest())
+    assert command == ["python", "probe.py"]

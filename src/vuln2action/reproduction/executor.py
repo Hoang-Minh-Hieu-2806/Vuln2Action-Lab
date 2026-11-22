@@ -12,6 +12,23 @@ from vuln2action.domain import ExecutionPlan, ExecutionResult, LabManifest
 
 VALIDATION_PREFIX = "V2A_VALIDATION_JSON:"
 _PYTHON_ALIASES = {"python", "python3", "py"}
+_ACTION_HINTS = {
+    "probe": ("probe", "inspect", "scan", "survey"),
+    "validate": ("validate", "verify", "check", "confirm"),
+}
+
+
+def select_validation_command(
+    plan: ExecutionPlan, manifest: LabManifest
+) -> tuple[str, str, list[str]]:
+    """Choose a checked-in command by workflow intent; never derive argv from model text."""
+    for step in plan.steps:
+        text = f"{step.action} {step.detail}".lower()
+        for name, command in manifest.actions.items():
+            hints = _ACTION_HINTS.get(name, (name,))
+            if any(hint in text for hint in hints):
+                return step.id, name, list(command)
+    return "", "validation_command", list(manifest.validation_command)
 
 
 def is_allowed_target(target: str, allowed_hosts: set[str] | None = None) -> bool:
@@ -84,15 +101,18 @@ class ReproductionExecutor:
             )
         if manifest.status == "placeholder":
             raise ValueError(f"Lab {manifest.lab_id!r} is still a placeholder; no commands to run")
-        if not manifest.validation_command:
-            raise ValueError(f"Lab {manifest.lab_id!r} declares no validation_command")
         if manifest.status == "ready" and not manifest.has_patched_counterfactual:
             raise ValueError(
                 f"Lab {manifest.lab_id!r} is marked ready but has no patched counterfactual"
             )
+        step_id, action_name, validation_command = select_validation_command(plan, manifest)
+        if not validation_command:
+            raise ValueError(f"Lab {manifest.lab_id!r} declares no validation command")
 
         lab_dir = self._lab_dir(manifest.lab_id)
         log: list[str] = []
+        if step_id:
+            log.append(f"[workflow] step {step_id} selected allowlisted action {action_name}")
         steps_executed = 0
         validation: dict[str, object] | None = None
         error: str | None = None
@@ -101,7 +121,7 @@ class ReproductionExecutor:
             if manifest.setup_command:
                 self._run(manifest.setup_command, lab_dir, "setup", log)
                 steps_executed += 1
-            result = self._run(manifest.validation_command, lab_dir, "validate", log)
+            result = self._run(validation_command, lab_dir, "validate", log)
             steps_executed += 1
             validation = parse_validation_output(result.stdout)
             if validation is None:

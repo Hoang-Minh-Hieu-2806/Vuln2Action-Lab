@@ -19,4 +19,7 @@ class EvidenceBundle(BaseModel):
     logs: list[str] = Field(default_factory=list)
     command_outputs: dict[str, str] = Field(default_factory=dict)
     http: list[HttpEvidence] = Field(default_factory=list)
+    generation: dict[str, Any] | None = None
+    workflow: dict[str, Any] | None = None
+    plan: dict[str, Any] | None = None
     validation_result: dict[str, Any] | None = None

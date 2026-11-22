@@ -1,6 +1,14 @@
 """Build an immutable, serialisable evidence bundle."""
 
-from vuln2action.domain import EvidenceBundle, HttpEvidence, ReproductionResult
+from typing import Any
+
+from vuln2action.domain import (
+    EvidenceBundle,
+    ExecutionPlan,
+    HttpEvidence,
+    ReproductionResult,
+    Workflow,
+)
 
 
 class EvidenceCollector:
@@ -15,6 +23,15 @@ class EvidenceCollector:
 
     def add_log(self, message: str) -> None:
         self._bundle.logs.append(message)
+
+    def add_generation(self, data: dict[str, Any]) -> None:
+        self._bundle.generation = data
+
+    def add_workflow(self, workflow: Workflow) -> None:
+        self._bundle.workflow = workflow.model_dump(mode="json")
+
+    def add_plan(self, plan: ExecutionPlan) -> None:
+        self._bundle.plan = plan.model_dump(mode="json")
 
     def add_result(self, result: ReproductionResult) -> None:
         self._bundle.validation_result = result.model_dump(mode="json")

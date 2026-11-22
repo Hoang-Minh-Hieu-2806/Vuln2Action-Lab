@@ -15,6 +15,11 @@ def test_pipeline_runs_for_every_sample():
         outcome = run_pipeline(cve, settings=settings, provider="rule_based")
         assert outcome.result.status is ReproductionStatus.SIMULATED
         assert outcome.workflow.cve_id == cve.cve_id
+        assert outcome.evidence.generation is not None
+        assert outcome.evidence.generation["input"]["cve_id"] == cve.cve_id
+        assert outcome.evidence.workflow == outcome.workflow.model_dump(mode="json")
+        assert outcome.evidence.plan is not None
+        assert outcome.evidence.plan["lab_id"] == outcome.lab.lab_id
 
 
 def test_report_writer(tmp_path):
