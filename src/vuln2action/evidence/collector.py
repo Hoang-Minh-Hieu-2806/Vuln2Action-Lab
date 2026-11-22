@@ -27,6 +27,9 @@ class EvidenceCollector:
     def add_generation(self, data: dict[str, Any]) -> None:
         self._bundle.generation = data
 
+    def add_checkpoint_id(self, checkpoint_id: str | None) -> None:
+        self._bundle.checkpoint_id = checkpoint_id
+
     def add_workflow(self, workflow: Workflow) -> None:
         self._bundle.workflow = workflow.model_dump(mode="json")
 

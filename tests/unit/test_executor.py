@@ -137,6 +137,33 @@ def test_unmatched_workflow_falls_back_to_manifest_validation():
     )
 
 
+def test_executor_refuses_non_local_target_before_running(monkeypatch):
+    plan = ExecutionPlan(
+        cve_id="DEMO-1",
+        lab_id="demo",
+        steps=[
+            PlanStep(
+                id="s1",
+                action="probe",
+                detail="safe",
+                target="https://example.com",
+                lab_id="demo",
+            )
+        ],
+    )
+    calls: list[object] = []
+    monkeypatch.setattr(
+        "vuln2action.reproduction.executor.subprocess.run",
+        lambda *args, **kwargs: calls.append((args, kwargs)),
+    )
+    with pytest.raises(ValueError, match="non-local"):
+        ReproductionExecutor(
+            simulate=False,
+            allowed_hosts={"localhost", "127.0.0.1"},
+        ).execute(plan)
+    assert calls == []
+
+
 def test_generated_text_never_becomes_a_command():
     plan = ExecutionPlan(
         cve_id="DEMO-1",

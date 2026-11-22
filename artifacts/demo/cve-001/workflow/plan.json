@@ -1,0 +1,41 @@
+{
+  "cve_id": "CVE-2024-0001",
+  "lab_id": "cve-001",
+  "steps": [
+    {
+      "id": "lab-up",
+      "action": "Start isolated lab",
+      "detail": "Start lab cve-001 from its checked-in manifest.",
+      "target": "localhost",
+      "lab_id": "cve-001"
+    },
+    {
+      "id": "inspect",
+      "action": "Inspect target service",
+      "detail": "Confirm the expected demo version and localhost binding.",
+      "target": "localhost",
+      "lab_id": "cve-001"
+    },
+    {
+      "id": "probe",
+      "action": "Run benign validation probe",
+      "detail": "Inspect reflected-output encoding in the isolated XSS demo.",
+      "target": "localhost",
+      "lab_id": "cve-001"
+    },
+    {
+      "id": "validate",
+      "action": "Run lab validator",
+      "detail": "Collect the lab-specific vulnerable and patched verdicts.",
+      "target": "localhost",
+      "lab_id": "cve-001"
+    },
+    {
+      "id": "teardown",
+      "action": "Collect evidence and stop lab",
+      "detail": "Persist logs and stop only the selected lab.",
+      "target": "localhost",
+      "lab_id": "cve-001"
+    }
+  ]
+}

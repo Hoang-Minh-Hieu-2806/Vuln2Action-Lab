@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-11-22",
+  "source": {
+    "cve_ids": "src/vuln2action/connectors/reproduction.py:PAPER_HUMAN_EVAL_CVES",
+    "split_builder": "src/vuln2action/connectors/reproduction.py:make_splits",
+    "reference": "Kumari & Yadav, JISA 99 (2026) 104420, section 3(e), Table 6"
+  },
+  "status": "candidate-list-unverified-against-local-split",
+  "note": "The local dataset data/processed/reproduction/ is absent on this machine. The authoritative case list is splits.json['human_eval_20'] produced by make_splits; PAPER_HUMAN_EVAL_CVES may be padded deterministically when a CVE is outside the selected cutoff. Do not claim these 20 ids are the final split until splits.json is available and checked.",
+  "cve_ids": [
+    "CVE-2020-1472",
+    "CVE-2020-0796",
+    "CVE-2020-35848",
+    "CVE-2020-25079",
+    "CVE-2020-25078",
+    "CVE-2020-14060",
+    "CVE-2021-44228",
+    "CVE-2021-26855",
+    "CVE-2021-21972",
+    "CVE-2022-22536",
+    "CVE-2022-22965",
+    "CVE-2022-26134",
+    "CVE-2022-30190",
+    "CVE-2021-36942",
+    "CVE-2023-28252",
+    "CVE-2023-43643",
+    "CVE-2024-9463",
+    "CVE-2024-5910",
+    "CVE-2024-41713",
+    "CVE-2024-55550"
+  ],
+  "required_before_sending_to_reviewer": [
+    "Load data/processed/reproduction/splits.json and copy the exact human_eval_20 list into this manifest.",
+    "Generate or load the corresponding workflow outputs for each case.",
+    "Confirm each case has a CVE description and a CAPEC/flow reference where applicable.",
+    "Record the dataset SHA-256 and the checkpoint identifier used to produce the outputs."
+  ]
+}

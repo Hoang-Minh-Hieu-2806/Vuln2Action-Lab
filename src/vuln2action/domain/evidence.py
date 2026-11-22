@@ -22,4 +22,5 @@ class EvidenceBundle(BaseModel):
     generation: dict[str, Any] | None = None
     workflow: dict[str, Any] | None = None
     plan: dict[str, Any] | None = None
+    checkpoint_id: str | None = None
     validation_result: dict[str, Any] | None = None

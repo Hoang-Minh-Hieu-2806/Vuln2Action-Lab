@@ -32,6 +32,7 @@ class Workflow(BaseModel):
     context_summary: str = ""
     safety: str = "localhost lab only"
     lab_id: str = ""
+    checkpoint_id: str | None = None
 
 
 class ReproductionStatus(str, Enum):

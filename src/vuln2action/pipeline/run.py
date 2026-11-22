@@ -82,6 +82,7 @@ def run_pipeline(
     )
     collector.add_workflow(outcome.workflow)
     collector.add_plan(plan)
+    collector.add_checkpoint_id(outcome.workflow.checkpoint_id)
     for line in execution.log:
         collector.add_log(line)
     collector.add_result(result)

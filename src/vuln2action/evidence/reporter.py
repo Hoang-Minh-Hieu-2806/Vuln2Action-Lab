@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
+import copy
 import re
 from pathlib import Path
 from typing import Any
 
 from pydantic import BaseModel, ConfigDict
 
+from vuln2action.evidence.provenance import ProvenanceError, build_provenance, write_provenance
 from vuln2action.utils.filesystem import ensure_dir, repo_path, write_json
 
 
@@ -34,9 +36,30 @@ def save_report(
     if not root.is_absolute():
         root = repo_path(str(root))
     run_dir = ensure_dir(root / _safe_run_id(run_id))
-    json_path = write_json(run_dir / "report.json", payload)
+    try:
+        sidecar = write_provenance(run_dir, build_provenance(payload))
+    except Exception as exc:
+        raise ProvenanceError(
+            "WRITE_FAILED",
+            f"Provenance sidecar write failed; report not published: {exc}",
+        ) from exc
+    published = copy.deepcopy(payload)
+    evidence = published.get("evidence")
+    if isinstance(evidence, dict):
+        generation = evidence.get("generation")
+        if not isinstance(generation, dict):
+            generation = {}
+            evidence["generation"] = generation
+        generation["provenance_ref"] = sidecar.name
+    try:
+        json_path = write_json(run_dir / "report.json", published)
+    except Exception as exc:
+        raise RuntimeError(
+            f"Report write failed after sidecar {sidecar.name} was written "
+            f"(orphan sidecar kept): {exc}"
+        ) from exc
     markdown_path = run_dir / "report.md"
-    result = payload.get("result", {})
+    result = published.get("result", {})
     markdown_path.write_text(
         f"# Vuln2Action-Lab run: {run_id}\n\n"
         f"- Vulnerability: {payload.get('cve_id', '?')}\n"

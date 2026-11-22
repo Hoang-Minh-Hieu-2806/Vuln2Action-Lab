@@ -149,6 +149,7 @@ def flow_to_workflow(
     provider: str = "t5",
     lab_id: str = "",
     normalise: bool = True,
+    checkpoint_id: str | None = None,
 ) -> Workflow:
     """Convert generated text into the pipeline's typed Workflow.
 
@@ -193,6 +194,7 @@ def flow_to_workflow(
         context_summary=build_context_summary(contexts),
         safety=safety,
         steps=steps,
+        checkpoint_id=checkpoint_id,
     )
 
 
@@ -303,4 +305,5 @@ class T5Generator(GenerationProvider):
             contexts,
             provider=self.name,
             normalise=self.settings.normalise_output,
+            checkpoint_id=flow.checkpoint,
         )
