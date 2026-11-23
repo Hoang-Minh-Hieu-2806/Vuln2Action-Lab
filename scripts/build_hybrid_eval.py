@@ -170,7 +170,7 @@ def main(argv: list[str] | None = None) -> int:
     capecs = _load_capecs(_resolve(args.capec))
     predictions = _load_predictions(_resolve(args.predictions))
     references = _load_references(_resolve(args.reference))
-    base_rows = read_jsonl(base_file)
+    base_rows = list(read_jsonl(base_file))
     if args.limit is not None:
         base_rows = base_rows[: args.limit]
     if args.sample_size is not None and args.sample_size < len(base_rows):

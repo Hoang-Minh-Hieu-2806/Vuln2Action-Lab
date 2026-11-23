@@ -15,6 +15,7 @@ from vuln2action.domain import CapecRecord
 from vuln2action.mapping.corpus import capec_selection_text
 from vuln2action.mapping.ranking import best_candidate
 from vuln2action.retrieval.text import split_camel_case, tokenize
+from vuln2action.utils.vectors import mean_vector
 
 
 class Word2VecCapecSelector:
@@ -77,14 +78,7 @@ class Word2VecCapecSelector:
         return tuple(self._capec_ids)
 
     def _mean_vector(self, tokens: list[str]) -> np.ndarray | None:
-        vectors = [self.model.wv[token] for token in tokens if token in self.model.wv]
-        if not vectors:
-            return None
-        vector = np.mean(vectors, axis=0)
-        norm = float(np.linalg.norm(vector))
-        if norm == 0.0:
-            return None
-        return vector / norm
+        return mean_vector(self.model, tokens)
 
     def scores(self, query: str, candidate_ids: Iterable[str]) -> dict[str, float]:
         known = sorted(

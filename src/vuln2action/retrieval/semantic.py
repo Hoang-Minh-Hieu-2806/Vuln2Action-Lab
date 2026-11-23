@@ -19,6 +19,8 @@ from __future__ import annotations
 from collections.abc import Mapping
 from functools import lru_cache
 from pathlib import Path
+from threading import Lock
+from typing import Any
 from xml.etree import ElementTree
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -29,10 +31,50 @@ from vuln2action.retrieval.text import STOPWORDS, split_camel_case, tokenize
 from vuln2action.utils.filesystem import read_json, repo_path
 
 TRACKED_CONTEXT = ("data", "samples", "cwe_semantic_context.json")
-RAW_CWE = ("data", "raw", "cwe", "cwec_latest.xml")
-RAW_CAPEC = ("data", "raw", "capec", "capec_latest.xml")
 
 _STOP_WORDS = sorted(STOPWORDS)
+_SEMANTIC_CACHE: dict[tuple[tuple[str, ...], int, float], tuple[Any, Any, Any, Any]] = {}
+_SEMANTIC_LOCK = Lock()
+
+
+def clear_semantic_cache() -> None:
+    """Release fitted vectorizers; the next search rebuilds them from the corpus."""
+    with _SEMANTIC_LOCK:
+        _SEMANTIC_CACHE.clear()
+
+
+def _fitted_vectorizers(
+    texts: list[str],
+    name_weight: int,
+    char_weight: float,
+) -> tuple[Any, Any, Any, Any] | None:
+    key = (tuple(texts), name_weight, char_weight)
+    with _SEMANTIC_LOCK:
+        cached = _SEMANTIC_CACHE.get(key)
+        if cached is None:
+            try:
+                from sklearn.feature_extraction.text import TfidfVectorizer
+            except ImportError:
+                return None
+            word_vectorizer = TfidfVectorizer(
+                ngram_range=(1, 2),
+                sublinear_tf=True,
+                stop_words=_STOP_WORDS,
+                token_pattern=r"(?u)\b\w+\b",
+            )
+            char_vectorizer = TfidfVectorizer(
+                analyzer="char_wb",
+                ngram_range=(3, 5),
+                sublinear_tf=True,
+            )
+            cached = (
+                word_vectorizer,
+                char_vectorizer,
+                word_vectorizer.fit_transform(texts),
+                char_vectorizer.fit_transform(texts),
+            )
+            _SEMANTIC_CACHE[key] = cached
+        return cached
 
 
 class RelatedAttackPattern(BaseModel):
@@ -222,25 +264,16 @@ def _index_text(
 
 @lru_cache(maxsize=1)
 def default_semantic_enricher() -> SemanticEnricher:
-    """Load the tracked seed context and, when available, the full catalogs.
+    """Load only the tracked seed context.
 
-    The tracked file keeps CI and offline seed-corpus runs reproducible. Raw
-    CWE/CAPEC snapshots are optional and only read from disk; no network access
-    happens here.
+    Raw CWE/CAPEC snapshots are never discovered implicitly: an identical
+    commit must produce the same benchmark input on every machine. Explicit
+    corpus builders may call ``build_semantic_contexts`` with chosen paths.
     """
     contexts: dict[str, SemanticContext] = {}
     tracked = repo_path(*TRACKED_CONTEXT)
     if tracked.is_file():
         contexts.update(load_semantic_contexts(tracked))
-
-    cwe_path = repo_path(*RAW_CWE)
-    capec_path = repo_path(*RAW_CAPEC)
-    if cwe_path.is_file() and capec_path.is_file():
-        try:
-            contexts.update(build_semantic_contexts(cwe_path, capec_path))
-        except (OSError, ValueError, ElementTree.ParseError):
-            # A malformed/partial snapshot must not break offline retrieval.
-            pass
     return SemanticEnricher(contexts)
 
 
@@ -269,27 +302,15 @@ def semantic_search(
         for document in documents
     ]
 
-    try:
-        from sklearn.feature_extraction.text import TfidfVectorizer
-        from sklearn.metrics.pairwise import cosine_similarity
-    except ImportError:
+    cached = _fitted_vectorizers(texts, name_weight, char_weight)
+    if cached is None:
         from vuln2action.retrieval.keyword import keyword_search
 
         return keyword_search(split_camel_case(query), texts, top_k=top_k)
 
-    word_vectorizer = TfidfVectorizer(
-        ngram_range=(1, 2),
-        sublinear_tf=True,
-        stop_words=_STOP_WORDS,
-        token_pattern=r"(?u)\b\w+\b",
-    )
-    char_vectorizer = TfidfVectorizer(
-        analyzer="char_wb",
-        ngram_range=(3, 5),
-        sublinear_tf=True,
-    )
-    word_matrix = word_vectorizer.fit_transform(texts)
-    char_matrix = char_vectorizer.fit_transform(texts)
+    from sklearn.metrics.pairwise import cosine_similarity
+
+    word_vectorizer, char_vectorizer, word_matrix, char_matrix = cached
     word_scores = cosine_similarity(word_vectorizer.transform([query_text]), word_matrix)[0]
     char_scores = cosine_similarity(char_vectorizer.transform([query_text]), char_matrix)[0]
 

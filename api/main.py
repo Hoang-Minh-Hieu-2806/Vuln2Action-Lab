@@ -12,8 +12,10 @@ def create_app():
     if FastAPI is None:
         raise RuntimeError("Install the optional API dependencies: pip install -e .[api]")
     from api.routes import analysis, cve, reproduction, results
+    from vuln2action.config import load_settings
 
     application = FastAPI(title="Vuln2Action-Lab", version="0.2.0")
+    application.state.settings = load_settings()
     application.include_router(cve.router)
     application.include_router(analysis.router)
     application.include_router(reproduction.router)

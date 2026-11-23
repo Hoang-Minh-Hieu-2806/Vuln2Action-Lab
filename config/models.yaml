@@ -1,13 +1,12 @@
 # Generation provider configs. The pipeline selects via `default_provider`
 # in settings.yaml or --provider flag.
 providers:
-  rule_based:
-    enabled: true
-    # no external deps
+  rule_based: {}
+  # selected with --provider rule_based; no external deps
 
+  # stub: --provider llm raises a helpful error until implemented
+  # TODO: wire an OpenAI-compatible client.
   llm:
-    enabled: false
-    # TODO: wire an OpenAI-compatible client.
     api_base_env: LLM_API_BASE
     api_key_env: LLM_API_KEY
     model_env: LLM_MODEL
@@ -19,7 +18,6 @@ providers:
   # Nothing is downloaded unless allow_download is true or the checkpoint is
   # already present in the local Hugging Face cache.
   t5:
-    enabled: true
     base_checkpoint: t5-small
     # Path to a fine-tuned checkpoint produced by scripts/train_t5.py.
     # Empty = use base_checkpoint (untuned) as a smoke-test fallback.

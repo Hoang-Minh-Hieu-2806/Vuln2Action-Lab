@@ -70,10 +70,19 @@ def run_pipeline(
     collector.add_generation(
         {
             "provider": outcome.provider,
+            "retrieval_backend": selected_backend,
             "input": {
                 "cve_id": cve.cve_id,
                 "description": cve.description,
                 "context_sources": [context.source for context in outcome.contexts],
+                "context_items": [
+                    {
+                        "source": context.source,
+                        "score": context.score,
+                        "backend": context.backend,
+                    }
+                    for context in outcome.contexts
+                ],
             },
             "capec": outcome.capec.model_dump(mode="json") if outcome.capec else None,
             "capec_note": outcome.capec_note,

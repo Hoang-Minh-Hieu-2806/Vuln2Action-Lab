@@ -17,7 +17,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--stage",
         default="retrieval",
-        choices=["retrieval", "capec", "capec-independent", "generation", "reproduction"],
+        choices=["retrieval", "capec", "capec-independent", "generation"],
     )
     parser.add_argument("-h", "--help", action="store_true", dest="show_help")
     args, rest = parser.parse_known_args(argv)
@@ -40,8 +40,8 @@ def main(argv: list[str] | None = None) -> int:
     if args.show_help:
         parser.print_help()
         return 0
-    print(f"run_evaluation.py: stage '{args.stage}' is not implemented yet (Phase 7).")
-    return 0
+    parser.error(f"unsupported evaluation stage: {args.stage!r}")
+    return 2
 
 
 if __name__ == "__main__":

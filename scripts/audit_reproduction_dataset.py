@@ -53,14 +53,14 @@ def audit(dataset_dir: str | Path) -> dict[str, Any]:
     if missing:
         return {"ok": False, "errors": [f"missing output: {name}" for name in missing]}
 
-    cves = read_jsonl(root / "cves.jsonl")
+    cves = list(read_jsonl(root / "cves.jsonl"))
     cwes = read_json(root / "cwe.json")
     capecs = read_json(root / "capec.json")
-    cve_cwe = read_jsonl(root / "cve_cwe.jsonl")
-    cwe_capec = read_jsonl(root / "cwe_capec.jsonl")
-    candidates = read_jsonl(root / "cve_capec_candidates.jsonl")
-    references = read_jsonl(root / "cve2capec_reference.jsonl")
-    exploits = read_jsonl(root / "exploitdb.jsonl")
+    cve_cwe = list(read_jsonl(root / "cve_cwe.jsonl"))
+    cwe_capec = list(read_jsonl(root / "cwe_capec.jsonl"))
+    candidates = list(read_jsonl(root / "cve_capec_candidates.jsonl"))
+    references = list(read_jsonl(root / "cve2capec_reference.jsonl"))
+    exploits = list(read_jsonl(root / "exploitdb.jsonl"))
     splits = read_json(root / "splits.json")
     stats = read_json(root / "stats.json")
 

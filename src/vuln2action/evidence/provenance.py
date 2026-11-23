@@ -4,12 +4,12 @@ from __future__ import annotations
 
 import hashlib
 import json
-import os
-import tempfile
 from pathlib import Path
 from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
+
+from vuln2action.utils.filesystem import write_json
 
 NOT_AVAILABLE = "NOT_AVAILABLE"
 PROVENANCE_REF = "provenance.json"
@@ -105,22 +105,50 @@ def build_provenance(payload: dict[str, Any]) -> ProvenanceDocument:
     execution = _as_dict(payload.get("execution"))
     plan = _as_dict(payload.get("plan"))
     generation_input = _as_dict(generation.get("input"))
-    sources = generation_input.get("context_sources")
+    backend = generation.get("retrieval_backend")
+    backend = backend if isinstance(backend, str) else NOT_AVAILABLE
     items = []
-    if isinstance(sources, list):
-        for rank, source in enumerate(sources, start=1):
-            if isinstance(source, str):
-                items.append(
-                    {
-                        "rank": rank,
-                        "document_id": source,
-                        "source": source,
-                        "document_kind": NOT_AVAILABLE,
-                        "source_url": NOT_AVAILABLE,
-                        "retrieval_score": NOT_AVAILABLE,
-                        "context_backend": NOT_AVAILABLE,
-                    }
-                )
+    context_items = generation_input.get("context_items")
+    if isinstance(context_items, list):
+        for rank, item in enumerate(context_items, start=1):
+            if not isinstance(item, dict):
+                continue
+            source = item.get("source")
+            if not isinstance(source, str):
+                continue
+            score = item.get("score")
+            if isinstance(score, bool) or not isinstance(score, (int, float)):
+                score = NOT_AVAILABLE
+            item_backend = item.get("backend")
+            if not isinstance(item_backend, str):
+                item_backend = NOT_AVAILABLE
+            items.append(
+                {
+                    "rank": rank,
+                    "document_id": source,
+                    "source": source,
+                    "document_kind": NOT_AVAILABLE,
+                    "source_url": NOT_AVAILABLE,
+                    "retrieval_score": score,
+                    "context_backend": item_backend,
+                }
+            )
+    else:
+        sources = generation_input.get("context_sources")
+        if isinstance(sources, list):
+            for rank, source in enumerate(sources, start=1):
+                if isinstance(source, str):
+                    items.append(
+                        {
+                            "rank": rank,
+                            "document_id": source,
+                            "source": source,
+                            "document_kind": NOT_AVAILABLE,
+                            "source_url": NOT_AVAILABLE,
+                            "retrieval_score": NOT_AVAILABLE,
+                            "context_backend": NOT_AVAILABLE,
+                        }
+                    )
     provider = generation.get("provider")
     checkpoint = evidence.get("checkpoint_id")
     if checkpoint is None:
@@ -140,7 +168,7 @@ def build_provenance(payload: dict[str, Any]) -> ProvenanceDocument:
             "lab_id": plan.get("lab_id"),
         }
     return ProvenanceDocument(
-        retrieval=RetrievalTrace(backend=NOT_AVAILABLE, query_fingerprint=None, items=items),
+        retrieval=RetrievalTrace(backend=backend, query_fingerprint=None, items=items),
         generation=GenerationTrace(
             provider=provider if isinstance(provider, str) else NOT_AVAILABLE,
             generation_mode=provider if isinstance(provider, str) else NOT_AVAILABLE,
@@ -164,17 +192,7 @@ def write_provenance(run_dir: str | Path, document: ProvenanceDocument) -> Path:
     content.pop(_INTEGRITY_KEY, None)
     document.integrity = Integrity(content_sha256=_digest(content))
     final_path = directory / PROVENANCE_REF
-    descriptor, temporary = tempfile.mkstemp(prefix=".provenance-", suffix=".tmp", dir=directory)
-    try:
-        with os.fdopen(descriptor, "w", encoding="utf-8") as handle:
-            json.dump(document.model_dump(mode="json"), handle, indent=2, ensure_ascii=False)
-            handle.flush()
-            os.fsync(handle.fileno())
-        os.replace(temporary, final_path)
-    except BaseException:
-        Path(temporary).unlink(missing_ok=True)
-        raise
-    return final_path
+    return write_json(final_path, document.model_dump(mode="json"))
 
 
 def _reference(payload: dict[str, Any] | None) -> str | None:

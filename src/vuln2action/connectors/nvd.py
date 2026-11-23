@@ -235,6 +235,7 @@ def _cpe_criteria(configurations: Any) -> list[str]:
             if criteria and match.get("vulnerable", True) and criteria not in found:
                 found.append(criteria)
         walk(node.get("nodes") or [])
+        walk(node.get("children") or [])
 
     walk(configurations)
     return found

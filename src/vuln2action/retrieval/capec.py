@@ -32,6 +32,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from vuln2action.retrieval.text import STOPWORDS, split_camel_case, tokenize
 from vuln2action.utils.filesystem import repo_path
+from vuln2action.utils.vectors import mean_vector
 
 RAW_CAPEC = ("data", "raw", "capec", "capec_latest.xml")
 
@@ -324,17 +325,6 @@ def train_word2vec(
     )
 
 
-def _mean_vector(model, text: str):
-    import numpy as np
-
-    tokens = [token for token in tokenize(split_camel_case(text)) if token in model.wv]
-    if not tokens:
-        return None
-    vector = np.mean([model.wv[token] for token in tokens], axis=0)
-    norm = float(np.linalg.norm(vector))
-    return vector / norm if norm else None
-
-
 def word2vec_cosine_scores(
     query: str,
     index: CapecIndex,
@@ -351,12 +341,14 @@ def word2vec_cosine_scores(
     if not candidate_ids:
         return []
     active_model = model if model is not None else train_word2vec(index)
-    query_vector = _mean_vector(active_model, query)
+    query_vector = mean_vector(active_model, tokenize(split_camel_case(query)))
     if query_vector is None:
         return [(cid, 0.0) for cid in candidate_ids]
     scored: list[tuple[str, float]] = []
     for capec_id in candidate_ids:
-        document_vector = _mean_vector(active_model, index.text_for(capec_id, name_weight))
+        document_vector = mean_vector(
+            active_model, tokenize(split_camel_case(index.text_for(capec_id, name_weight)))
+        )
         if document_vector is None:
             scored.append((capec_id, 0.0))
             continue

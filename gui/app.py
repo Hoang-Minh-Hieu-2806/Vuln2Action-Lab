@@ -87,7 +87,14 @@ def create_app(
     technique_map_path: str | Path | None = None,
 ) -> Flask:
     root = Path(dataset_dir)
-    dataset = load_selection_dataset(root)
+    try:
+        dataset = load_selection_dataset(root)
+    except FileNotFoundError as exc:
+        raise RuntimeError(
+            f"GUI dataset is incomplete at {root}: {exc}. "
+            "Run scripts/build_reproduction_dataset.py to create it, "
+            "or pass dataset_dir= to create_app(). No data is downloaded automatically."
+        ) from exc
     predictions_file = (
         Path(predictions_path)
         if predictions_path is not None

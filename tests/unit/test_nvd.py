@@ -202,3 +202,120 @@ def test_save_nvd_snapshot_writes_json(tmp_path):
     path = save_nvd_snapshot({"vulnerabilities": []}, out_dir=tmp_path, name="snap")
     assert path.name == "snap.json"
     assert '"vulnerabilities"' in path.read_text(encoding="utf-8")
+
+
+def test_parse_nvd_cve_collects_cpe_from_nested_configuration_children():
+    record = parse_nvd_cve(
+        {
+            "id": "CVE-2022-0001",
+            "descriptions": [{"lang": "en", "value": "nested configuration"}],
+            "configurations": [
+                {
+                    "nodes": [
+                        {
+                            "operator": "AND",
+                            "children": [
+                                {
+                                    "cpeMatch": [
+                                        {
+                                            "vulnerable": True,
+                                            "criteria": "cpe:2.3:a:acme:widget:1.0:*:*:*:*:*:*:*",
+                                        }
+                                    ]
+                                }
+                            ],
+                        }
+                    ]
+                }
+            ],
+        }
+    )
+    assert record.cpe == ["cpe:2.3:a:acme:widget:1.0:*:*:*:*:*:*:*"]
+
+
+def test_parse_nvd_cpe_without_children_keeps_top_level_matches():
+    record = parse_nvd_cve(
+        {
+            "id": "CVE-2022-0002",
+            "descriptions": [{"lang": "en", "value": "flat configuration"}],
+            "configurations": [
+                {
+                    "nodes": [
+                        {
+                            "cpeMatch": [
+                                {"vulnerable": True, "criteria": "cpe:2.3:a:flat:app:1:*:*:*:*:*:*:*"},
+                                {"vulnerable": False, "criteria": "cpe:2.3:a:flat:not-affected:1:*:*:*:*:*:*:*"},
+                            ]
+                        }
+                    ]
+                }
+            ],
+        }
+    )
+    assert record.cpe == ["cpe:2.3:a:flat:app:1:*:*:*:*:*:*:*"]
+
+
+def test_parse_nvd_cpe_deduplicates_across_nodes_and_deep_children():
+    criteria = "cpe:2.3:a:acme:shared:2:*:*:*:*:*:*:*"
+    record = parse_nvd_cve(
+        {
+            "id": "CVE-2022-0003",
+            "descriptions": [{"lang": "en", "value": "deep configuration"}],
+            "configurations": [
+                {
+                    "nodes": [
+                        {
+                            "cpeMatch": [{"vulnerable": True, "criteria": criteria}],
+                            "children": [
+                                {
+                                    "children": [
+                                        {
+                                            "cpeMatch": [{"vulnerable": True, "criteria": criteria}]
+                                        }
+                                    ]
+                                }
+                            ],
+                        }
+                    ]
+                }
+            ],
+        }
+    )
+    assert record.cpe == [criteria]
+
+
+def test_parse_nvd_cpe_preserves_traversal_order_across_nodes_and_children():
+    record = parse_nvd_cve(
+        {
+            "id": "CVE-2022-0004",
+            "descriptions": [{"lang": "en", "value": "ordered configuration"}],
+            "configurations": [
+                {
+                    "nodes": [
+                        {
+                            "cpeMatch": [
+                                {"vulnerable": True, "criteria": "cpe:2.3:a:order:first:1:*:*:*:*:*:*:*"}
+                            ],
+                            "children": [
+                                {
+                                    "cpeMatch": [
+                                        {"vulnerable": True, "criteria": "cpe:2.3:a:order:second:1:*:*:*:*:*:*:*"}
+                                    ]
+                                }
+                            ],
+                        },
+                        {
+                            "cpeMatch": [
+                                {"vulnerable": True, "criteria": "cpe:2.3:a:order:third:1:*:*:*:*:*:*:*"}
+                            ]
+                        },
+                    ]
+                }
+            ],
+        }
+    )
+    assert record.cpe == [
+        "cpe:2.3:a:order:first:1:*:*:*:*:*:*:*",
+        "cpe:2.3:a:order:second:1:*:*:*:*:*:*:*",
+        "cpe:2.3:a:order:third:1:*:*:*:*:*:*:*",
+    ]

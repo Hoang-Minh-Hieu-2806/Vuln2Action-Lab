@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 try:
     import yaml
@@ -52,7 +52,6 @@ class T5ProviderSettings(BaseModel):
     """
 
     model_config = ConfigDict(extra="forbid")
-    enabled: bool = False
     base_checkpoint: str = "t5-small"
     checkpoint: str = ""
     max_input_length: int = Field(default=512, ge=1)
@@ -75,7 +74,7 @@ class T5ProviderSettings(BaseModel):
 
 class GenerationProvidersSettings(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    rule_based: dict[str, object] = Field(default_factory=lambda: {"enabled": True})
+    rule_based: dict[str, object] = Field(default_factory=dict)
     llm: dict[str, object] = Field(default_factory=dict)
     t5: T5ProviderSettings = Field(default_factory=T5ProviderSettings)
 
@@ -116,4 +115,12 @@ def load_settings(path: str | Path | None = None) -> ApplicationSettings:
 def load_model_settings(path: str | Path | None = None) -> GenerationSettings:
     """Load ``config/models.yaml`` (generation provider settings only)."""
     config_path = Path(path) if path else project_root() / "config" / "models.yaml"
-    return GenerationSettings.model_validate(load_yaml(config_path))
+    try:
+        return GenerationSettings.model_validate(load_yaml(config_path))
+    except ValidationError as exc:
+        if "enabled" in str(exc):
+            raise ValueError(
+                f"{config_path}: legacy 'enabled' provider flags are no longer supported; "
+                "remove them and select a provider with --provider or default_provider"
+            ) from exc
+        raise

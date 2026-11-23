@@ -24,8 +24,10 @@ retrieval-context:
 lint:
 	python -m compileall -q src api scripts tests evaluation
 
+# Removes only generated caches: __pycache__, src/__pycache__, .pytest_cache.
+# Never deletes results/, artifacts/, reports/ or any research evidence.
 clean:
-	rm -rf __pycache__ src/__pycache__ .pytest_cache results/*
+	rm -rf __pycache__ src/__pycache__ .pytest_cache
 
 docker-up:
 	docker compose up -d --build

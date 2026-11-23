@@ -32,8 +32,14 @@ def select_validation_command(
 
 
 def is_allowed_target(target: str, allowed_hosts: set[str] | None = None) -> bool:
-    allowed = allowed_hosts or {"localhost", "127.0.0.1", "lab", "local"}
-    return (target or "").strip().lower() in {host.lower() for host in allowed}
+    if allowed_hosts is None:
+        allowed_hosts = {"localhost", "127.0.0.1", "lab", "local"}
+    allowed = {
+        host.strip().lower()
+        for host in allowed_hosts
+        if isinstance(host, str) and host.strip()
+    }
+    return (target or "").strip().lower() in allowed
 
 
 def parse_validation_output(stdout: str) -> dict[str, object] | None:

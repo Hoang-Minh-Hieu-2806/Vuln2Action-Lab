@@ -3,6 +3,9 @@
 from __future__ import annotations
 
 import json
+import os
+import tempfile
+from collections.abc import Iterator
 from pathlib import Path
 from typing import Any
 
@@ -23,8 +26,18 @@ def read_json(path: str | Path) -> Any:
 def write_json(path: str | Path, data: Any, indent: int = 2) -> Path:
     resolved = Path(path)
     resolved.parent.mkdir(parents=True, exist_ok=True)
-    with resolved.open("w", encoding="utf-8") as handle:
-        json.dump(data, handle, indent=indent, ensure_ascii=False)
+    descriptor, temporary = tempfile.mkstemp(
+        prefix=f".{resolved.name}.", suffix=".tmp", dir=resolved.parent
+    )
+    try:
+        with os.fdopen(descriptor, "w", encoding="utf-8") as handle:
+            json.dump(data, handle, indent=indent, ensure_ascii=False)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temporary, resolved)
+    except BaseException:
+        Path(temporary).unlink(missing_ok=True)
+        raise
     return resolved
 
 
@@ -37,9 +50,11 @@ def write_jsonl(path: str | Path, rows: list[dict[str, Any]]) -> Path:
     return resolved
 
 
-def read_jsonl(path: str | Path) -> list[dict[str, Any]]:
+def read_jsonl(path: str | Path) -> Iterator[dict[str, Any]]:
     with Path(path).open(encoding="utf-8") as handle:
-        return [json.loads(line) for line in handle if line.strip()]
+        for line in handle:
+            if line.strip():
+                yield json.loads(line)
 
 
 def repo_path(*parts: str) -> Path:

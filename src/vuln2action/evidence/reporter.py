@@ -20,6 +20,12 @@ class ReportPaths(BaseModel):
     markdown_path: str
 
 
+def _md_inline(value: object) -> str:
+    text = str(value).replace("\\", "\\\\").replace("`", "\\`")
+    text = text.replace("|", "\\|").replace("\n", " ").replace("\r", " ")
+    return text.replace("<", "&lt;").replace(">", "&gt;")
+
+
 def _safe_run_id(run_id: str) -> str:
     safe = re.sub(r"[^A-Za-z0-9_.-]+", "-", run_id.strip()).strip(".-")
     if not safe:
@@ -31,11 +37,19 @@ def save_report(
     run_id: str,
     payload: dict[str, Any],
     output_dir: str | Path = "results",
+    *,
+    overwrite: bool = False,
 ) -> ReportPaths:
     root = Path(output_dir)
     if not root.is_absolute():
         root = repo_path(str(root))
-    run_dir = ensure_dir(root / _safe_run_id(run_id))
+    run_dir = root / _safe_run_id(run_id)
+    if (run_dir / "report.json").exists() and not overwrite:
+        raise FileExistsError(
+            f"Report already exists at {run_dir / 'report.json'}; "
+            "choose a new run id or pass overwrite=True explicitly"
+        )
+    ensure_dir(run_dir)
     try:
         sidecar = write_provenance(run_dir, build_provenance(payload))
     except Exception as exc:
@@ -61,10 +75,10 @@ def save_report(
     markdown_path = run_dir / "report.md"
     result = published.get("result", {})
     markdown_path.write_text(
-        f"# Vuln2Action-Lab run: {run_id}\n\n"
-        f"- Vulnerability: {payload.get('cve_id', '?')}\n"
-        f"- Provider: {payload.get('provider', '?')}\n"
-        f"- Verdict: **{result.get('status', 'UNKNOWN')}**\n\n"
+        f"# Vuln2Action-Lab run: {_md_inline(run_id)}\n\n"
+        f"- Vulnerability: {_md_inline(payload.get('cve_id', '?'))}\n"
+        f"- Provider: {_md_inline(payload.get('provider', '?'))}\n"
+        f"- Verdict: **{_md_inline(result.get('status', 'UNKNOWN'))}**\n\n"
         "The JSON report contains the complete typed evidence bundle.\n",
         encoding="utf-8",
     )
