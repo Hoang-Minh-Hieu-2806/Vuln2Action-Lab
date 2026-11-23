@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
@@ -211,7 +211,16 @@ def _reference(payload: dict[str, Any] | None) -> str | None:
 
 def _resolve_reference(run_dir: str | Path, reference: str) -> Path:
     candidate = Path(reference)
-    if not reference or candidate.is_absolute() or candidate.drive or ".." in candidate.parts:
+    windows = PureWindowsPath(reference)
+    if (
+        not reference
+        or candidate.is_absolute()
+        or candidate.drive
+        or windows.drive
+        or windows.root
+        or ".." in candidate.parts
+        or ".." in windows.parts
+    ):
         raise ProvenanceError("INVALID_REF", f"Refusing provenance reference: {reference!r}")
     resolved = (Path(run_dir) / candidate).resolve()
     if not resolved.is_relative_to(Path(run_dir).resolve()):

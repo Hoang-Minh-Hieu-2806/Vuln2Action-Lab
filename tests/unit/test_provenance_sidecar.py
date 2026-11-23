@@ -81,7 +81,15 @@ def test_missing_sidecar_reports_clear_error(tmp_path):
     assert exc.value.code == "MISSING"
 
 
-@pytest.mark.parametrize("reference", ["../provenance.json", "C:\\outside\\provenance.json"])
+@pytest.mark.parametrize(
+    "reference",
+    [
+        "../provenance.json",
+        "..\\provenance.json",
+        "C:\\outside\\provenance.json",
+        "\\\\server\\share\\provenance.json",
+    ],
+)
 def test_invalid_reference_is_rejected(tmp_path, reference):
     payload = _payload()
     payload["evidence"]["generation"]["provenance_ref"] = reference
