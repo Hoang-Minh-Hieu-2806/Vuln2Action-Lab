@@ -54,9 +54,7 @@ def test_capec_score_is_not_used_as_retrieval_score():
 def test_missing_backend_metadata_stays_unavailable():
     generation = {
         "provider": "rule_based",
-        "input": {
-            "context_items": [{"source": "CWE-79", "score": None, "backend": None}]
-        },
+        "input": {"context_items": [{"source": "CWE-79", "score": None, "backend": None}]},
     }
     document = build_provenance(_payload(generation))
     assert document.retrieval.backend == NOT_AVAILABLE

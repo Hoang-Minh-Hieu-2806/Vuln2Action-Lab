@@ -27,9 +27,7 @@ def test_raw_xml_files_do_not_change_default_enricher(tmp_path, monkeypatch):
         SEED.read_text(encoding="utf-8"), encoding="utf-8"
     )
     (tmp_path / "data" / "raw" / "cwe").mkdir(parents=True)
-    (tmp_path / "data" / "raw" / "cwe" / "cwec_latest.xml").write_text(
-        RAW_CWE, encoding="utf-8"
-    )
+    (tmp_path / "data" / "raw" / "cwe" / "cwec_latest.xml").write_text(RAW_CWE, encoding="utf-8")
     (tmp_path / "data" / "raw" / "capec").mkdir(parents=True)
     (tmp_path / "data" / "raw" / "capec" / "capec_latest.xml").write_text(
         RAW_CAPEC, encoding="utf-8"

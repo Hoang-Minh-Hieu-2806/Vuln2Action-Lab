@@ -243,8 +243,14 @@ def test_parse_nvd_cpe_without_children_keeps_top_level_matches():
                     "nodes": [
                         {
                             "cpeMatch": [
-                                {"vulnerable": True, "criteria": "cpe:2.3:a:flat:app:1:*:*:*:*:*:*:*"},
-                                {"vulnerable": False, "criteria": "cpe:2.3:a:flat:not-affected:1:*:*:*:*:*:*:*"},
+                                {
+                                    "vulnerable": True,
+                                    "criteria": "cpe:2.3:a:flat:app:1:*:*:*:*:*:*:*",
+                                },
+                                {
+                                    "vulnerable": False,
+                                    "criteria": "cpe:2.3:a:flat:not-affected:1:*:*:*:*:*:*:*",
+                                },
                             ]
                         }
                     ]
@@ -269,9 +275,7 @@ def test_parse_nvd_cpe_deduplicates_across_nodes_and_deep_children():
                             "children": [
                                 {
                                     "children": [
-                                        {
-                                            "cpeMatch": [{"vulnerable": True, "criteria": criteria}]
-                                        }
+                                        {"cpeMatch": [{"vulnerable": True, "criteria": criteria}]}
                                     ]
                                 }
                             ],
@@ -294,19 +298,28 @@ def test_parse_nvd_cpe_preserves_traversal_order_across_nodes_and_children():
                     "nodes": [
                         {
                             "cpeMatch": [
-                                {"vulnerable": True, "criteria": "cpe:2.3:a:order:first:1:*:*:*:*:*:*:*"}
+                                {
+                                    "vulnerable": True,
+                                    "criteria": "cpe:2.3:a:order:first:1:*:*:*:*:*:*:*",
+                                }
                             ],
                             "children": [
                                 {
                                     "cpeMatch": [
-                                        {"vulnerable": True, "criteria": "cpe:2.3:a:order:second:1:*:*:*:*:*:*:*"}
+                                        {
+                                            "vulnerable": True,
+                                            "criteria": "cpe:2.3:a:order:second:1:*:*:*:*:*:*:*",
+                                        }
                                     ]
                                 }
                             ],
                         },
                         {
                             "cpeMatch": [
-                                {"vulnerable": True, "criteria": "cpe:2.3:a:order:third:1:*:*:*:*:*:*:*"}
+                                {
+                                    "vulnerable": True,
+                                    "criteria": "cpe:2.3:a:order:third:1:*:*:*:*:*:*:*",
+                                }
                             ]
                         },
                     ]

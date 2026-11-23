@@ -35,9 +35,7 @@ def is_allowed_target(target: str, allowed_hosts: set[str] | None = None) -> boo
     if allowed_hosts is None:
         allowed_hosts = {"localhost", "127.0.0.1", "lab", "local"}
     allowed = {
-        host.strip().lower()
-        for host in allowed_hosts
-        if isinstance(host, str) and host.strip()
+        host.strip().lower() for host in allowed_hosts if isinstance(host, str) and host.strip()
     }
     return (target or "").strip().lower() in allowed
 

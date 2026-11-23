@@ -22,9 +22,7 @@ def test_tracked_model_settings_load_without_enabled_flags():
 
 def test_unknown_enabled_flag_is_rejected():
     with pytest.raises(ValidationError):
-        ApplicationSettings.model_validate(
-            {"generation": {"providers": {"t5": {"enabled": True}}}}
-        )
+        ApplicationSettings.model_validate({"generation": {"providers": {"t5": {"enabled": True}}}})
 
 
 @pytest.mark.parametrize(

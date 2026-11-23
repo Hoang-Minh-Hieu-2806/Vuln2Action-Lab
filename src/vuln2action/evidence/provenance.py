@@ -87,7 +87,9 @@ class ProvenanceDocument(BaseModel):
 
 
 def _canonical(payload: dict[str, Any]) -> bytes:
-    return json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+    return json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode(
+        "utf-8"
+    )
 
 
 def _digest(payload: dict[str, Any]) -> str:
@@ -213,7 +215,9 @@ def _resolve_reference(run_dir: str | Path, reference: str) -> Path:
         raise ProvenanceError("INVALID_REF", f"Refusing provenance reference: {reference!r}")
     resolved = (Path(run_dir) / candidate).resolve()
     if not resolved.is_relative_to(Path(run_dir).resolve()):
-        raise ProvenanceError("INVALID_REF", f"Provenance reference escapes run directory: {reference!r}")
+        raise ProvenanceError(
+            "INVALID_REF", f"Provenance reference escapes run directory: {reference!r}"
+        )
     return resolved
 
 
@@ -238,11 +242,15 @@ def read_provenance(
     try:
         document = ProvenanceDocument.model_validate(data)
     except ValidationError as exc:
-        raise ProvenanceError("INVALID_SCHEMA", f"Provenance sidecar schema invalid: {exc}") from exc
+        raise ProvenanceError(
+            "INVALID_SCHEMA", f"Provenance sidecar schema invalid: {exc}"
+        ) from exc
     if document.integrity is None or not document.integrity.content_sha256:
         raise ProvenanceError("MISSING_DIGEST", "Provenance sidecar has no content digest")
     content = document.model_dump(mode="json")
     content.pop(_INTEGRITY_KEY, None)
     if document.integrity.content_sha256 != _digest(content):
-        raise ProvenanceError("DIGEST_MISMATCH", "Provenance sidecar digest does not match its content")
+        raise ProvenanceError(
+            "DIGEST_MISMATCH", "Provenance sidecar digest does not match its content"
+        )
     return document

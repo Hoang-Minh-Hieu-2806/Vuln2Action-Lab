@@ -81,5 +81,7 @@ def test_concurrent_searches_are_stable():
     query = documents[3].name
     expected = semantic_search(query, documents, top_k=3)
     with ThreadPoolExecutor(max_workers=8) as executor:
-        results = list(executor.map(lambda _: semantic_search(query, documents, top_k=3), range(16)))
+        results = list(
+            executor.map(lambda _: semantic_search(query, documents, top_k=3), range(16))
+        )
     assert all(result == expected for result in results)
