@@ -1,0 +1,14 @@
+{
+  "simulated": true,
+  "completed": true,
+  "log": [
+    "[SIM] lab-up: Start isolated lab (localhost)",
+    "[SIM] inspect: Inspect target service (localhost)",
+    "[SIM] probe: Run benign validation probe (localhost)",
+    "[SIM] validate: Run lab validator (localhost)",
+    "[SIM] teardown: Collect evidence and stop lab (localhost)"
+  ],
+  "steps_executed": 5,
+  "error": null,
+  "validation": null
+}

@@ -1,0 +1,12 @@
+{
+  "exit_code_zero": true,
+  "stderr_empty": true,
+  "cve_id": true,
+  "provider_rule_based": true,
+  "status_simulated": true,
+  "execution_simulated": true,
+  "provenance_ref_matches": true,
+  "report_md_exists": true,
+  "provenance_digest_valid": true,
+  "all_pass": true
+}

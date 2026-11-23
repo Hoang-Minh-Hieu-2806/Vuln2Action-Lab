@@ -1,0 +1,17 @@
+{
+  "cve_id": "CVE-2024-0001",
+  "lab_id": "cve-001",
+  "status": "SIMULATED",
+  "steps_executed": 5,
+  "details": "Plan was simulated; no vulnerability claim was validated.",
+  "evidence": {
+    "execution_log": [
+      "[SIM] lab-up: Start isolated lab (localhost)",
+      "[SIM] inspect: Inspect target service (localhost)",
+      "[SIM] probe: Run benign validation probe (localhost)",
+      "[SIM] validate: Run lab validator (localhost)",
+      "[SIM] teardown: Collect evidence and stop lab (localhost)"
+    ]
+  },
+  "timestamp": "2026-11-23T08:00:41.198662+00:00"
+}

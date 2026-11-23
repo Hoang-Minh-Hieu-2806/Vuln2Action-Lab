@@ -1,0 +1,29 @@
+[
+  {
+    "cve_id": "CVE-2024-0001",
+    "description": "SAMPLE (fake): Example reflected cross-site scripting in FakeApp search endpoint via unsanitised q parameter.",
+    "cvss": 6.1,
+    "cwe": ["CWE-79"],
+    "cpe": ["cpe:2.3:a:fakevendor:fakeapp:1.0:*:*:*:*:*:*:*"],
+    "references": ["https://example.com/fake-advisory-0001"],
+    "lab_id": "cve-001"
+  },
+  {
+    "cve_id": "CVE-2024-0002",
+    "description": "SAMPLE (fake): Example SQL injection in FakeShop login form allows authentication bypass with crafted username input.",
+    "cvss": 9.8,
+    "cwe": ["CWE-89"],
+    "cpe": ["cpe:2.3:a:fakevendor:fakeshop:2.3:*:*:*:*:*:*:*"],
+    "references": ["https://example.com/fake-advisory-0002"],
+    "lab_id": "cve-002"
+  },
+  {
+    "cve_id": "CVE-2024-0003",
+    "description": "SAMPLE (fake): Example path traversal in FakeFiles download handler permits reading files outside the intended directory.",
+    "cvss": 7.5,
+    "cwe": ["CWE-22"],
+    "cpe": ["cpe:2.3:a:fakevendor:fakefiles:0.9:*:*:*:*:*:*:*"],
+    "references": ["https://example.com/fake-advisory-0003"],
+    "lab_id": "cve-003"
+  }
+]

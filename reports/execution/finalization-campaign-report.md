@@ -126,7 +126,8 @@ configuration was changed.
 
 1. Kaggle final artifact/metrics unavailable; no BLEU/ROUGE computed or invented.
 2. Docker lab validation not executed (explicit constraint); demo is simulated only.
-3. GUI full startup blocked by missing `data/processed/reproduction`.
+3. Full 55k GUI still blocked by missing production dataset; a local demo-only
+   fixture now makes the GUI routes work for rehearsal.
 4. Human evaluation blocked by missing `splits.json` and no advisor contact.
 5. `credential-manager-core` warning remains in global git config (not touched).
 
@@ -153,3 +154,25 @@ No commit or push.
    defend the engineering and caveated negative-result story, but must not claim
    full paper reproduction, three-expert human evaluation, 50 epochs, or T5
    fine-tuned effectiveness without artifacts.
+
+## Post-finalization additions (while waiting for Kaggle)
+
+- **GUI fixture:** `data/processed/reproduction/` was created from tracked
+  `sample_cves.json` plus the local CAPEC catalog (3 CVEs, 615 CAPEC records).
+  `DEMO_FIXTURE.md` marks it demo-only; `cve2capec_reference.jsonl` is empty and
+  no predictions/technique map were fabricated. Verified `/`, `/health` and
+  `/api/analyze` all return 200; `selected_capec_id=CAPEC-591`.
+- **Rehearsal demo #2:** `rehearsal-cve001-20261123T080038Z`, exit 0, `SIMULATED`,
+  `consistency.json` all true, 14 SHA-256 entries, both screenshots generated.
+- **Limitations slide:** `docs/defense/limitations-slide.md` keeps the four
+  readiness dimensions separate and lists forbidden claims.
+- **Automation added:** `tests/unit/test_gui_fixture.py` builds its own fixture in
+  `tmp_path` and passes; `scripts/prepare_human_eval.py` and
+  `scripts/build_group_split.py` were written but intentionally not run on real
+  data. Neither fills scores nor edits the source dataset.
+- **Full-repo lint:** fixed 5 pre-existing `labs/` warnings (2 unused `noqa`,
+  3 missing explicit `check=False`); `ruff check .` and `ruff format --check .`
+  are now clean across 250 files.
+- **Kaggle monitor:** last observed `RUNNING`, GPU 30.41/30h, remaining 0, logs
+  empty. No output downloaded, no kernel interaction.
+- These additions are uncommitted; no commit or push was made.
