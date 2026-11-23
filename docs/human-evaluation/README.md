@@ -6,6 +6,8 @@ Files:
 - `protocol.md` — rubric, flags, aggregation, safety instructions.
 - `reviewer-form.md` — one block per case, separate reference section.
 - `cases.json` — candidate list of 20 CVE ids with provenance.
+- `sampling-and-data-format.md` — authoritative sampling, JSONL schema and
+  advisor instructions. No scores are filled.
 
 ## Why it is not sendable yet
 

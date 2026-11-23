@@ -58,3 +58,18 @@ assign groups -> train/validation/test with fixed seed
 assert group_ids(train) & group_ids(validation) == empty
 assert group_ids(train | validation) & group_ids(test) == empty
 ```
+
+## Metrics to report after a future split
+
+- Leakage counts before training: exact-normalised duplicate count,
+  near-duplicate pair count at ratio >= 0.85, and CVE overlap for every split
+  pair. All must be zero after grouping.
+- Group-disjoint assertions: `train ∩ validation`, `train ∩ test` and
+  `validation ∩ test` are empty; store the assertions with the split manifest.
+- Generation quality: BLEU and ROUGE on the group-disjoint test set, plus
+  exact-target match rate and distinct-target coverage. Do not average across
+  CVE-only, gold-CAPEC-conditioned and hybrid conditions into one headline.
+- Reproducibility: record seed, normalisation rules, near-duplicate threshold,
+  manifest SHA-256 and the dataset SHA-256 next to the model artifact.
+- Decision rule: the test set is used once, after checkpoint and decoding
+  choices are frozen. Any reuse must be disclosed as tuning, not held-out.

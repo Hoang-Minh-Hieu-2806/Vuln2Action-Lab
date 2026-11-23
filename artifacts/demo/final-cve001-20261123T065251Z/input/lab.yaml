@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "lab_id": "cve-001",
+  "vulnerability_id": "CVE-2024-0001",
+  "kind": "demo",
+  "status": "ready",
+  "compose_file": "docker-compose.yml",
+  "allowed_hosts": ["localhost", "127.0.0.1"],
+  "setup_command": ["python", "validation/labctl.py", "up"],
+  "validation_command": ["python", "validation/labctl.py", "validate"],
+  "actions": {
+    "probe": ["python", "validation/labctl.py", "validate"],
+    "validate": ["python", "validation/labctl.py", "validate"]
+  },
+  "teardown_command": ["python", "validation/labctl.py", "down"],
+  "has_patched_counterfactual": true
+}

@@ -444,3 +444,14 @@ or counted as PASS. No commit or push occurred.
 | Kaggle artifact / training | BLOCKED (explicit constraint) |
 | Full-repo Ruff labs warnings | DEFERRED (pre-existing, out of CI scope) |
 | mean_vector / dead harness / read_jsonl | NOT_APPLICABLE (already resolved in prior audit) |
+
+### CI fix follow-up (verified)
+- `7bece23 Fix CI formatting check`: workflow also runs `ruff format --check`;
+  7 files were reformatted, AST compared equal before/after, lint/format both clean.
+- `886c17c Reject Windows-style provenance refs on all platforms`: on Linux,
+  `C:\outside\provenance.json` is not `Path.is_absolute()`, so the sidecar reader
+  returned `MISSING` instead of `INVALID_REF`. `PureWindowsPath` now rejects drive,
+  UNC/root and `..` segments cross-platform. Reproduced failure in Docker Python
+  3.11, then verified 3.11 and 3.12 both pass (311 passed, 22 skipped).
+- GitHub Actions run #10 at `886c17c`: **success** for Python 3.11 and 3.12.
+- No commit or push was made by the finalization campaign itself.

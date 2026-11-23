@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "retrieval": {
+    "backend": "semantic",
+    "query_fingerprint": null,
+    "items": [
+      {
+        "rank": 1,
+        "document_id": "CWE-79",
+        "source": "CWE-79",
+        "document_kind": "NOT_AVAILABLE",
+        "source_url": "NOT_AVAILABLE",
+        "retrieval_score": 1.0,
+        "context_backend": "record-cwe"
+      },
+      {
+        "rank": 2,
+        "document_id": "CWE-352",
+        "source": "CWE-352",
+        "document_kind": "NOT_AVAILABLE",
+        "source_url": "NOT_AVAILABLE",
+        "retrieval_score": 0.7770578837875335,
+        "context_backend": "semantic"
+      },
+      {
+        "rank": 3,
+        "document_id": "reference:https://example.com/fake-advisory-0001",
+        "source": "reference:https://example.com/fake-advisory-0001",
+        "document_kind": "NOT_AVAILABLE",
+        "source_url": "NOT_AVAILABLE",
+        "retrieval_score": 0.5,
+        "context_backend": "reference-metadata"
+      }
+    ]
+  },
+  "generation": {
+    "provider": "rule_based",
+    "generation_mode": "rule_based",
+    "generator_version": "NOT_AVAILABLE",
+    "prompt_version": "NOT_AVAILABLE",
+    "generation_config": null,
+    "generation_config_hash": null,
+    "checkpoint_id": null,
+    "model_identity": "NOT_AVAILABLE"
+  },
+  "execution": {
+    "execution_mode": "simulated",
+    "selected_action": null,
+    "plan_snapshot": {
+      "steps": 5,
+      "lab_id": "cve-001"
+    },
+    "argv": [],
+    "exit_code": null,
+    "stdout_ref": null,
+    "stderr_ref": null,
+    "lab_manifest_sha256": null,
+    "repository_commit": null,
+    "container_image_digest": "NOT_AVAILABLE"
+  },
+  "environment": {
+    "collected_at": "2026-11-23T06:52:53.634104+00:00",
+    "repository_commit": null,
+    "container_image_digest": "NOT_AVAILABLE"
+  },
+  "integrity": {
+    "algorithm": "sha256",
+    "content_sha256": "cbfa69aa9f0ddd88364d0a9700a759cb68dd46395fc9fb080f2958377a1d5ba3"
+  }
+}
