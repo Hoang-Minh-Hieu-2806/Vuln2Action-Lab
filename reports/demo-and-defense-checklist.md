@@ -46,7 +46,7 @@
 
 ## Rehearsal acceptance
 
-- [ ] Full script runs twice consecutively with clean teardown.
-- [ ] Every number shown has an artifact file behind it.
+- [x] Full script runs twice consecutively with clean teardown.
+- [x] Every number shown has an artifact file behind it.
 - [ ] Limitations slide is shown before Q&A, not hidden.
 - [ ] Reviewer can answer: "What does T5 actually contribute today?" with "code + local toy run, not the paper-scale result".
