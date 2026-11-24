@@ -12,18 +12,25 @@ readiness dimensions into one status.
 
 ## 2. Demo — READY WITH KNOWN LIMITATIONS
 
-- Demo runs: `final-cve001-20261123T065251Z`,
-  `rehearsal-cve001-20261123T080038Z`. Both `SIMULATED`, consistency all true.
-- CLI, evidence, provenance, report JSON/Markdown, screenshots and SHA-256 present.
-- GUI fixture is local-only: 3 sample CVEs + 615 CAPEC records, no predictions,
-  no technique map, empty reference file. `/`, `/health`, `/api/analyze` return 200.
+- Frozen demo: `final-cve001-20261123T065251Z`; 14/14 SHA-256 entries verified,
+  `consistency.all_pass=true`, verdict `SIMULATED`, provider `rule_based`.
+- Verify read-only with `python scripts/verify_demo_freeze.py`.
+- CLI, evidence, provenance, report JSON/Markdown and two screenshots are present.
+- GUI fixture is local-only: 3 sample CVEs; `/`, `/health`, `/api/analyze` return 200.
+- GUI now labels `reference_flow` explicitly and reports `generation_status=unavailable`;
+  it never labels CAPEC reference flow as T5-generated.
 - Docker lab validation not run; no real `PASS`/`FAIL` claim.
 
-## 3. Research — NOT READY
+## 3. Research — PARTIAL (observed validation only)
 
-- Kaggle kernel last observed `RUNNING`, GPU 30.30/30h, remaining 0, logs empty.
-- No `metrics.json`, `predictions.jsonl` or final checkpoint artifact locally.
-- BLEU/ROUGE = **PENDING**, not computed or inferred.
+- Kaggle kernel `alexdannguyen/v2a-stage1-resume-checkpoint-3465` is `COMPLETE`;
+  resume `3465 → 4158`, epoch 6, FP32 on 2×T4.
+- Artifacts in `data/external/resume_cp3465/`: config, trainer state, metrics,
+  11,089 predictions and kernel log; SHA-256 inventory in `docs/t5-stage1-final-vi.md`.
+- Observed validation: BLEU 0.4802, ROUGE-L F1 0.5659 on 11,089 rows.
+- Leakage 11,083/11,089: not generalization, not independent evaluation,
+  not paper-comparable, not successful paper reproduction.
+- Full checkpoint weights are not local; only metadata and log were downloaded.
 - Human evaluation blocked: no authoritative `splits.json`, no advisor contact.
 - Group split is a plan only; no retrain, no dataset change.
 
@@ -37,16 +44,30 @@ Defend the engineering and caveated negative-result story only. Do **not** claim
 - generalization on the leaked validation split (11,083/11,089 targets overlap train);
 - real Docker PASS/FAIL from simulated runs.
 
+## 5. Future work
+
+- Independent group-based evaluation: T8 group-split plan exists, but no manifest
+  or holdout artifact is implemented.
+- Human evaluation: T3 blocked; needs authoritative `splits.json`, 20 workflow
+  outputs and 1 advisor reviewer.
+- Docker CI verification: T6 not enabled; no GitHub-run PASS and no Docker
+  integration test in this gate.
+
 ## Evidence pointers
 
-- `reports/execution/finalization-campaign-report.md`
-- `reports/execution/pony-tail-optimization-report.md`
+- `docs/defense/defense-claims-vi.md`
+- `docs/defense/demo-script-vi.md`
+- `docs/t5-stage1-final-vi.md`
+- `data/external/resume_cp3465/`
 - `docs/paper-deviation-report-vi.md`
 - `artifacts/demo/final-cve001-20261123T065251Z/`
-- `artifacts/demo/rehearsal-cve001-20261123T080038Z/`
+- `scripts/verify_demo_freeze.py`
+- `reports/execution/finalization-campaign-report.md`
+- `reports/execution/pony-tail-optimization-report.md`
 - `data/processed/reproduction/DEMO_FIXTURE.md`
 
 ## Q&A line
 
-"Local CLI/API/evidence path is reproducible and CI is green; research claims beyond
-the documented negative-result caveats remain pending artifact verification."
+"Local CLI/API/evidence path is reproducible and CI is green; Stage 1 observed
+validation has real artifacts, but leakage blocks generalization and reproduction
+claims."

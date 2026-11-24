@@ -53,6 +53,36 @@ def _load_technique_map(path: Path) -> dict[str, dict[str, Any]]:
     return mapping
 
 
+def build_generation_view(
+    *,
+    provider: str,
+    status: str,
+    generated_flow: list[dict[str, Any]] | None = None,
+    reason: str = "",
+    reference_is_sample: bool = False,
+) -> dict[str, Any]:
+    if status == "generated" and not generated_flow:
+        raise ValueError("generated status requires a non-empty generated_flow")
+    if status == "generated" and provider == "simulated":
+        raise ValueError("simulated provider cannot report generated status")
+    if status in {"generated", "simulated"} and provider == "unavailable":
+        raise ValueError("unavailable provider cannot produce a generated flow")
+    if status == "failed" and not reason:
+        raise ValueError("failed status requires a reason")
+    if (
+        status in {"not_generated", "unavailable", "failed", "sample_flow"}
+        and generated_flow is not None
+    ):
+        raise ValueError(f"{status} status cannot carry a generated_flow")
+    return {
+        "provider": provider,
+        "status": status,
+        "generated_flow": generated_flow,
+        "reason": reason,
+        "reference_is_sample": reference_is_sample,
+    }
+
+
 def _flow_view(capec: Any, technique_map: dict[str, dict[str, Any]]) -> list[dict[str, Any]]:
     grouped = phase_steps(capec)
     view: list[dict[str, Any]] = []
@@ -143,6 +173,16 @@ def create_app(
             candidate = dataset.capecs.get(candidate_id)
             if candidate is not None:
                 candidate_details.append({"capec_id": candidate_id, "name": candidate.name})
+        reference_flow = _flow_view(capec, technique_map)
+        generation = build_generation_view(
+            provider="unavailable",
+            status="unavailable",
+            reason=(
+                "T5 checkpoint and generated-flow wiring are not available in this "
+                "read-only GUI. Only the CAPEC reference flow is shown."
+            ),
+            reference_is_sample=not bool(cve_id),
+        )
         return {
             "cve_id": cve_id or "(description input)",
             "description": description,
@@ -151,7 +191,10 @@ def create_app(
             "selected_capec_name": capec.name,
             "selected_capec_description": capec.description,
             "score": score,
-            "flow": _flow_view(capec, technique_map),
+            "flow": reference_flow,
+            "reference_flow": reference_flow,
+            "generated_flow": generation["generated_flow"],
+            "generation_status": generation,
             "candidates": candidate_details,
             "has_technique_mapping": bool(technique_map),
         }

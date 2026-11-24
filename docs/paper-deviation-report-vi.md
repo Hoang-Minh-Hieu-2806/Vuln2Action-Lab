@@ -55,8 +55,13 @@ chạy ra 0,3333 do enricher đọc snapshot local (`retrieval/semantic.py:236-2
 
 ## 7. T5 generation
 
-- **PENDING KAGGLE ARTIFACT** — BLEU/ROUGE stage 1 sẽ điền sau khi có
-  `metrics.json` từ kernel `phamquang0606/vuln2action-paper-stage1-cve-only-target-fp32`.
+- Stage 1 sau resume trên kernel `alexdannguyen/v2a-stage1-resume-checkpoint-3465`:
+  BLEU 0,4802 và ROUGE-L F1 0,5659 trên 11,089 validation rows; checkpoint
+  `3465 → 4158`, epoch 6. Đây là observed validation result trên split có leakage
+  11,083/11,089; không phải independent evaluation, generalization evidence hay
+  paper-comparable result. Chi tiết: `docs/t5-stage1-final-vi.md`.
+- Phân loại claim: observed validation result = có artifact; independent evaluation =
+  chưa có; generalization evidence = không; paper-comparable result = không.
 - Kết quả cũ đã có (không phải kết quả chạy hiện tại): CVE-only BLEU 0,1640
   (10 epoch) / 0,2567 (1 epoch), paper 0,7589; collapse về 25 prediction duy
   nhất trên 11.089 dòng; 11.083/11.089 validation target trùng train.
@@ -91,7 +96,7 @@ Freeze independent set tại `docs/evaluation/capec-independent-freeze.md`
 | Retrieval P@3 (README) | 0,296 | local có raw XML: 0,3333 |
 | CAPEC Top-1 (120, circular) | 87/100 | không dùng làm bằng chứng độc lập |
 | CAPEC Top-1 (independent, TF-IDF) | 0,3333 all / 0,5833 reachable | 21 case, coverage 12/21 |
-| Stage 1 BLEU/ROUGE | **PENDING KAGGLE ARTIFACT** | không tự điền |
+| Stage 1 BLEU/ROUGE | BLEU 0,4802; ROUGE-L F1 0,5659 | 11,089 validation rows, resume 3465→4158, epoch 6; observed validation, leakage 11,083/11,089, không generalization |
 | SBERT retrieval | chưa tích hợp | chỉ có Word2Vec description mapping |
 | Stage 2 CVE-only | chưa chạy | chờ checkpoint stage 1 |
 
@@ -105,7 +110,7 @@ Không gọi là 3 chuyên gia, không tái tạo Table 6 của paper.
 
 - Dataset nhỏ hơn paper về số CAPEC có flow (176 so với ~1.024).
 - FP16 từng gây NaN; chuyển FP32 là lựa chọn triển khai, không đổi protocol.
-- Chạy 5 epoch thực tế, không phải 50 epoch hoàn thành.
+- Chạy 6 epoch thực tế sau resume từ checkpoint epoch 5, không phải 50 epoch hoàn thành.
 - T4 x2 thay A100 32GB.
 - Local exploit code không được đưa vào Kaggle hay evidence công khai.
 - CI chưa kiểm chứng Docker lab integration (2 test skip).
@@ -115,8 +120,8 @@ Không gọi là 3 chuyên gia, không tái tạo Table 6 của paper.
 | Paper | Repo implementation | Deviation | Evidence |
 |---|---|---|---|
 | 114.560 CVE, A100 | 114.560 CVE, T4 x2 | Khác phần cứng | `docs/paper-reproduction.md`, Kaggle kernel |
-| 50 epoch, lr 5e-5 | lịch 50, dừng sau 5 epoch; FP32 | Khác số epoch thực chạy | notebook Kaggle |
-| BLEU 0,7589 | PENDING KAGGLE ARTIFACT (cũ: 0,1640) | Chưa có kết quả cuối | `docs/t5-stage1-paper10-eval-vi.md` |
+| 50 epoch, lr 5e-5 | lịch 50, dừng sau 6 epoch (resume từ checkpoint epoch 5); FP32 | Khác số epoch thực chạy | `docs/t5-stage1-final-vi.md`, kernel log |
+| BLEU 0,7589 | BLEU 0,4802 observed validation (cũ: 0,1640; ROUGE-L F1 0,5659) | Không paper-comparable; validation leakage 11,083/11,089 | `docs/t5-stage1-final-vi.md`, `data/external/resume_cp3465/` |
 | 3 chuyên gia | 1 advisor reviewer | Khác số reviewer | `docs/human-evaluation/protocol.md` |
 | CAPEC 89/100 | 87/100; independent TF-IDF 0,3333 | Thấp hơn và đảo chiều ranker | `docs/capec-selection-report-vi.md`, `docs/analysis.md` |
 | SBERT + threshold | Word2Vec description mapping | SBERT chưa tích hợp | `src/vuln2action/mapping/exploit.py` |

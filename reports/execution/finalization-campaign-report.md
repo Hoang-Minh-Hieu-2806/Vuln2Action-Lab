@@ -48,15 +48,16 @@ stash or branch switch during this campaign. All pre-existing changes preserved.
 | Retrieval backends + tracked benchmark | VERIFIED | `evaluation/datasets/retrieval_benchmark.json`; semantic P@3=0.296296, MRR@3=0.777778 |
 | CAPEC selection 87/100, independent caveat | PARTIALLY VERIFIED | `docs/capec-selection-report-vi.md`, benchmark files; not recomputed this campaign |
 | Dataset 44,331 train / 11,089 validation | PARTIALLY VERIFIED | docs/manifests describe counts; generated dataset files absent locally |
-| T5 GPU training run and full evaluation | PENDING / BLOCKED | README 87 unchecked; Kaggle last observed `RUNNING`, no `metrics.json`; no new Kaggle interaction |
-| BLEU/ROUGE final numbers | NOT CLAIMED | `docs/paper-deviation-report-vi.md:119` still `PENDING KAGGLE ARTIFACT`; no metrics artifact found |
+| T5 GPU training run and full evaluation | VERIFIED by post-Kaggle closure | README 87 checked; kernel `alexdannguyen/v2a-stage1-resume-checkpoint-3465` COMPLETE; `docs/t5-stage1-final-vi.md` |
+| BLEU/ROUGE final numbers | OBSERVED VALIDATION ONLY | BLEU 0.4802, ROUGE-L F1 0.5659 on 11,089 rows; `data/external/resume_cp3465/`; leakage 11,083/11,089; not generalization |
 | Live labs `cve-002`/`cve-003` | BLOCKED | README 88 unchecked; Docker execution out of scope |
 | Real `PASS`/`FAIL` for `cve-001` | PARTIALLY VERIFIED | historical live-lab artifacts exist; this campaign ran simulation only |
 | Hybrid / CVE-only / gold-CAPEC separation | VERIFIED as policy | `docs/t5-group-split-plan.md` and deviation report require separate reporting |
 | Human evaluation (3 experts / Table 6) | NOT CLAIMED | single advisor protocol; no scores; no external contact |
 
-README checkboxes were **not** changed: the two unchecked items remain unchecked
-because no corresponding artifact exists.
+At the end of the original campaign the README checkboxes were unchanged. The later
+post-Kaggle closure verified the Stage 1 artifact and checked only README line 87;
+line 88 for live labs remains unchecked because no artifact exists.
 
 ## D. API/GUI verification
 

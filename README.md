@@ -84,7 +84,7 @@ Vuln2Action-Lab/
 - [x] CVE→CWE→CAPEC mapping (TF-IDF vs Word2Vec + cosine) with a tracked
       120-CVE benchmark and a measured, caveated comparison
 - [x] Sample end-to-end CLI pipeline over fake sample CVEs
-- [ ] T5 GPU training run and full evaluation
+- [x] T5 GPU training run and full evaluation
 - [ ] Live labs for `cve-002`/`cve-003`; generation and reproduction benchmarks
 
 ## Paper-reproduction dataset (step 1)

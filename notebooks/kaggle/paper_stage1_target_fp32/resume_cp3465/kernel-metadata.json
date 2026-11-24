@@ -1,0 +1,19 @@
+{
+  "id": "alexdannguyen/v2a-stage1-resume-cp3465-1123",
+  "title": "V2A stage1 resume checkpoint 3465",
+  "code_file": "kaggle_t5_resume_cp3465.ipynb",
+  "language": "python",
+  "kernel_type": "notebook",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_tpu": false,
+  "enable_internet": true,
+  "machine_shape": "",
+  "dataset_sources": [
+    "alexdannguyen/v2a-stage1-cp3465-1123",
+    "dangthiet/vuln2action-p0-stage1"
+  ],
+  "competition_sources": [],
+  "kernel_sources": [],
+  "model_sources": []
+}

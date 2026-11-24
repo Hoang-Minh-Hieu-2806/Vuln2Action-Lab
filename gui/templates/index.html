@@ -7,6 +7,37 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+{% macro render_flow(flow) %}
+<div class="phases">
+  {% for phase in flow %}
+  <article class="phase">
+    <h4>{{ phase.phase }}</h4>
+    {% if phase.steps %}
+      {% for step in phase.steps %}
+      <div class="step">
+        <div class="step-no">Step {{ step.step }}</div>
+        <p>{{ step.description }}</p>
+        {% if step.techniques %}
+        <ul class="techniques">
+          {% for technique in step.techniques %}
+          <li>
+            <span class="technique">{{ technique.text }}</span>
+            {% if technique.exploit_id %}
+            <span class="exploit">? {{ technique.exploit_id }}: {{ technique.exploit_description }} ({{ "%.3f"|format(technique.score) }})</span>
+            {% endif %}
+          </li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+      </div>
+      {% endfor %}
+    {% else %}
+      <p class="muted">No step in this phase for the selected CAPEC.</p>
+    {% endif %}
+  </article>
+  {% endfor %}
+</div>
+{% endmacro %}
 <main>
   <header>
     <h1>Vuln2Action local reproduction GUI</h1>
@@ -45,36 +76,22 @@
     <p>{{ result.description }}</p>
     <p class="cap-desc">{{ result.selected_capec_description }}</p>
 
-    <h3>Execution flow</h3>
-    <div class="phases">
-      {% for phase in result.flow %}
-      <article class="phase">
-        <h4>{{ phase.phase }}</h4>
-        {% if phase.steps %}
-          {% for step in phase.steps %}
-          <div class="step">
-            <div class="step-no">Step {{ step.step }}</div>
-            <p>{{ step.description }}</p>
-            {% if step.techniques %}
-            <ul class="techniques">
-              {% for technique in step.techniques %}
-              <li>
-                <span class="technique">{{ technique.text }}</span>
-                {% if technique.exploit_id %}
-                <span class="exploit">? {{ technique.exploit_id }}: {{ technique.exploit_description }} ({{ "%.3f"|format(technique.score) }})</span>
-                {% endif %}
-              </li>
-              {% endfor %}
-            </ul>
-            {% endif %}
-          </div>
-          {% endfor %}
-        {% else %}
-          <p class="muted">No step in this phase for the selected CAPEC.</p>
-        {% endif %}
-      </article>
-      {% endfor %}
+    <div class="generation-status">
+      <p><strong>Generation status:</strong> {{ result.generation_status.status }} ({{ result.generation_status.provider }})</p>
+      {% if result.generation_status.reason %}
+      <p class="muted">{{ result.generation_status.reason }}</p>
+      {% endif %}
     </div>
+
+    {% if result.generated_flow %}
+    <h3>Generated flow ({{ result.generation_status.provider }})</h3>
+    {{ render_flow(result.generated_flow) }}
+    {% else %}
+    <p class="muted">No generated flow is available. The flow below is a CAPEC reference flow, not T5 output.</p>
+    {% endif %}
+
+    <h3>Reference execution flow (CAPEC catalog, not generated)</h3>
+    {{ render_flow(result.reference_flow) }}
 
     {% if result.candidates %}
     <details>
